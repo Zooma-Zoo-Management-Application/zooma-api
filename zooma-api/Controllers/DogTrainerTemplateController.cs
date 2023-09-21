@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using zooma_api.Models;
@@ -35,10 +36,12 @@ namespace zooma_api.Controllers
     {
         [HttpGet]
         [Route("dog-trainers")]
+        [Authorize]
         public IActionResult GetAllUsers()
         {
             try
             {
+
                 var data = new User{
                     Id = 11723,
                 };
