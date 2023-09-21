@@ -31,20 +31,16 @@ namespace zooma_api.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class DogTrainerController : ControllerBase
+    public class DogTrainerTemplateController : ControllerBase
     {
         [HttpGet]
-        [Route("v1/dog-trainers")]
+        [Route("dog-trainers")]
         public IActionResult GetAllUsers()
         {
             try
             {
-                var data = new DogTrainer{
+                var data = new User{
                     Id = 11723,
-                    Username = $"user Uy",
-                    Password = $"password Uy",
-                    Fullname = $"fullname Uy Le",
-                    IsActive = true
                 };
 
                 return Ok(data);
@@ -56,7 +52,7 @@ namespace zooma_api.Controllers
 
         // POST api/Users/CreateNew
         [HttpPost]
-        [Route("v1/dog-trainers")]
+        [Route("dog-trainers")]
         public IActionResult CreateNew(string Username, string Password, string Fullname, Boolean IsActive)
         {
             try
@@ -72,13 +68,13 @@ namespace zooma_api.Controllers
         }
 
         [HttpPut]
-        [Route("v1/dog-trainers")]
+        [Route("dog-trainers")]
         public IActionResult PutExample(int id)
         {
             try
             {
                 
-
+                return Ok();
             }
             catch (Exception ex)
             {
@@ -88,18 +84,14 @@ namespace zooma_api.Controllers
 
 
 
-        private List<DogTrainer> AllUser()
+        private List<User> AllUser()
         {
-            List<DogTrainer> list = new List<DogTrainer>();
+            List<User> list = new List<User>();
             for (int i = 1; i < 10; i++)   // Tạo ra 6 User
             {
-                DogTrainer u = new DogTrainer()   // Tạo ra user mới
+                User u = new User()   // Tạo ra user mới
                 {
-                    Id = i,
-                    Username = $"user {i}",
-                    Password = $"password {i}",
-                    Fullname = $"fullname {i}",
-                    IsActive = true
+                    Id = short.Parse(i.ToString()),
                 };
                 list.Add(u);   // Thêm vào danh sách User
             }
