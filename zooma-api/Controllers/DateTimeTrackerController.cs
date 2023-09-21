@@ -54,7 +54,7 @@ namespace zooma_api.Controllers
         }
         private Boolean isValidDate(int year, int month, int day)
         {
-            if(month >= 1 && month <= 12)
+            if(month >= 0 && month < 12)
             {
                 if(day >= 1)
                 {
