@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using zooma_api.DTO;
 using zooma_api.Models;
 
@@ -127,10 +132,102 @@ namespace zooma_api.Controllers
             return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        //  Lấy ra Email từ token
+        private string GetCurrentEmail()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+                Console.Write(userClaims.Count());
+
+                foreach (var claim in userClaims)
+                {
+                    Console.WriteLine(claim.ToString());
+                }
+
+                return userClaims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+            }
+            return null;
+        }
+        // End
+
+        // Lấy User 
+        private User GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+
+                var email = userClaims.FirstOrDefault(x => x.Type == "email")?.Value;
+                var result = _context.Users.FirstOrDefault(row => row.Email == email);
+
+                return result;
+            }
+            return null;
+        }
+
+        //For admin Only
+        [HttpGet]
+        [Route("Admins")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult AdminEndPoint()
+        {
+            var currentUser = GetCurrentUser();
+            return Ok($"Hi you are an {currentUser.Role.Name}");
+        }
+
+
+        // xác thực bởi token, và sẽ lấy body token ra làm dữ diệu 
+        [Authorize]
+        [HttpGet("Launch")]
+        public async Task<ActionResult<User>> Launch()
+        {
+            var extractedEmail = GetCurrentEmail();
+
+            if (extractedEmail == null) return NotFound("Token hết hạn");
+
+            var result = await _context.Users.FirstOrDefaultAsync(row => row.Email == extractedEmail);
+
+            return Ok(result);
+        }
+        // End
+
+
+        // tạo ra token dựa trên account
+        private string GenerateToken(User user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            // claim này dựa trên email trong tham số account
+            var claims = new List<Claim> // claims có thẻ coi như session
+            {
+                new Claim("email", user.Email), 
+                new Claim("role", user.Role.Name)
+            };
+
+            // tạo ra token
+            var token = new JwtSecurityToken(
+                _config["Jwt:Issuer"],
+                _config["Jwt:Audience"],
+                claims,
+                // có thời gian chết, 15 phút
+                expires: DateTime.Now.AddMinutes(60),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+
+
+        [AllowAnonymous]
         [HttpPost("Login")]
         // dòng Task<ActionResult<Account>> hơi dài, nhưng mà ta chỉ cần để ý tới cái trong cùng, tức là Account
         // hàm này sẽ trả về 1 cái tài khoản
-        public async Task<ActionResult<User>> Login(LoginBody body)
+        public async Task<ActionResult<LoginResponse>> Login(LoginBody body)
         {
             if (_context.Users == null)
             {
@@ -158,7 +255,12 @@ namespace zooma_api.Controllers
                 // trả về mã 200, và với kết quả thành công
                 var loginUser = _mapper.Map<UserDTO>(userChecking);
 
-                return Ok(loginUser);
+                return Ok(new LoginResponse()
+                {
+                    user = loginUser,
+                    // tạo ra accessToken dựa trên tài khoản
+                    AccessToken = GenerateToken(userChecking)
+                });
             }
                 
 
