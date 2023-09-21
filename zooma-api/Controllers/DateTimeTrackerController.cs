@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using zooma_api.DTO;
 
 namespace zooma_api.Controllers
 {
@@ -7,18 +9,18 @@ namespace zooma_api.Controllers
     [ApiController]
     public class DateTimeTrackerController : ControllerBase
     {
-        [HttpGet]
+        [HttpPost]
         [Route("date-time-tracker")]
-        public IActionResult CheckDate(int year, int month, int day)
+        public IActionResult CheckDate(DateTimeBody dateTime)
         {
             try
             {
-                if (isValidDate(year, month, day)){
-                    return Ok($"{year}/{month}/{day} is a valid date!");
+                if (isValidDate(dateTime.year, dateTime.month, dateTime.day)){
+                    return Ok($"{dateTime.year}/{dateTime.month}/{dateTime.day} is a valid date!");
                 }
                 else
                 {
-                    return BadRequest($"{year}/{month}/{day} is a invalid date!");
+                    return BadRequest($"{dateTime.year}/{dateTime.month}/{dateTime.day} is a invalid date!");
                 }
 
             }catch (Exception ex)
@@ -54,7 +56,7 @@ namespace zooma_api.Controllers
         }
         private Boolean isValidDate(int year, int month, int day)
         {
-            if(month >= 1 && month <= 12)
+            if(month >= 0 && month < 12)
             {
                 if(day >= 1)
                 {
