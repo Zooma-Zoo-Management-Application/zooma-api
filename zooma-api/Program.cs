@@ -17,6 +17,9 @@ builder.Services.AddDbContext<ZoomaContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
 });
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); // ACTIVATE SERVICE CỦA AUTOMAPPING
+
+
 // Enable CORS
 builder.Services.AddCors(options =>
 {
