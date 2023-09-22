@@ -26,6 +26,8 @@ namespace zooma_api.Models
         public byte RoleId { get; set; }
 
         public virtual Role Role { get; set; }
+
+       
         public virtual ICollection<AnimalUser> AnimalUsers { get; set; }
         public virtual ICollection<News> News { get; set; }
         public virtual ICollection<Order> Orders { get; set; }

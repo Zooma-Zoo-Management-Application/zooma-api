@@ -152,33 +152,6 @@ namespace zooma_api.Controllers
         }
         // End
 
-        // Lấy User 
-        private User GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var userClaims = identity.Claims;
-
-                var email = userClaims.FirstOrDefault(x => x.Type == "email")?.Value;
-                var result = _context.Users.FirstOrDefault(row => row.Email == email);
-
-                return result;
-            }
-            return null;
-        }
-
-        //For admin Only
-        [HttpGet]
-        [Route("Admins")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult AdminEndPoint()
-        {
-            var currentUser = GetCurrentUser();
-            return Ok($"Hi you are an {currentUser.Role.Name}");
-        }
-
-
         // xác thực bởi token, và sẽ lấy body token ra làm dữ diệu 
         [Authorize]
         [HttpGet("Launch")]
@@ -198,27 +171,31 @@ namespace zooma_api.Controllers
         // tạo ra token dựa trên account
         private string GenerateToken(User user)
         {
+            string role = "";
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            // claim này dựa trên email trong tham số account
-            var claims = new List<Claim> // claims có thẻ coi như session
+            if (user.RoleId == 1)
             {
-                new Claim("email", user.Email), 
-                new Claim("role", user.Role.Name)
-            };
+                role = "Admin";
+            }else if (user.RoleId == 2)
+            {
+                role = "Staff";
+            }
 
-            // tạo ra token
-            var token = new JwtSecurityToken(
-                _config["Jwt:Issuer"],
+                var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier,user.Email),
+                new Claim(ClaimTypes.Role,role)
+            };
+            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                // có thời gian chết, 15 phút
-                expires: DateTime.Now.AddMinutes(60),
-                signingCredentials: credentials
-            );
+                expires: DateTime.Now.AddMinutes(15),
+                signingCredentials: credentials);
+
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
 
 
@@ -254,13 +231,15 @@ namespace zooma_api.Controllers
             {
                 // trả về mã 200, và với kết quả thành công
                 var loginUser = _mapper.Map<UserDTO>(userChecking);
+                String accessToken = GenerateToken(userChecking);
 
                 return Ok(new LoginResponse()
                 {
-                    user = loginUser,
+                    AccessToken = accessToken,
+
+                    user = loginUser
                     // tạo ra accessToken dựa trên tài khoản
-                    AccessToken = GenerateToken(userChecking)
-                });
+                }); 
             }
                 
 
