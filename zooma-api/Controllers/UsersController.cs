@@ -196,6 +196,7 @@ namespace zooma_api.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
 
+
         }
 
 
@@ -240,6 +241,7 @@ namespace zooma_api.Controllers
                     user = loginUser
                     // tạo ra accessToken dựa trên tài khoản
                 }); 
+
             }
                 
 
