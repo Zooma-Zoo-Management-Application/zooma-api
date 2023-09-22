@@ -11,12 +11,12 @@ namespace zooma_api.Models
             FoodSpecies = new HashSet<FoodSpecy>();
         }
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public bool Status { get; set; }
+        public int? Id { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public bool? Status { get; set; }
 
-        public virtual ICollection<Animal> Animals { get; set; }
-        public virtual ICollection<FoodSpecy> FoodSpecies { get; set; }
+        public virtual ICollection<Animal>? Animals { get; set; }
+        public virtual ICollection<FoodSpecy>? FoodSpecies { get; set; }
     }
 }
