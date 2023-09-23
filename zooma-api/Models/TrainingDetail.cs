@@ -9,6 +9,6 @@ namespace zooma_api.Models
         public int? Column { get; set; }
         public short TrainingPlanId { get; set; }
 
-        public virtual TrainingPlan TrainingPlan { get; set; }
+        public virtual TrainingPlan TrainingPlan { get; set; } = null!;
     }
 }

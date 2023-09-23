@@ -13,6 +13,7 @@ namespace zooma_api.Models
 
         public int Id { get; set; }
         public string? Name { get; set; }
+
         public DateTime? ArrivalDate { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public float? Height { get; set; }
