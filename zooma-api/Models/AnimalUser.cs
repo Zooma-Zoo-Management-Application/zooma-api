@@ -9,7 +9,7 @@ namespace zooma_api.Models
         public short UserId { get; set; }
         public bool MainTrainer { get; set; }
 
-        public virtual Animal Animal { get; set; }
-        public virtual User User { get; set; }
+        public virtual Animal Animal { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

@@ -12,9 +12,9 @@ namespace zooma_api.Models
         }
 
         public short Id { get; set; }
-        public string Name { get; set; }
-        public string TrainingGoal { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = null!;
+        public string TrainingGoal { get; set; } = null!;
+        public string? Description { get; set; }
         public bool Status { get; set; }
 
         public virtual ICollection<Animal> Animals { get; set; }
