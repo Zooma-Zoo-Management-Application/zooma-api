@@ -12,6 +12,7 @@ namespace zooma_api.Helper
             // CreateMap<Animal, AnimalDTO>(); Template để mapping dữ liệu giữa Model trong DB và DTO
             CreateMap<Animal, AnimalDTO>().ReverseMap();
             CreateMap<Species, SpeciesDTO>().ReverseMap();
+            CreateMap<News, NewsDTO>().ReverseMap();
         }
     }
 }
