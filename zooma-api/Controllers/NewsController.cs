@@ -124,13 +124,13 @@ namespace zooma_api.Controllers
 
         // Hàm tạo news 
         [HttpPost("Create")]
-        public async Task<ActionResult<News>> CreateNews(NewsDTO newsDTO)
+        public async Task<ActionResult<News>> CreateNews(NewsBody newsBody)
         {
           if (_context.News == null)
           {
               return Problem("Entity set 'ZoomaContext.News'  is null.");
           }
-            var news = _mapper.Map<News>(newsDTO);
+            var news = _mapper.Map<News>(newsBody);
             _context.News.Add(news);
             await _context.SaveChangesAsync();
 
