@@ -16,7 +16,7 @@ namespace zooma_api.Controllers
         //For admin Only
         [HttpGet]
         [Route("admins")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public IActionResult AdminEndpoint()
         {
             var currentUser = GetCurrentUser(); 
