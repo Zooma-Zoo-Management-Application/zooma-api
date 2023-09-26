@@ -42,7 +42,7 @@ namespace zooma_api.Controllers
         }
 
         // GET: api/Species/5
- /*       [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Species>> GetSpecies(int id)
         {
           if (_context.Species == null)
@@ -124,7 +124,7 @@ namespace zooma_api.Controllers
 
             return NoContent();
         }
-  */
+  
         private bool SpeciesExists(int id)
         {
             return (_context.Species?.Any(e => e.Id == id)).GetValueOrDefault();
