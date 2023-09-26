@@ -63,34 +63,34 @@ namespace zooma_api.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(short id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutUser(short id, User user)
+        //{
+        //    if (id != user.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(user).State = EntityState.Modified;
+        //    _context.Entry(user).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!UserExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -132,6 +132,143 @@ namespace zooma_api.Controllers
             return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
+        private bool UserExists(String email)
+        {
+            return  (_context.Users?.Any(e => e.Email == email)).GetValueOrDefault();
+        }
+
+
+        // ==================================== SIGNUP API ===========================//
+ 
+        // POST: api/Users
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost("sign-up")]
+        public async Task<ActionResult<User>> SignUp(SignUpBody user)
+        {
+            //                var loginUser = _mapper.Map<UserDTO>(userChecking);
+
+
+            if (_context.Users == null)
+            {
+                return Problem("Entity set 'ZoomaContext.Users'  is null.");
+            }
+
+            if (UserExists(user.Email))
+            {
+                return BadRequest("Email already exists");
+
+            }
+
+            if ( user.Password != user.ConfirmPassword)
+            {
+                return BadRequest("Please type the correct confirm password");
+
+            }
+
+
+            User signUpUser = new User
+            {
+                // Assuming you have similar fields in your User entity
+                UserName = user.UserName,
+                Password = user.Password,
+                Email = user.Email,
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
+                Gender = user.Gender,
+                DateOfBirth = user.DateOfBirth,
+                AvatarUrl = user.AvatarUrl,
+                Status = true,
+                RoleId = 3
+            };
+
+
+
+            _context.Users.Add(signUpUser);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetUser", new { id = signUpUser.Id }, signUpUser);
+        }
+        // ==================================== UPDATE API ===========================//
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateUser(UpdateUserBody updateUserBody)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == updateUserBody.Email);
+
+
+            if (existingUser == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Update fields from UpdateUserBody
+            existingUser.UserName = updateUserBody.UserName ?? existingUser.UserName;
+            existingUser.Email = updateUserBody.Email ?? existingUser.Email;
+            existingUser.FullName = updateUserBody.FullName ?? existingUser.FullName;
+            existingUser.PhoneNumber = updateUserBody.PhoneNumber ?? existingUser.PhoneNumber;
+            existingUser.Gender = updateUserBody.Gender ?? existingUser.Gender;
+            existingUser.DateOfBirth = updateUserBody.DateOfBirth ?? existingUser.DateOfBirth;
+            existingUser.AvatarUrl = updateUserBody.AvatarUrl ?? existingUser.AvatarUrl;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(existingUser.Email))  // Assuming email is unique
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok("Update Successfully"); // Return 204 No Content to indicate the request has succeeded
+        }
+
+        [HttpPut("update-password")]
+        public async Task<IActionResult> UpdatePassword(UpdatePasswordBody updatePassword)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == updatePassword.Id);
+
+
+            if (existingUser == null)
+            {
+                return NotFound("User not found");
+            }
+
+            if (existingUser.Password != updatePassword.currentPassword)
+            {
+                return BadRequest("Your old password is wrong!!");
+            }
+            else
+            {
+                // Update password from UpdatePasswordBody
+                existingUser.Password = updatePassword.NewPassword;
+            }
+
+      
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(existingUser.Email))  // Assuming email is unique
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok("Update Password Successfully"); // Return 204 No Content to indicate the request has succeeded
+        }
+        // ==================================== LOGIN API ===========================//
         //  Lấy ra Email từ token
         private string GetCurrentEmail()
         {
