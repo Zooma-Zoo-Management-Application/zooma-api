@@ -298,9 +298,22 @@ namespace zooma_api.Controllers
 
             if (extractedEmail == null) return NotFound("Token hết hạn");
 
-            var result = await _context.Users.FirstOrDefaultAsync(row => row.Email == extractedEmail);
+            var result = GetCurrentUser();
 
             return Ok(result);
+        }
+
+        private User GetCurrentUser()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+                var email = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+                var result = _context.Users.FirstOrDefault(x => x.Email == email);
+                return result;
+            }
+            return null;
         }
         // End
 
