@@ -24,7 +24,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy tất cả News
-        [HttpGet("GetAll")]
+        [HttpGet()]
         public async Task<ActionResult<IEnumerable<NewsDTO>>> GetAllNews()
         {
           if (_context.News == null)
@@ -37,7 +37,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy News dựa trên Id
-        [HttpGet("GetNewById/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<News>> GetNews(short id)
         {
           if (_context.News == null)
@@ -55,7 +55,7 @@ namespace zooma_api.Controllers
         }
 
         //Hàm lấy các pinned news
-        [HttpGet("GetPinNews")]
+        [HttpGet("pin-news")]
         public async Task<ActionResult<NewsDTO>> GetPinNews()
         {
             if (_context.News == null)
@@ -73,8 +73,8 @@ namespace zooma_api.Controllers
             return Ok(pinnedNews);
         }
 
-        //Hàm lấy các pinned news
-        [HttpGet("GetUnpinNews")]
+        //Hàm lấy các unpinned news
+        [HttpGet("unpin-news")]
         public async Task<ActionResult<NewsDTO>> GetUnpinNews()
         {
             if (_context.News == null)
@@ -93,15 +93,19 @@ namespace zooma_api.Controllers
         }
 
         // PUT: api/News/5
-        [HttpPut("Update/{id}")]
-        public async Task<IActionResult> UpdateNews(short id, [FromBody]NewsDTO news)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateNews(short id, [FromBody]NewsBody newsBody)
         {
-            if (id != news.Id)
+            var existingNews = await _context.News.FirstOrDefaultAsync(e => e.Id == id);
+
+            if (existingNews == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(news).State = EntityState.Modified;
+            _mapper.Map(newsBody, existingNews);
+
+            _context.Entry(existingNews).State = EntityState.Modified;
 
             try
             {
@@ -123,14 +127,14 @@ namespace zooma_api.Controllers
         }
 
         // Hàm tạo news 
-        [HttpPost("Create")]
-        public async Task<ActionResult<News>> CreateNews(NewsDTO newsDTO)
+        [HttpPost()]
+        public async Task<ActionResult<News>> CreateNews(NewsBody newsBody)
         {
           if (_context.News == null)
           {
               return Problem("Entity set 'ZoomaContext.News'  is null.");
           }
-            var news = _mapper.Map<News>(newsDTO);
+            var news = _mapper.Map<News>(newsBody);
             _context.News.Add(news);
             await _context.SaveChangesAsync();
 
@@ -139,7 +143,7 @@ namespace zooma_api.Controllers
 
         //Hàm Pin News
 
-        [HttpPut("Pin/{id}")]
+        [HttpPut("{id}/pin-news")]
         public async Task<IActionResult> PinNews(short id)
             {
 
@@ -175,7 +179,7 @@ namespace zooma_api.Controllers
             return NoContent();
         }
 
-        [HttpPut("Unpin/{id}")]
+        [HttpPut("{id}/unpin-news")]
         public async Task<IActionResult> UnpinNews(short id)
         {
 
