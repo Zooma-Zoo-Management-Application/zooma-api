@@ -269,29 +269,13 @@ namespace zooma_api.Controllers
             return Ok("Update Password Successfully"); // Return 204 No Content to indicate the request has succeeded
         }
         // ==================================== LOGIN API ===========================//
-        //  Lấy ra Email từ token
-        private string GetCurrentEmail()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var userClaims = identity.Claims;
-                Console.Write(userClaims.Count());
-
-                foreach (var claim in userClaims)
-                {
-                    Console.WriteLine(claim.ToString());
-                }
-
-                return userClaims.FirstOrDefault(x => x.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-            }
-            return null;
-        }
-        // End
+        
 
         // xác thực bởi token, và sẽ lấy body token ra làm dữ diệu 
+        [HttpGet]
+        [Route("Launch")]
         [Authorize]
-        [HttpGet("Launch")]
+
         public async Task<ActionResult<User>> Launch()
         {
             var extractedEmail = GetCurrentEmail();
@@ -315,6 +299,25 @@ namespace zooma_api.Controllers
             }
             return null;
         }
+        //  Lấy ra Email từ token
+        private string GetCurrentEmail()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                var userClaims = identity.Claims;
+                Console.Write(userClaims.Count());
+
+                foreach (var claim in userClaims)
+                {
+                    Console.WriteLine(claim.ToString());
+                }
+
+                return userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+            }
+            return null;
+        }
+        // End
         // End
 
 
