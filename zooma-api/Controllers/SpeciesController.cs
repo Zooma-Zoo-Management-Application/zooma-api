@@ -163,5 +163,29 @@ namespace zooma_api.Controllers
             return CreatedAtAction("GetSpecies", new { id = species.Id }, species);
         }
 
-        
+        // DELETE: api/Species/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteSpecies(int id)
+        {
+            if (_context.Species == null)
+            {
+                return NotFound();
+            }
+            var species = await _context.Species.FindAsync(id);
+            if (species == null)
+            {
+                return NotFound();
+            }
+
+            _context.Species.Remove(species);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+  
+        private bool SpeciesExists(int id)
+        {
+            return (_context.Species?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+    }
 }
