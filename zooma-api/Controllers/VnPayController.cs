@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using zooma_api.DTO;
 
 namespace zooma_api.Controllers
 {
@@ -14,7 +15,7 @@ namespace zooma_api.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("createPaymentUrl")]
+        [HttpPost("create-payment")]
         public IActionResult CreatePaymentUrl([FromBody] OrderInfo order)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
@@ -30,7 +31,7 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString());
             vnpay.AddRequestData("vnp_CreateDate", order.CreatedDate.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_IpAddr", HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString());
+            vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
             vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
             vnpay.AddRequestData("vnp_OrderType", "other");
@@ -40,5 +41,21 @@ namespace zooma_api.Controllers
             var paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             return Ok(new { url = paymentUrl });
         }
+
+        [HttpPost("response-payment")]
+        public IActionResult CreatePaymentUrl()
+        {
+            var pay = new VnPayLibrary();
+            var response = pay.GetFullResponseData(Request.Query, _configuration["VnPayConfig:vnp_HashSecret"]);
+
+            return Ok(new { response = response });
+
+
+
+        }
+
+
+
+
     }
 }

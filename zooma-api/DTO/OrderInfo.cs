@@ -1,4 +1,4 @@
-﻿namespace zooma_api
+﻿namespace zooma_api.DTO
 {
     public class OrderInfo
     {
