@@ -189,10 +189,10 @@ namespace zooma_api.Controllers
             return CreatedAtAction("GetUser", new { id = signUpUser.Id }, signUpUser);
         }
         // ==================================== UPDATE API ===========================//
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateUser(UpdateUserBody updateUserBody)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(short id, UpdateUserBody updateUserBody)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == updateUserBody.Email);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
 
             if (existingUser == null)
@@ -274,8 +274,6 @@ namespace zooma_api.Controllers
         // xác thực bởi token, và sẽ lấy body token ra làm dữ diệu 
         [HttpGet]
         [Route("Launch")]
-        [Authorize]
-
         public async Task<ActionResult<User>> Launch()
         {
             var extractedEmail = GetCurrentEmail();
