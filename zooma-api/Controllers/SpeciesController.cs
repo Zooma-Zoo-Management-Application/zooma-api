@@ -24,6 +24,64 @@ namespace zooma_api.Controllers
             _config = config;
             _mapper = mapper;
         }
+        //Hàm lấy tất cả species
+        [HttpGet("GetAll")]
+        public async Task<ActionResult<IEnumerable<SpeciesDTO>>> GetAllSpecies()
+        {
+            if (_context.Species == null)
+            {
+                return NotFound();
+            }
+            var speciesDTO = _mapper.Map<ICollection<SpeciesDTO>>(await _context.Species.ToListAsync());
+
+            return Ok(speciesDTO);
+        }
+
+        //Hàm tạo species mới
+        [HttpPost("CreateSpecies")]
+        public async Task<ActionResult<SpeciesDTO>> CreateSpecies(CreateSpecies createSpecies)
+        {
+            if (_context.Species == null)
+            {
+                return NotFound();
+            }
+            var species = _mapper.Map<Species>(createSpecies);
+            _context.Species.Add(species);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetSpecies", new { id = species.Id }, species);
+        }
+        //Hàm sửa species
+        [HttpPut("UpdateSpecies/{id}")]
+        public async Task<IActionResult> UpdateSpecies(int id, SpeciesDTO speciesDTO)
+        {
+            if (id != speciesDTO.Id)
+            {
+                return BadRequest();
+            }
+            var species = _mapper.Map<Species>(speciesDTO);
+            _context.Entry(species).State = EntityState.Modified;
+            try
+            {
+                await _context.SaveChangesAsync();
+                Console.WriteLine("Update success");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SpeciesExists(id))
+                {
+                    return NotFound();
+                    Console.WriteLine("Not found");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return NoContent();
+        }   
+
+
 
         // GET: api/Species
         [HttpGet]
@@ -105,29 +163,5 @@ namespace zooma_api.Controllers
             return CreatedAtAction("GetSpecies", new { id = species.Id }, species);
         }
 
-        // DELETE: api/Species/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSpecies(int id)
-        {
-            if (_context.Species == null)
-            {
-                return NotFound();
-            }
-            var species = await _context.Species.FindAsync(id);
-            if (species == null)
-            {
-                return NotFound();
-            }
-
-            _context.Species.Remove(species);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-  
-        private bool SpeciesExists(int id)
-        {
-            return (_context.Species?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-    }
+        
 }
