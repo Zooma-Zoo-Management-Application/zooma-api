@@ -343,12 +343,17 @@ namespace zooma_api.Models
 
             modelBuilder.Entity<Species>(entity =>
             {
+                entity.ToTable("Species");
+
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.Name).HasMaxLength(100);
+
+                entity.Property(e => e.Status).HasColumnName("status");
             });
+           
 
             modelBuilder.Entity<Ticket>(entity =>
             {
