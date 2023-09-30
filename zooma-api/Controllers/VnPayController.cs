@@ -42,13 +42,13 @@ namespace zooma_api.Controllers
             return Ok(new { url = paymentUrl });
         }
 
-        [HttpPost("response-payment")]
+        [Route("vnpay-return")]
         public IActionResult CreatePaymentUrl()
         {
             var pay = new VnPayLibrary();
             var response = pay.GetFullResponseData(Request.Query, _configuration["VnPayConfig:vnp_HashSecret"]);
 
-            return Ok(new { response = response });
+            return Ok(response);
 
 
 
