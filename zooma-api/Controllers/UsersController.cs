@@ -217,7 +217,7 @@ namespace zooma_api.Controllers
             {
                 if (!UserExists(existingUser.Email))  // Assuming email is unique
                 {
-                    return NotFound();
+                    return NotFound("Email đã tồn tại");
                 }
                 else
                 {
@@ -400,7 +400,7 @@ namespace zooma_api.Controllers
             //    return BadRequest(ModelState);
 
             // trả về mã lỗi 404
-            return NotFound("The User is not existed");
+            return BadRequest("The User is not existed");
         }
 
     }
