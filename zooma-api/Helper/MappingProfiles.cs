@@ -15,6 +15,8 @@ namespace zooma_api.Helper
             CreateMap<CreateSpecies, Species>().ReverseMap();
             CreateMap<News, NewsDTO>().ReverseMap();
             CreateMap<News, NewsBody>().ReverseMap();
+            CreateMap<Ticket, CartItemDTO>().ReverseMap();
+
         }
     }
 }
