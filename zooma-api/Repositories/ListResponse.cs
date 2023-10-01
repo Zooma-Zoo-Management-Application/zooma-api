@@ -1,11 +1,11 @@
-﻿using VNPayDemo.DTO;
+﻿using zooma_api.DTO;
 
 namespace VNPayDemo
 {
     public class ListResponse
     {
         private static ListResponse instance;
-        public List<PaymentReturnDtos> list; 
+        public List<PaymentResponseModel> list; 
 
         public static ListResponse Instance
         {
@@ -19,17 +19,17 @@ namespace VNPayDemo
 
         private ListResponse()
         {
-            list = new List<PaymentReturnDtos>();
+            list = new List<PaymentResponseModel>();
         }
 
-        public void AddToCart(PaymentReturnDtos payment)
+        public void AddToCart(PaymentResponseModel payment)
         {
 
             list.Add(payment);
             
         }
 
-        public List<PaymentReturnDtos> GetLists()
+        public List<PaymentResponseModel> GetLists()
         {
             return this.list;
         }

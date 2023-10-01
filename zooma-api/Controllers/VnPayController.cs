@@ -42,6 +42,8 @@ namespace zooma_api.Controllers
             return Ok(new { url = paymentUrl });
         }
 
+
+        [HttpGet]
         [Route("vnpay-return")]
         public IActionResult CreatePaymentUrl()
         {
