@@ -119,7 +119,7 @@ namespace zooma_api.Controllers
 
         }
 
-        public string createPayment(Order order)
+        private string createPayment(Order order)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -145,7 +145,6 @@ namespace zooma_api.Controllers
             return paymentUrl;
 
         }
-
 
 
 

@@ -11,11 +11,11 @@
     <Compile Remove="Interfaces\**" />
     <Compile Remove="Repository\**" />
     <Content Remove="Interfaces\**" />
-    <Content Remove="Repository\**" />
+    <Content Remove="Repositories\**" />
     <EmbeddedResource Remove="Interfaces\**" />
-    <EmbeddedResource Remove="Repository\**" />
+    <EmbeddedResource Remove="Repositories\**" />
     <None Remove="Interfaces\**" />
-    <None Remove="Repository\**" />
+    <None Remove="Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>
