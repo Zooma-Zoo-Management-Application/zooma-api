@@ -8,5 +8,6 @@
         public DateTime? Date { get; set; }
         public bool Status { get; set; }
         public short UserId { get; set; }
+        public UserDTO User { get; set; }
     }
 }
