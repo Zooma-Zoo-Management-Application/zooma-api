@@ -31,27 +31,28 @@ namespace zooma_api.Controllers
           {
               return NotFound();
           }
-            var newsDTO = _mapper.Map<ICollection<NewsDTO>>(await _context.News.ToListAsync());
+
+            var news = await _context.News.Include(n => n.User).ToListAsync();
+
+            var newsDTO = _mapper.Map<ICollection<NewsDTO>>(news);
 
             return Ok(newsDTO);
         }
 
         // Hàm lấy News dựa trên Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<News>> GetNews(short id)
+        public async Task<ActionResult<NewsDTO>> GetNewsById(short id)
         {
-          if (_context.News == null)
-          {
-              return NotFound();
-          }
-            var news = await _context.News.FindAsync(id);
+            var news = await _context.News.Include(n => n.User).FirstOrDefaultAsync(n => n.Id == id);
 
             if (news == null)
             {
                 return NotFound();
             }
 
-            return news;
+            var newsDTO = _mapper.Map<NewsDTO>(news);
+
+            return Ok(newsDTO);
         }
 
         //Hàm lấy các pinned news
