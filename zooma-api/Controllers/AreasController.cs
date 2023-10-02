@@ -22,13 +22,13 @@ namespace zooma_api.Controllers
         //hàm này để lấy danh sách các khu vực đã có trong hệ thống
         [HttpGet]
         [Route("api/areas")]
-        public async Task<ActionResult<IEnumerable<AreasDTO>>> GetAreas()
+        public async Task<ActionResult<IEnumerable<Area>>> GetAreas()
         {
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
-            return await _context.Areas.Select(a => new AreasDTO(a)).ToListAsync();
+            return await _context.Areas.ToListAsync();
         }
      
 
