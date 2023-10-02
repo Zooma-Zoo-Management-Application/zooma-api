@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zooma-api", "zooma-api\zooma-api.csproj", "{971411B7-2773-427E-8D06-45FAA27BAEFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zooma-api", "zooma-api\zooma-api.csproj", "{971411B7-2773-427E-8D06-45FAA27BAEFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{9F538F20-2BF8-464C-8D23-FA7E4821788D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{971411B7-2773-427E-8D06-45FAA27BAEFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{971411B7-2773-427E-8D06-45FAA27BAEFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{971411B7-2773-427E-8D06-45FAA27BAEFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F538F20-2BF8-464C-8D23-FA7E4821788D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F538F20-2BF8-464C-8D23-FA7E4821788D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F538F20-2BF8-464C-8D23-FA7E4821788D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F538F20-2BF8-464C-8D23-FA7E4821788D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

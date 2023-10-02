@@ -29,7 +29,7 @@ namespace zooma_api.Controllers
             }
         }
 
-        private int DaysInMonth(int year, int month)
+        public int DaysInMonth(int year, int month)
         {
             int[] monthHas31 = { 1, 3, 5, 7, 8, 10, 12 };
             int[] monthHas30 = { 4, 6, 9, 11 };
