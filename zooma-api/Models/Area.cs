@@ -5,7 +5,7 @@ namespace zooma_api.Models
 {
     public partial class Area
     {
-        public Area()
+        public Area(DTO.AreasDTO areaDTO)
         {
             Cages = new HashSet<Cage>();
         }

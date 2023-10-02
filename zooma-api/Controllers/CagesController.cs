@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.Models;
 using zooma_api.DTO;
+using System.Xml.Linq;
 
 namespace zooma_api.Controllers
 {
@@ -62,43 +63,35 @@ namespace zooma_api.Controllers
         }
         //select an animal from the database and assign to the cage 
         [HttpPut("AssignAnimal/{id}")]
-        public async Task<IActionResult> AssignAnimal(int id, CagesDTO cageDTO)
+        public async Task<IActionResult> AssignAnimal(int id, int cageID)
         {
-            if (id != cageDTO.Id)
+            var animal = await _context.Animals.FindAsync(id);
+            var cageDTO = await _context.Cages.FindAsync(cageID);
+            if (animal == null || cageDTO == null)
             {
-                return BadRequest("No cage found");
+                return NotFound("No animals available");
             }
-            var cage = new Cage
+            if (cageDTO.AnimalCount < cageDTO.AnimalLimit)
             {
-                Id = cageDTO.Id,
-                Name = cageDTO.Name,
-                AnimalLimit = cageDTO.AnimalLimit,
-                AnimalCount = cageDTO.AnimalCount,
-                Description = cageDTO.Description,
-                Status = cageDTO.Status,
-                AreaId = cageDTO.AreaId
-            };
-            _context.Entry(cage).State = EntityState.Modified;
-            try
-            {
+                cageDTO.AnimalCount++;
+                animal.CageId = (short?)cageID;
                 await _context.SaveChangesAsync();
+                return Ok("Animal assigned to cage");
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!CageExists((short)id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest("Cage is full");
             }
-            return NoContent();
         }
+               
+           
+
+          //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
+         
+           
         //Hàm xóa cage
         [HttpDelete("DeleteCage/{id}")]
-        public async Task<IActionResult> DeleteCage(int id)
+            public async Task<IActionResult> DeleteCage(int id)
         {
             if (_context.Cages == null)
             {
