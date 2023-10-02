@@ -7,7 +7,9 @@ namespace Repositories
     public interface IOrderRepository
     {
         int CreateOrder(short customerId, List<CartItemDTO> cartItems);
-        List<Order> GetOrdersById(int orderId);
+        Order GetOrdersById(int orderId);
         List<Order> GetOrdersByCustomerId(int customerID);
+
+        List<OrderDetail> GetOrderDetailsByOrderId(int orderId);
     }
 }

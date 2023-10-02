@@ -26,13 +26,34 @@ namespace VNPayDemo
         public void AddToCart(CartItemDTO product)
         {
 
-            list.Add(product);
-            
+            var existingCartItem = list.FirstOrDefault(c =>
+                c.Id == product.Id);
+
+            if (existingCartItem != null) {
+                existingCartItem.quantity += product.quantity;
+            }
+            else
+            {
+                list.Add(product);
+
+            }
+
+
+
+
+
+
+
         }
 
         public List<CartItemDTO> GetLists()
         {
             return this.list;
+        }
+
+        public void ClearCart() {
+            list.Clear();
+        
         }
 
     }

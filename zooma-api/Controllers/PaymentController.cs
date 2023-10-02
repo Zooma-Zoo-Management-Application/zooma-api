@@ -44,7 +44,7 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
             vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", order.CreatedDate.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
@@ -59,21 +59,46 @@ namespace zooma_api.Controllers
 
 
         [HttpGet]
-        [Route("vnpay-return")]
+        [Route("vnpay-return")] // API XỬ LÝ URL TRẢ VỀ KHI THANH TOÁN VNPAY XONG
 
         public IActionResult CreatePaymentUrl()
         {
             var pay = new VnPayLibrary();
             var response = pay.GetFullResponseData(Request.Query, _configuration["VnPayConfig:vnp_HashSecret"]);
 
-            return Ok(response);
+            if( response.Success )
+            {
+                var order = repository.GetOrdersById(int.Parse(response.OrderId));
+
+                if( order != null )
+                {
+                    var transaction = new Transaction()
+                    {
+                        Id = int.Parse(response.TransactionId),
+                        Date = order.OrderDate,
+                        AccountNumber = response.BanKTranNo,
+                        TransactionToken = response.Token,
+                        AmountOfMoney = order.TotalPrice * 23500,
+                        Status = order.Status,
+                        OrderId = int.Parse(response.OrderId)
+                    };
+
+                    _context.Transactions.Add(transaction);
+                    _context.SaveChanges();
+
+                    return Ok(new { transaction = response });
+                }
+
+            }
+            
+                return BadRequest("Transaction in VNPay has been failed");
+            
+
 
         }
 
-        // DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU VÀO DATABASE
-
-        
-        
+        // ============= DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU ORDER VÀO DATABASE ============= //
+   
         [HttpPost]
         [Route("add-to-cart")]
 
@@ -113,13 +138,34 @@ namespace zooma_api.Controllers
 
         [HttpPost]
         [Route("checkout")]
-        public async Task<IActionResult> Checkout() // ADD NHIỀU LẦN 
+        public IActionResult Checkout(short userID) // ADD XONG RỒI THÌ CHECKOUT
         {
-            return Ok();//(new { url = payme });
+            int orderId = 0;
+            try
+            {
+                if(ListCart.Instance.GetLists() == null)
+                {
+                    throw new Exception("vl bro you didnt add the item in cart");
+                }
+                else
+                {
+                    orderId = repository.CreateOrder(userID, ListCart.Instance.GetLists());
+
+                    ListCart.Instance.ClearCart();
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest("dead");
+                throw;
+            }
+            return Ok(new { url = createPaymentUrl(repository.GetOrdersById(orderId)) });
 
         }
 
-        public string createPayment(Order order)
+
+
+        private string createPaymentUrl(Order order) // METHOD TẠO URL TỪ ORDER ĐÃ THANH TOÁN
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -131,8 +177,8 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-            vnpay.AddRequestData("vnp_Amount", (order.TotalPrice * 100).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", order.OrderDate.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_Amount", (order.TotalPrice * 100 * 23500).ToString()); // TIỀN DOLLAR 🐧
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
@@ -146,10 +192,6 @@ namespace zooma_api.Controllers
 
         }
 
-
-
-
-
         // BODY CHO ITEM TRONG GIỎ HÀNG
         public class itemBody
         {
@@ -157,6 +199,9 @@ namespace zooma_api.Controllers
             public byte quantity { get; set; }
             public DateTime TicketDate { get; set; }
             public string? Description { get; set; }
+
+
+
         }
 
 
