@@ -143,7 +143,7 @@ namespace zooma_api.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("sign-up")]
-        public async Task<ActionResult<User>> SignUp(SignUpBody user)
+        public async Task<ActionResult<LoginResponse>> SignUp(SignUpBody user)
         {
             //                var loginUser = _mapper.Map<UserDTO>(userChecking);
 
@@ -184,9 +184,32 @@ namespace zooma_api.Controllers
 
 
             _context.Users.Add(signUpUser);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = signUpUser.Id }, signUpUser);
+            // LOGIN VÀO LUÔN 
+            if (_context.Users == null)
+            {
+                return Problem("Entity set from Zooma context's User is null.");
+            }
+         
+           
+                // trả về mã 200, và với kết quả thành công
+
+                var loginUser = _mapper.Map<UserDTO>(signUpUser);
+                String accessToken = GenerateToken(signUpUser);
+
+                return Ok(new LoginResponse()
+                {
+                    AccessToken = accessToken,
+
+                    user = loginUser
+                    // tạo ra accessToken dựa trên tài khoản
+                });
+
+            
+
+
         }
         // ==================================== UPDATE API ===========================//
         [HttpPut("{id}")]

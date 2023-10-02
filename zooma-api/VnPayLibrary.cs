@@ -26,7 +26,7 @@ namespace zooma_api
                 _requestData.Add(key, value);
             }
         }
-
+        
         public string CreateRequestUrl(string paymentUrl, string secretKey) // METHOD TẠO URL THANH TOÁN
         {
             StringBuilder data = new StringBuilder();
@@ -111,7 +111,7 @@ namespace zooma_api
                 }
             }
 
-            var orderId = Convert.ToInt64(vnPay.GetResponseData("vnp_TxnRef")); //chuyển c
+            var orderId = Convert.ToInt64(vnPay.GetResponseData("vnp_TxnRef")); //mã tham chiếu được gửi về VNPay lúc tạo url
             var vnPayTranId = Convert.ToInt64(vnPay.GetResponseData("vnp_TransactionNo"));
             var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
             var vnpSecureHash =
@@ -120,6 +120,8 @@ namespace zooma_api
 
             var checkSignature =
                 vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
+
+            var banKTranNo = vnPay.GetResponseData("vnp_BankTranNo");
 
             if (!checkSignature)
                 return new PaymentResponseModel()
@@ -136,7 +138,8 @@ namespace zooma_api
                 PaymentId = vnPayTranId.ToString(),
                 TransactionId = vnPayTranId.ToString(),
                 Token = vnpSecureHash,
-                VnPayResponseCode = vnpResponseCode
+                VnPayResponseCode = vnpResponseCode,
+                BanKTranNo = banKTranNo
             };
         }
         public bool ValidateSignature(string inputHash, string secretKey)
