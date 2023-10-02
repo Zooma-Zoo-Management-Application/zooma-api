@@ -16,6 +16,7 @@
     <EmbeddedResource Remove="Repository\**" />
     <None Remove="Interfaces\**" />
     <None Remove="Repository\**" />
+
   </ItemGroup>
 
   <ItemGroup>

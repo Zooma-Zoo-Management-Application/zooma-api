@@ -39,11 +39,6 @@ namespace VNPayDemo
             }
 
 
-
-
-
-
-
         }
 
         public List<CartItemDTO> GetLists()
@@ -55,6 +50,7 @@ namespace VNPayDemo
             list.Clear();
         
         }
+
 
     }
 }

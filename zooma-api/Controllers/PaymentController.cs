@@ -61,6 +61,7 @@ namespace zooma_api.Controllers
         [HttpGet]
         [Route("vnpay-return")] // API XỬ LÝ URL TRẢ VỀ KHI THANH TOÁN VNPAY XONG
 
+
         public IActionResult CreatePaymentUrl()
         {
             var pay = new VnPayLibrary();
@@ -98,7 +99,7 @@ namespace zooma_api.Controllers
         }
 
         // ============= DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU ORDER VÀO DATABASE ============= //
-   
+
         [HttpPost]
         [Route("add-to-cart")]
 
@@ -199,8 +200,6 @@ namespace zooma_api.Controllers
             public byte quantity { get; set; }
             public DateTime TicketDate { get; set; }
             public string? Description { get; set; }
-
-
 
         }
 

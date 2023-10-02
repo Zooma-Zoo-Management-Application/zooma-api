@@ -1,4 +1,4 @@
-﻿using AutoMapper.Execution;
+using AutoMapper.Execution;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using zooma_api.DTO;
@@ -27,6 +27,7 @@ namespace zooma_api.Repositories
                 float totalPrice = 0;
 
                 //   context.SaveChanges();
+
                 foreach (var cartItem in cartItems)
                 {
                     totalPrice += cartItem.Price * cartItem.quantity;
@@ -44,7 +45,6 @@ namespace zooma_api.Repositories
                 }
                 order.TotalPrice = totalPrice;
                 context.Entry(order).State = EntityState.Modified; // TÍNH RA TỔNG SỐ TIỀN CUỐI CÙNG 
-
                 context.SaveChanges();
                 return order.Id;
 
@@ -75,6 +75,7 @@ namespace zooma_api.Repositories
             {
                 return context.Orders.SingleOrDefault(o => o.Id == orderId);
             }
+
         }
     }
 }
