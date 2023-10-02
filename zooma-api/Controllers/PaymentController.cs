@@ -75,7 +75,7 @@ namespace zooma_api.Controllers
                 {
                     var transaction = new Transaction()
                     {
-                        Id = int.Parse(response.TransactionId),
+                        //Id = int.Parse(response.TransactionId),
                         Date = order.OrderDate,
                         AccountNumber = response.BanKTranNo,
                         TransactionToken = response.Token,

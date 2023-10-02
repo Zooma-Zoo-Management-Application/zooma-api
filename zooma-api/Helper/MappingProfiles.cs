@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using zooma_api.Controllers;
 using zooma_api.DTO;
 using zooma_api.Models;
 
@@ -17,6 +18,8 @@ namespace zooma_api.Helper
             CreateMap<News, NewsDTO>().ReverseMap();
             CreateMap<News, NewsBody>().ReverseMap();
             CreateMap<Ticket, CartItemDTO>().ReverseMap();
+            CreateMap<Transaction, TransactionDTO>().ReverseMap();
+
 
         }
     }
