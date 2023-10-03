@@ -18,14 +18,11 @@ namespace zooma_api.Helper
             CreateMap<News, NewsDTO>().ReverseMap();
             CreateMap<News, NewsBody>().ReverseMap();
             CreateMap<Ticket, CartItemDTO>().ReverseMap();
+            CreateMap<User, NewsDTO>().ReverseMap();
             CreateMap<Transaction, TransactionDTO>().ReverseMap();
             CreateMap<Order, OrderDTO>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();
             CreateMap<Ticket,TicketDTO >().ReverseMap();
-
-
-
-
         }
     }
 }
