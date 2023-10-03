@@ -1,4 +1,4 @@
-﻿namespace zooma_api.Controllers
+﻿namespace zooma_api.DTO
 {
     public class TransactionDTO
     {

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using zooma_api.DTO;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -14,22 +16,52 @@ namespace zooma_api.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly ZoomaContext _context;
+        private readonly IMapper _mapper;
 
-        public OrdersController(ZoomaContext context)
+
+        public OrdersController(ZoomaContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Orders
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrders() // XỬ LÝ GET ORDERS TRẢ VỀ KÈM CHUNG
+                                                                           // VỚI DANH SÁCH CÁC ORDER DETAILS CỦA NÓ 
         {
           if (_context.Orders == null)
           {
               return NotFound();
           }
-            return await _context.Orders.ToListAsync();
+
+          var list = await _context.Orders.Include(o => o.OrderDetails).Include(o=>o.Transactions).Include(o => o.User).ToListAsync();
+
+           var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
+
+
+            return Ok(orderDTOs);
         }
+        // GET: api/Orders
+
+
+        [HttpGet("userId/{id}")]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrdersWithUserID(short id) // XỬ LÝ GET ORDERS TRẢ VỀ KÈM CHUNG VỚI USER
+
+        {
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+
+            var list = await _context.Orders.Where( o => o.UserId == id ).Include(o => o.OrderDetails).Include(o => o.Transactions).Include(o => o.User).ToListAsync();
+
+            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
+
+
+            return Ok(orderDTOs);
+        }
+
 
         // GET: api/Orders/5
         [HttpGet("{id}")]
@@ -51,15 +83,20 @@ namespace zooma_api.Controllers
 
         // PUT: api/Orders/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
+        [HttpPut]
+        public async Task<IActionResult> PutOrder(OrderBody orderUpdate) // UPDATE ORDER INFORMATION
         {
-            if (id != order.Id)
+            var order = await _context.Orders.SingleOrDefaultAsync(o => o.Id == orderUpdate.Id);
+
+
+            if (order != null)
             {
-                return BadRequest();
+                order.Notes=orderUpdate.Notes;
+                order.Status=orderUpdate.Status;
+                _context.Entry(order).State = EntityState.Modified;
+
             }
 
-            _context.Entry(order).State = EntityState.Modified;
 
             try
             {
@@ -67,7 +104,7 @@ namespace zooma_api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!OrderExists(id))
+                if (!OrderExists(orderUpdate.Id))
                 {
                     return NotFound();
                 }
@@ -77,7 +114,40 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(_mapper.Map<Order>(order));
+        }
+
+        [HttpPut("order-details")]
+        public async Task<IActionResult> PutOrderDetails(OrderDetailsBody update) // UPDATE ORDER DETAILS 
+        {
+            var orderDetail = await _context.OrderDetails.SingleOrDefaultAsync(o => o.Id == update.Id);
+
+            if (orderDetail != null)
+            {
+                orderDetail.TicketDate = update.TicketDate;
+                orderDetail.UsedTicket=update.UsedTicket;
+
+                _context.Entry(orderDetail).State = EntityState.Modified;
+
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.OrderDetails.Any(o => o.Id == update.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(_mapper.Map<OrderDetailDTO>(orderDetail));
         }
 
         // POST: api/Orders
@@ -120,4 +190,20 @@ namespace zooma_api.Controllers
             return (_context.Orders?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
+}
+
+public class OrderBody
+{
+    public int Id { get; set; }
+    public string? Notes { get; set; }
+    public bool Status { get; set; }
+}
+
+public class OrderDetailsBody
+{
+    public int Id { get; set; }
+    public DateTime TicketDate { get; set; }
+    //public byte Quantity { get; set; }
+    public byte UsedTicket { get; set; }
+
 }
