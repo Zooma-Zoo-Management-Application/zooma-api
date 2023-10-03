@@ -55,6 +55,22 @@ namespace zooma_api.Controllers
             return Ok(newsDTO);
         }
 
+        // Hàm lấy News dựa trên staffid
+        [HttpGet("/Staffs/{staffId}")]
+        public async Task<ActionResult<NewsDTO>> GetNewsByStaffId(short staffId)
+        {
+            var user = await _context.Users.Include(n => n.News).FirstOrDefaultAsync(n => n.Id == staffId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var newsDTO = _mapper.Map<List<NewsDTO>>(user.News);
+
+            return Ok(newsDTO);
+        }
+
         //Hàm lấy các pinned news
         [HttpGet("pin-news")]
         public async Task<ActionResult<NewsDTO>> GetPinNews()
