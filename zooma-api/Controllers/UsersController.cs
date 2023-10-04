@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Sockets;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
@@ -34,24 +35,28 @@ namespace zooma_api.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
           if (_context.Users == null)
           {
               return NotFound();
-          }
-            return await _context.Users.ToListAsync();
+
+            }
+
+            var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.ToListAsync());
+
+            return Ok(list);
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(short id)
+        public async Task<ActionResult<UserDTO>> GetUser(short id)
         {
           if (_context.Users == null)
           {
               return NotFound();
           }
-            var user = await _context.Users.FindAsync(id);
+            var user = _mapper.Map<UserDTO>(await _context.Users.FindAsync(id));
 
             if (user == null)
             {
@@ -107,24 +112,50 @@ namespace zooma_api.Controllers
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
+        //========================= API BAN USER VỚI BODY EMAIL HOẶC USERID ==========================//
+
         // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(short id)
+        [HttpDelete("ban-user")]
+        public async Task<IActionResult> DeleteUser(banUserBody body) 
         {
+            
             if (_context.Users == null)
             {
                 return NotFound();
             }
-            var user = await _context.Users.FindAsync(id);
+
+            var user = await _context.Users.FirstOrDefaultAsync(
+                row =>
+                row.Email == body.Email
+                //
+                );
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            user.Status = body.Status;
+            _context.Entry(user).State = EntityState.Modified;
 
-            return NoContent();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (UserExists(user.Email))  // Assuming email is unique
+                {
+                    throw;
+                }
+                else
+                {
+                    return NotFound("Email không tồn tại");
+                   
+                }
+            }
+
+            return Ok(_mapper.Map<UserDTO>(user));
         }
 
         private bool UserExists(short id)
@@ -231,6 +262,8 @@ namespace zooma_api.Controllers
             existingUser.Gender = updateUserBody.Gender ?? existingUser.Gender;
             existingUser.DateOfBirth = updateUserBody.DateOfBirth ?? existingUser.DateOfBirth;
             existingUser.AvatarUrl = updateUserBody.AvatarUrl ?? existingUser.AvatarUrl;
+
+            _context.Entry(existingUser).State = EntityState.Modified;
 
             try
             {
@@ -425,6 +458,16 @@ namespace zooma_api.Controllers
             // trả về mã lỗi 404
             return BadRequest("The User is not existed");
         }
+
+    }
+
+    public class banUserBody
+    {
+        //public short Id { get; set; }
+
+        public string Email { get; set; } = null!;
+        public bool Status  = false;
+
 
     }
 }

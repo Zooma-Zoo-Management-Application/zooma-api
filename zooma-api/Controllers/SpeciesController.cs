@@ -71,7 +71,6 @@ namespace zooma_api.Controllers
                 if (!SpeciesExists(id))
                 {
                     return NotFound();
-                    Console.WriteLine("Not found");
                 }
                 else
                 {
