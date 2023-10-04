@@ -18,7 +18,8 @@ namespace zooma_api.Repositories
                     OrderDate = DateTime.Now,
                     Status = true,
                     TotalPrice = 0,
-                    PaymentMethod = "VnPay"
+                    PaymentMethod = "VnPay",
+                    LastUpdateDate= DateTime.Now
 
                 };
                 context.Orders.Add(order);
