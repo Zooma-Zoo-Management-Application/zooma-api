@@ -50,20 +50,20 @@ namespace zooma_api.Controllers
             return new AreasDTO(area);
         }
         //create a new area
-        [HttpPost]
-        [Route("api/areas")]
-        public async Task<ActionResult<AreasDTO>> PostArea(AreasDTO areaDTO)
-        {
-            if (_context.Areas == null)
-            {
-                return Problem("Entity set 'ZoomaContext.Areas'  is null.");
-            }
-            var area = new Area(areaDTO);
-            _context.Areas.Add(area);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetArea), new { id = area.Id }, new AreasDTO(area));
-        }
+        //[HttpPost]
+        //[Route("api/areas")]
+        //public async Task<ActionResult<AreasDTO>> PostArea(AreasDTO areaDTO)
+        //{
+        //    if (_context.Areas == null)
+        //    {
+        //        return Problem("Entity set 'ZoomaContext.Areas'  is null.");
+        //    }
+        //    //var area = new Area(areaDTO);
+        //    //_context.Areas.Add(area);
+        //    await _context.SaveChangesAsync();
+//
+            //return CreatedAtAction(nameof(GetArea), new { id = area.Id }, new AreasDTO(area));
+        //}
         //update an area
         [HttpPut]
         [Route("api/areas/{id}")]
@@ -77,8 +77,8 @@ namespace zooma_api.Controllers
             {
                 return BadRequest();
             }
-            var area = new Area(areaDTO);
-            _context.Entry(area).State = EntityState.Modified;
+            //var area = new Area(areaDTO);
+            //_context.Entry(area).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();

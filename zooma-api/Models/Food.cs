@@ -14,6 +14,8 @@ namespace zooma_api.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
+        public double EnergyValue { get; set; }
+        public string? Image { get; set; }
         public bool Status { get; set; }
 
         public virtual ICollection<DietDetail> DietDetails { get; set; }

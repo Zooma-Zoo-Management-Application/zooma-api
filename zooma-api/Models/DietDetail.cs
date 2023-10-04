@@ -14,6 +14,8 @@ namespace zooma_api.Models
         public bool Status { get; set; }
         public int DietId { get; set; }
         public int FoodId { get; set; }
+        public DateTime? ScheduleAt { get; set; }
+        public DateTime? EndAt { get; set; }
 
         public virtual Diet Diet { get; set; } = null!;
         public virtual Food Food { get; set; } = null!;
