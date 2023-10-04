@@ -155,7 +155,7 @@ namespace zooma_api.Controllers
             _context.News.Add(news);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNews", new { id = news.Id }, news);
+            return CreatedAtAction("GetNewsById", new { id = news.Id }, news);
         }
 
         //Hàm Pin News
