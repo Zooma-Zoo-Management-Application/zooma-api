@@ -152,10 +152,11 @@ namespace zooma_api.Controllers
               return Problem("Entity set 'ZoomaContext.News'  is null.");
           }
             var news = _mapper.Map<News>(newsBody);
+            news.Date = DateTime.Now;
             _context.News.Add(news);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNews", new { id = news.Id }, news);
+            return CreatedAtAction("GetNewsById", new { id = news.Id }, news);
         }
 
         //Hàm Pin News
