@@ -18,6 +18,7 @@ namespace zooma_api.Models
         public string PaymentMethod { get; set; } = null!;
         public bool Status { get; set; }
         public short UserId { get; set; }
+        public DateTime? LastUpdateDate { get; set; }
 
         public virtual User User { get; set; } = null!;
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
