@@ -16,10 +16,11 @@ namespace zooma_api.Repositories
                 {
                     UserId = userID,
                     OrderDate = DateTime.Now,
-                    Status = true,
+                    Status = false,
                     TotalPrice = 0,
                     PaymentMethod = "VnPay",
-                    LastUpdateDate= DateTime.Now
+                    LastUpdateDate= DateTime.Now,
+                    Notes="Thanh toan hoa don"
 
                 };
                 context.Orders.Add(order);
@@ -77,6 +78,29 @@ namespace zooma_api.Repositories
                 return context.Orders.SingleOrDefault(o => o.Id == orderId);
             }
 
+        }
+
+        public void updateRefundOrder(int orderId)
+        {
+            using (var context = new ZoomaContext())
+            {
+                try
+                {
+                    var order = context.Orders.SingleOrDefault(o => o.Id == orderId);
+                    if( order != null )
+                    {
+                        order.Notes = "Refund order";
+                        context.Entry(order).State = EntityState.Modified;
+                        context.SaveChanges();
+                    }                   
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
+            }
         }
     }
 }

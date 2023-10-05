@@ -11,5 +11,7 @@ namespace Repositories
         List<Order> GetOrdersByCustomerId(int customerID);
         List<OrderDetail> GetOrderDetailsByOrderId(int orderId);
 
+        void updateRefundOrder(int orderId);
+
     }
 }

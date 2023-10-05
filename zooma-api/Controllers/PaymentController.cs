@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -20,8 +22,6 @@ namespace zooma_api.Controllers
         private readonly IConfiguration _configuration;
         private readonly ZoomaContext _context;
         private readonly IMapper _mapper;
-
-
 
         private IOrderRepository repository = new OrderRepository();
 
@@ -64,8 +64,6 @@ namespace zooma_api.Controllers
 
         [HttpGet]
         [Route("vnpay-return")] // API XỬ LÝ URL TRẢ VỀ KHI THANH TOÁN VNPAY XONG
-
-
         public IActionResult CreatePaymentUrl()
         {
             var pay = new VnPayLibrary();
@@ -89,18 +87,19 @@ namespace zooma_api.Controllers
                         TransactionNo=response.TransactionId
                     };
 
+                    order.Status = true;
+                    _context.Entry(order).State = EntityState.Modified;
+
                     _context.Transactions.Add(transaction);
                     _context.SaveChanges();
 
-                    return Ok(new { transaction = transaction });
+                    return Ok(new { transaction = _mapper.Map<TransactionDTO>(transaction) });
                 }
 
             }
             
                 return BadRequest("Transaction in VNPay has been failed");
-            
-
-
+ 
         }
 
         // ============= DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU ORDER VÀO DATABASE ============= //
@@ -119,6 +118,11 @@ namespace zooma_api.Controllers
                 if (ticket == null || body == null)
                 {
                     return BadRequest("Please input valid item");
+                }
+                else if ( body.quantity == 0)
+                {
+                    return BadRequest("quantity have to be greater than 0");
+
                 }
                 else
                 {
@@ -157,7 +161,7 @@ namespace zooma_api.Controllers
                 {
                     orderId = repository.CreateOrder(userID, ListCart.Instance.GetLists());
 
-                    //ListCart.Instance.ClearCart();
+                    ListCart.Instance.ClearCart();
                 }
             }
             catch (Exception)
@@ -180,8 +184,7 @@ namespace zooma_api.Controllers
 
         }
 
-
-
+        // ===========XỬ LÝ PAYMENT URL KHI CHECK OUT=============//
         private String createPaymentUrl(OrderInfo order)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
@@ -194,7 +197,7 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-            vnpay.AddRequestData("vnp_Amount", ((double)order.Amount * 100).ToString());
+            vnpay.AddRequestData("vnp_Amount", ((double)order.Amount * 100).ToString()); // CHỖ NÀY ĐỂ FLOAT LÀ NÓ RA HEX 1.8E+..
             vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
@@ -291,7 +294,7 @@ namespace zooma_api.Controllers
                 var vnPayResponse = JsonSerializer.Deserialize<VnPayResponse>(strData);
 
 
-                return Ok(new { VnPayResponse = vnPayResponse });
+                return Ok(new { VnPayResponse = vnPayResponse , Url = strData , Message = addRefundTransaction(vnPayResponse,transaction) });
 
 
             }
@@ -305,8 +308,46 @@ namespace zooma_api.Controllers
             }
         }
 
+        // =================XỬ LÝ DATABASE TẠO TRANSACTION REFUND  KHI RESPONSE TRẢ VỀ ==================//
+        private string addRefundTransaction(VnPayResponse response, Transaction transaction) 
+        {
+            if(response.Message.Contains("Success"))
+            {
+                try
+                {
+                    var _transaction = new Transaction()
+                    {
+                        //Id = int.Parse(response.TransactionId),
+                        Date = DateTime.ParseExact(response.PayDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture),
+                        AccountNumber = response.ResponseId,
+                        TransactionToken = transaction.TransactionToken,
+                        AmountOfMoney = transaction.AmountOfMoney,
+                        Status = true,
+                        OrderId = transaction.OrderId,
+                        TransactionNo = response.TransactionNo
+                    };
+
+                    _context.Transactions.Add(_transaction);
+                    _context.SaveChanges();
+
+                    repository.updateRefundOrder(transaction.OrderId);
+                    return "Refund successfully";
 
 
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
+            }
+            else
+            {
+                return "This order have already refund";
+            }
+
+        }
 
         // BODY CHO ITEM TRONG GIỎ HÀNG
         public class itemBody
@@ -369,11 +410,5 @@ namespace zooma_api.Controllers
             [JsonPropertyName("vnp_SecureHash")]
             public string SecureHash { get; set; }
         }
-
-
-
-
     }
-
-
 }
