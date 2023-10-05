@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Repositories;
 using System.Net;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using VNPayDemo;
 using zooma_api.DTO;
 using zooma_api.Models;
@@ -287,8 +288,12 @@ namespace zooma_api.Controllers
                 {
                     strData = streamReader.ReadToEnd();
                 }
+                var vnPayResponse = JsonSerializer.Deserialize<VnPayResponse>(strData);
 
-                return Ok(new { VnPayResponse = strData });
+
+                return Ok(new { VnPayResponse = vnPayResponse });
+
+
             }
             catch (WebException ex)
             {
@@ -318,6 +323,51 @@ namespace zooma_api.Controllers
             public int OrderId { get; set; }
             public string Description { get; set; }
             public string RefundBy { get; set; }
+        }
+
+        public class VnPayResponse
+        {
+            [JsonPropertyName("vnp_ResponseId")]
+            public string ResponseId { get; set; }
+
+            [JsonPropertyName("vnp_Command")]
+            public string Command { get; set; }
+
+            [JsonPropertyName("vnp_ResponseCode")]
+            public string ResponseCode { get; set; }
+
+            [JsonPropertyName("vnp_Message")]
+            public string Message { get; set; }
+
+            [JsonPropertyName("vnp_TmnCode")]
+            public string TmnCode { get; set; }
+
+            [JsonPropertyName("vnp_TxnRef")]
+            public string TxnRef { get; set; }
+
+            [JsonPropertyName("vnp_Amount")]
+            public string Amount { get; set; }
+
+            [JsonPropertyName("vnp_OrderInfo")]
+            public string OrderInfo { get; set; }
+
+            [JsonPropertyName("vnp_BankCode")]
+            public string BankCode { get; set; }
+
+            [JsonPropertyName("vnp_PayDate")]
+            public string PayDate { get; set; }
+
+            [JsonPropertyName("vnp_TransactionNo")]
+            public string TransactionNo { get; set; }
+
+            [JsonPropertyName("vnp_TransactionType")]
+            public string TransactionType { get; set; }
+
+            [JsonPropertyName("vnp_TransactionStatus")]
+            public string TransactionStatus { get; set; }
+
+            [JsonPropertyName("vnp_SecureHash")]
+            public string SecureHash { get; set; }
         }
 
 

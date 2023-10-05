@@ -8,5 +8,7 @@
         public double AmountOfMoney { get; set; }
         public bool Status { get; set; }
         public int OrderId { get; set; }
+        public string? TransactionNo { get; set; }
+
     }
 }
