@@ -161,7 +161,7 @@ namespace zooma_api.Controllers
                 {
                     orderId = repository.CreateOrder(userID, ListCart.Instance.GetLists());
 
-                    ListCart.Instance.ClearCart();
+                    //ListCart.Instance.ClearCart();
                 }
             }
             catch (Exception)
@@ -347,7 +347,23 @@ namespace zooma_api.Controllers
                 return "This order have already refund";
             }
 
+
+                return Ok(new { VnPayResponse = vnPayResponse });
+
+
+            }
+            catch (WebException ex)
+            {
+                return BadRequest(new { Error = "Failed to connect to VnPay", Details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = "Unexpected error", Details = ex.Message });
+            }
         }
+
+
+
 
         // BODY CHO ITEM TRONG GIỎ HÀNG
         public class itemBody
