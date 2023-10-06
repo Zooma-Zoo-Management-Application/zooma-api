@@ -23,6 +23,9 @@ namespace zooma_api.Helper
             CreateMap<Order, OrderDTO>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailDTO>().ReverseMap();
             CreateMap<Ticket,TicketDTO >().ReverseMap();
+            CreateMap<Area, AreaDTO>().ReverseMap();
+
+
         }
     }
 }
