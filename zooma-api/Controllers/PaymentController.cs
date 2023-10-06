@@ -348,18 +348,6 @@ namespace zooma_api.Controllers
             }
 
 
-                return Ok(new { VnPayResponse = vnPayResponse });
-
-
-            }
-            catch (WebException ex)
-            {
-                return BadRequest(new { Error = "Failed to connect to VnPay", Details = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = "Unexpected error", Details = ex.Message });
-            }
         }
 
 
