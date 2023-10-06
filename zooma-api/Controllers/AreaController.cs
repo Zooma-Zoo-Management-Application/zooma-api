@@ -10,31 +10,29 @@ using zooma_api.DTO;
 
 namespace zooma_api.Controllers
 {
-    public class AreasController : Controller
+    public class AreaController : Controller
     {
         private readonly ZoomaContext _context;
 
-        public AreasController(ZoomaContext context)
+        public AreaController(ZoomaContext context)
         {
             _context = context;
         }
-        
-        //hàm này để lấy danh sách các khu vực đã có trong hệ thống
+        // Get all areas in the system
         [HttpGet]
         [Route("api/areas")]
-        public async Task<ActionResult<IEnumerable<Area>>> GetAreas()
+        public async Task<ActionResult<IEnumerable<AreasDTO>>> GetAreas()
         {
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
-            return await _context.Areas.ToListAsync();
+            return await _context.Areas.Select(a => new AreasDTO(a)).ToListAsync();
         }
-
-        //get detailed information of an area
+        // Get detailed information of an area
         [HttpGet]
         [Route("api/areas/{id}")]
-        public async Task<ActionResult<AreasDTO>> GetArea(byte id)
+        public async Task<ActionResult<AreasDTO>> GetArea(short id)
         {
             if (_context.Areas == null)
             {
@@ -44,56 +42,56 @@ namespace zooma_api.Controllers
 
             if (area == null)
             {
-                return NotFound();
+                return NotFound("Area not found");
             }
 
             return new AreasDTO(area);
         }
-        //create a new area
-        //[HttpPost]
-        //[Route("api/areas")]
-        //public async Task<ActionResult<AreasDTO>> PostArea(AreasDTO areaDTO)
-        //{
-        //    if (_context.Areas == null)
-        //    {
-        //        return Problem("Entity set 'ZoomaContext.Areas'  is null.");
-        //    }
-        //    //var area = new Area(areaDTO);
-        //    //_context.Areas.Add(area);
-        //    await _context.SaveChangesAsync();
-//
-            //return CreatedAtAction(nameof(GetArea), new { id = area.Id }, new AreasDTO(area));
-        //}
-        //update an area
-        [HttpPut]
-        [Route("api/areas/{id}")]
-        public async Task<IActionResult> PutArea(byte id, AreasDTO areaDTO)
+        // Create a new area
+        [HttpPost]
+        [Route("api/areas")]
+        public async Task<ActionResult<AreasDTO>> PostArea(Area area)
         {
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
-            if (id != areaDTO.Id)
+            _context.Areas.Add(area);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetArea", new { id = area.Id }, new AreasDTO(area));
+        }
+        // Update an area
+        [HttpPut]
+        [Route("api/areas/{id}")]
+        public async Task<IActionResult> UpdateArea(short id, Area area)
+        {
+            if (id != area.Id)
             {
-                return BadRequest();
+                return BadRequest("Area id does not match");
             }
-            //var area = new Area(areaDTO);
-            //_context.Entry(area).State = EntityState.Modified;
+
+            if (_context.Areas == null)
+            {
+                return Problem("Entity set 'ZoomaContext.Areas'  is null.");
+            }
+            _context.Entry(area).State = EntityState.Modified;
+
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException) when (!AreaExists(id))
             {
-                return NotFound();
+                return NotFound("Area not found");
             }
 
             return NoContent();
         }
-        //assign cage to the area
-        [HttpPost]
+        //Assign cage to an area
+        [HttpPut]
         [Route("api/areas/{id}/cages")]
-        public async Task<IActionResult> PostCageToArea(byte id, CagesDTO cageDTO)
+        public async Task<IActionResult> AssignCage(short id, Cage cage)
         {
             if (_context.Areas == null)
             {
@@ -108,46 +106,18 @@ namespace zooma_api.Controllers
             {
                 return NotFound("Area not found");
             }
-            var cage = await _context.Cages.FindAsync(cageDTO.Id);
-            if (cage == null)
+            var c = _context.Cages.FindAsync(cage.Id);
+            try
             {
-                return NotFound("Cage not found");
+                await _context.SaveChangesAsync();
             }
-            area.Cages.Add(cage);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetArea), new { id = area.Id }, new AreasDTO(area));
-           
-        }
-        //remove cage from the area
-        [HttpDelete]
-        [Route("api/areas/{id}/cages")]
-        public async Task<IActionResult> DeleteCageFromArea(byte id, CagesDTO cageDTO)
-        {
-            if (_context.Areas == null)
-            {
-                return Problem("Entity set 'ZoomaContext.Areas'  is null.");
-            }
-            if (_context.Cages == null)
-            {
-                return Problem("Entity set 'ZoomaContext.Cages'  is null.");
-            }
-            var area = await _context.Areas.FindAsync(id);
-            if (area == null)
+            catch (DbUpdateConcurrencyException) when (!AreaExists(id))
             {
                 return NotFound("Area not found");
             }
-            var cage = await _context.Cages.FindAsync(cageDTO.Id);
-            if (cage == null)
-            {
-                return NotFound("Cage not found");
-            }
-            area.Cages.Remove(cage);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetArea), new { id = area.Id }, new AreasDTO(area));
-           
-            
-        }
 
+            return NoContent();
+        }
         // GET: Areas
         public async Task<IActionResult> Index()
         {
