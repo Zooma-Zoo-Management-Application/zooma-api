@@ -64,42 +64,54 @@ namespace zooma_api.Controllers
 
         [HttpGet]
         [Route("vnpay-return")] // API XỬ LÝ URL TRẢ VỀ KHI THANH TOÁN VNPAY XONG
-        public IActionResult CreatePaymentUrl()
+        public IActionResult returnUrlVnPay()
         {
             var pay = new VnPayLibrary();
             var response = pay.GetFullResponseData(Request.Query, _configuration["VnPayConfig:vnp_HashSecret"]);
 
-            if( response.Success )
+            if (response.Success)
             {
                 var order = repository.GetOrdersById(int.Parse(response.OrderId));
 
-                if( order != null )
+                if (response.VnPayResponseCode == "00")
                 {
-                    var transaction = new Transaction()
+
+                    if (order != null)
                     {
-                        //Id = int.Parse(response.TransactionId),
-                        Date = order.OrderDate,
-                        AccountNumber = response.BanKTranNo,
-                        TransactionToken = response.Token,
-                        AmountOfMoney = order.TotalPrice * 23500,
-                        Status = order.Status,
-                        OrderId = int.Parse(response.OrderId),
-                        TransactionNo=response.TransactionId
-                    };
+                        var transaction = new Transaction()
+                        {
+                            //Id = int.Parse(response.TransactionId),
+                            Date = order.OrderDate,
+                            AccountNumber = response.BanKTranNo,
+                            TransactionToken = response.Token,
+                            AmountOfMoney = order.TotalPrice,
+                            Status = true,
+                            OrderId = int.Parse(response.OrderId),
+                            TransactionNo = response.TransactionId
+                        };
 
-                    order.Status = true;
+                        order.Status = true;
+                        _context.Entry(order).State = EntityState.Modified;
+
+                        _context.Transactions.Add(transaction);
+                        _context.SaveChanges();
+
+                        return Ok(new { transaction = _mapper.Map<TransactionDTO>(transaction), Message = "Successful tracsaction" });
+                    }
+                }
+                else
+                {
+                    order.Notes = "Unsuccessfull payment";
                     _context.Entry(order).State = EntityState.Modified;
-
-                    _context.Transactions.Add(transaction);
                     _context.SaveChanges();
+                    return BadRequest("Unsuccessfull payment, no transaction was created");
 
-                    return Ok(new { transaction = _mapper.Map<TransactionDTO>(transaction) });
                 }
 
             }
-            
-                return BadRequest("Transaction in VNPay has been failed");
- 
+
+            return BadRequest("Transaction in VNPay has been failed");
+
         }
 
         // ============= DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU ORDER VÀO DATABASE ============= //
@@ -174,11 +186,13 @@ namespace zooma_api.Controllers
             OrderInfo orderInfo = new OrderInfo()
             {
                 OrderId= order.Id,
-                Amount=order.TotalPrice * 23500,
+                Amount=order.TotalPrice,
                 OrderDesc = "Demo cart",
                 CreatedDate= DateTime.Now,
 
             };
+
+            Redirect(createPaymentUrl(orderInfo));
 
             return Ok(new { url = createPaymentUrl(orderInfo) });
 

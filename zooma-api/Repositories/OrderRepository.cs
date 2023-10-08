@@ -20,7 +20,7 @@ namespace zooma_api.Repositories
                     TotalPrice = 0,
                     PaymentMethod = "VnPay",
                     LastUpdateDate= DateTime.Now,
-                    Notes="Thanh toan hoa don"
+                    Notes="Thanh toan hoa don thanh cong"
 
                 };
                 context.Orders.Add(order);

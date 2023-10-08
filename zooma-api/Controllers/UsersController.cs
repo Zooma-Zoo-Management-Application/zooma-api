@@ -135,7 +135,7 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            user.Status = body.Status;
+            user.Status = false;
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -155,7 +155,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok(_mapper.Map<UserDTO>(user));
+            return Ok(new { banUser = _mapper.Map<UserDTO>(user) , message = "Ban successfully"});
         }
 
         private bool UserExists(short id)
@@ -466,7 +466,6 @@ namespace zooma_api.Controllers
         //public short Id { get; set; }
 
         public string Email { get; set; } = null!;
-        public bool Status  = false;
 
 
     }
