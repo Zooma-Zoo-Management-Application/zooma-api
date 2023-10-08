@@ -34,7 +34,7 @@ namespace zooma_api.Controllers
           }
 
             var list = await _context.Tickets.ToListAsync();
-            var ticketList = _mapper.Map<ICollection<Ticket>>(list);
+            var ticketList = _mapper.Map<ICollection<TicketDTO>>(list);
 
             return Ok(ticketList);
         }
@@ -92,7 +92,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok(_mapper.Map<TicketDTO>(ticket));
+            return Ok( new { ticket=_mapper.Map<TicketDTO>(ticket) , message= "Ticket price updated successfully" });
         }
 
         // POST: api/Tickets
