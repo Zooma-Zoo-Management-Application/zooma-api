@@ -5,9 +5,10 @@ namespace zooma_api.Models
 {
     public partial class Area
     {
-        public Area()
-        {
+
+        public Area() {
             Cages = new HashSet<Cage>();
+            
         }
 
         public short Id { get; set; }
@@ -16,5 +17,7 @@ namespace zooma_api.Models
         public bool Status { get; set; }
 
         public virtual ICollection<Cage> Cages { get; set; }
+        public Cage Cage { get; internal set; }
+
     }
 }

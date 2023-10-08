@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using zooma_api.Models;
 using zooma_api.DTO;
 
+
 namespace zooma_api.Controllers
 {
     public class AreaController : Controller
@@ -22,11 +23,13 @@ namespace zooma_api.Controllers
         [HttpGet]
         [Route("api/areas")]
         public async Task<ActionResult<IEnumerable<AreasDTO>>> GetAreas()
+
         {
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
+
             return await _context.Areas.Select(a => new AreasDTO(a)).ToListAsync();
         }
         // Get detailed information of an area
@@ -52,6 +55,7 @@ namespace zooma_api.Controllers
         [Route("api/areas")]
         public async Task<ActionResult<AreasDTO>> PostArea(Area area)
         {
+
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
@@ -70,6 +74,7 @@ namespace zooma_api.Controllers
             {
                 return BadRequest("Area id does not match");
             }
+
 
             if (_context.Areas == null)
             {
@@ -97,6 +102,7 @@ namespace zooma_api.Controllers
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
+
             if (_context.Cages == null)
             {
                 return Problem("Entity set 'ZoomaContext.Cages'  is null.");
@@ -118,7 +124,7 @@ namespace zooma_api.Controllers
 
             return NoContent();
         }
-        // GET: Areas
+
         public async Task<IActionResult> Index()
         {
               return _context.Areas != null ? 
@@ -127,6 +133,7 @@ namespace zooma_api.Controllers
         }
 
         // GET: Areas/Details/5
+
         public async Task<IActionResult> Details(short? id)
         {
             if (id == null || _context.Areas == null)
@@ -145,12 +152,14 @@ namespace zooma_api.Controllers
         }
 
         // GET: Areas/Create
+
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Areas/Create
+
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -167,6 +176,7 @@ namespace zooma_api.Controllers
         }
 
         // GET: Areas/Edit/5
+
         public async Task<IActionResult> Edit(short? id)
         {
             if (id == null || _context.Areas == null)
@@ -183,6 +193,7 @@ namespace zooma_api.Controllers
         }
 
         // POST: Areas/Edit/5
+
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -218,6 +229,7 @@ namespace zooma_api.Controllers
         }
 
         // GET: Areas/Delete/5
+
         public async Task<IActionResult> Delete(short? id)
         {
             if (id == null || _context.Areas == null)
@@ -236,6 +248,7 @@ namespace zooma_api.Controllers
         }
 
         // POST: Areas/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(short id)
@@ -260,3 +273,4 @@ namespace zooma_api.Controllers
         }
     } 
 }
+

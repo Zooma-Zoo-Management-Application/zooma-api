@@ -1,7 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Repositories;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using VNPayDemo;
 using zooma_api.DTO;
 using zooma_api.Models;
@@ -16,8 +22,6 @@ namespace zooma_api.Controllers
         private readonly IConfiguration _configuration;
         private readonly ZoomaContext _context;
         private readonly IMapper _mapper;
-
-
 
         private IOrderRepository repository = new OrderRepository();
 
@@ -60,8 +64,6 @@ namespace zooma_api.Controllers
 
         [HttpGet]
         [Route("vnpay-return")] // API XỬ LÝ URL TRẢ VỀ KHI THANH TOÁN VNPAY XONG
-
-
         public IActionResult CreatePaymentUrl()
         {
             var pay = new VnPayLibrary();
@@ -81,21 +83,23 @@ namespace zooma_api.Controllers
                         TransactionToken = response.Token,
                         AmountOfMoney = order.TotalPrice * 23500,
                         Status = order.Status,
-                        OrderId = int.Parse(response.OrderId)
+                        OrderId = int.Parse(response.OrderId),
+                        TransactionNo=response.TransactionId
                     };
+
+                    order.Status = true;
+                    _context.Entry(order).State = EntityState.Modified;
 
                     _context.Transactions.Add(transaction);
                     _context.SaveChanges();
 
-                    return Ok(new { transaction = response });
+                    return Ok(new { transaction = _mapper.Map<TransactionDTO>(transaction) });
                 }
 
             }
             
                 return BadRequest("Transaction in VNPay has been failed");
-            
-
-
+ 
         }
 
         // ============= DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU ORDER VÀO DATABASE ============= //
@@ -114,6 +118,11 @@ namespace zooma_api.Controllers
                 if (ticket == null || body == null)
                 {
                     return BadRequest("Please input valid item");
+                }
+                else if ( body.quantity == 0)
+                {
+                    return BadRequest("quantity have to be greater than 0");
+
                 }
                 else
                 {
@@ -152,7 +161,7 @@ namespace zooma_api.Controllers
                 {
                     orderId = repository.CreateOrder(userID, ListCart.Instance.GetLists());
 
-                    ListCart.Instance.ClearCart();
+                    //ListCart.Instance.ClearCart();
                 }
             }
             catch (Exception)
@@ -160,13 +169,23 @@ namespace zooma_api.Controllers
                 return BadRequest("dead");
                 throw;
             }
-            return Ok(new { url = createPaymentUrl(repository.GetOrdersById(orderId)) });
+            var order = repository.GetOrdersById(orderId);
+
+            OrderInfo orderInfo = new OrderInfo()
+            {
+                OrderId= order.Id,
+                Amount=order.TotalPrice * 23500,
+                OrderDesc = "Demo cart",
+                CreatedDate= DateTime.Now,
+
+            };
+
+            return Ok(new { url = createPaymentUrl(orderInfo) });
 
         }
 
-
-
-        private string createPaymentUrl(Order order) // METHOD TẠO URL TỪ ORDER ĐÃ THANH TOÁN
+        // ===========XỬ LÝ PAYMENT URL KHI CHECK OUT=============//
+        private String createPaymentUrl(OrderInfo order)
         {
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -178,20 +197,161 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-            vnpay.AddRequestData("vnp_Amount", (order.TotalPrice * 100 * 23500).ToString()); // TIỀN DOLLAR 🐧
+            vnpay.AddRequestData("vnp_Amount", ((double)order.Amount * 100).ToString()); // CHỖ NÀY ĐỂ FLOAT LÀ NÓ RA HEX 1.8E+..
             vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.Id);
+            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-            vnpay.AddRequestData("vnp_TxnRef", order.Id.ToString());
+            vnpay.AddRequestData("vnp_TxnRef", order.OrderId.ToString());
 
             var paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             return paymentUrl;
+        }
+
+        [HttpPost("refund-transaction")]
+        public async Task<IActionResult> RefundTransaction(RefundRequest refundRequest)
+        {
+            VnPayLibrary vnppay = new VnPayLibrary();
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == refundRequest.OrderId);
+            if (order == null)
+            {
+                return NotFound("order not found");
+            }
+
+            // Lấy thông tin transaction cần refund
+            var transaction = await _context.Transactions
+                                            .Where(t => t.OrderId == order.Id)
+                                            .FirstOrDefaultAsync();
+
+            if (transaction == null)
+            {
+                return NotFound("This order haven't paid or have transaction");
+            }
+
+            // ... (các bước kiểm tra và xác thực yêu cầu refund) ...
+
+            var vnp_Api = _configuration["VnPayConfig:vnp_Api"];
+            var vnp_HashSecret = _configuration["VnPayConfig:vnp_HashSecret"];
+            var vnp_TmnCode = _configuration["VnPayConfig:vnp_TmnCode"];
+
+            var vnp_RequestId = DateTime.Now.Ticks.ToString();
+            var vnp_Version = VnPayLibrary.VERSION;
+            var vnp_Command = "refund";
+            var vnp_TransactionType = "02"; // Hoàn toàn. Dùng "03" cho hoàn một phần
+            var vnp_Amount = transaction.AmountOfMoney * 100; // Chuyển về đơn vị tiền tệ nhỏ nhất
+            var vnp_TxnRef = transaction.OrderId.ToString();
+            var vnp_OrderInfo = refundRequest.Description;
+            var vnp_TransactionNo = transaction.TransactionNo;
+            var vnp_TransactionDate = transaction.Date.ToString("yyyyMMddHHmmss");
+            var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var vnp_CreateBy = refundRequest.RefundBy ;
+            var vnp_IpAddr = vnppay.GetIpAddress(HttpContext);
+
+            var signData = vnp_RequestId + "|" + vnp_Version + "|" + vnp_Command + "|" + vnp_TmnCode + "|" + vnp_TransactionType + "|" + vnp_TxnRef + "|" + vnp_Amount + "|" + vnp_TransactionNo + "|" + vnp_TransactionDate + "|" + vnp_CreateBy + "|" + vnp_CreateDate + "|" + vnp_IpAddr + "|" + vnp_OrderInfo;
+            var vnp_SecureHash = Utils.HmacSHA512(vnp_HashSecret, signData);
+
+            var rfData = new
+            {
+                vnp_RequestId = vnp_RequestId,
+                vnp_Version = vnp_Version,
+                vnp_Command = vnp_Command,
+                vnp_TmnCode = vnp_TmnCode,
+                vnp_TransactionType = vnp_TransactionType,
+                vnp_TxnRef = vnp_TxnRef,
+                vnp_Amount = vnp_Amount,
+                vnp_OrderInfo = vnp_OrderInfo,
+                vnp_TransactionNo = vnp_TransactionNo,
+                vnp_TransactionDate = vnp_TransactionDate,
+                vnp_CreateBy = vnp_CreateBy,
+                vnp_CreateDate = vnp_CreateDate,
+                vnp_IpAddr = vnp_IpAddr,
+                vnp_SecureHash = vnp_SecureHash
+
+            };
+
+            var jsonData = JsonSerializer.Serialize(rfData);
+
+            try
+            {
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create(vnp_Api);
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "POST";
+
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    streamWriter.Write(jsonData);
+                }
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                var strData = "";
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    strData = streamReader.ReadToEnd();
+                }
+                var vnPayResponse = JsonSerializer.Deserialize<VnPayResponse>(strData);
+
+
+                return Ok(new { VnPayResponse = vnPayResponse , Url = strData , Message = addRefundTransaction(vnPayResponse,transaction) });
+
+
+            }
+            catch (WebException ex)
+            {
+                return BadRequest(new { Error = "Failed to connect to VnPay", Details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = "Unexpected error", Details = ex.Message });
+            }
+        }
+
+        // =================XỬ LÝ DATABASE TẠO TRANSACTION REFUND  KHI RESPONSE TRẢ VỀ ==================//
+        private string addRefundTransaction(VnPayResponse response, Transaction transaction) 
+        {
+            if(response.Message.Contains("Success"))
+            {
+                try
+                {
+                    var _transaction = new Transaction()
+                    {
+                        //Id = int.Parse(response.TransactionId),
+                        Date = DateTime.ParseExact(response.PayDate, "yyyyMMddHHmmss", CultureInfo.InvariantCulture),
+                        AccountNumber = response.ResponseId,
+                        TransactionToken = transaction.TransactionToken,
+                        AmountOfMoney = transaction.AmountOfMoney,
+                        Status = true,
+                        OrderId = transaction.OrderId,
+                        TransactionNo = response.TransactionNo
+                    };
+
+                    _context.Transactions.Add(_transaction);
+                    _context.SaveChanges();
+
+                    repository.updateRefundOrder(transaction.OrderId);
+                    return "Refund successfully";
+
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+
+            }
+            else
+            {
+                return "This order have already refund";
+            }
+
 
         }
+
+
+
 
         // BODY CHO ITEM TRONG GIỎ HÀNG
         public class itemBody
@@ -203,10 +363,56 @@ namespace zooma_api.Controllers
 
         }
 
+        public class RefundRequest
+        {
+            public int OrderId { get; set; }
+            public string Description { get; set; }
+            public string RefundBy { get; set; }
+        }
 
+        public class VnPayResponse
+        {
+            [JsonPropertyName("vnp_ResponseId")]
+            public string ResponseId { get; set; }
 
+            [JsonPropertyName("vnp_Command")]
+            public string Command { get; set; }
 
+            [JsonPropertyName("vnp_ResponseCode")]
+            public string ResponseCode { get; set; }
+
+            [JsonPropertyName("vnp_Message")]
+            public string Message { get; set; }
+
+            [JsonPropertyName("vnp_TmnCode")]
+            public string TmnCode { get; set; }
+
+            [JsonPropertyName("vnp_TxnRef")]
+            public string TxnRef { get; set; }
+
+            [JsonPropertyName("vnp_Amount")]
+            public string Amount { get; set; }
+
+            [JsonPropertyName("vnp_OrderInfo")]
+            public string OrderInfo { get; set; }
+
+            [JsonPropertyName("vnp_BankCode")]
+            public string BankCode { get; set; }
+
+            [JsonPropertyName("vnp_PayDate")]
+            public string PayDate { get; set; }
+
+            [JsonPropertyName("vnp_TransactionNo")]
+            public string TransactionNo { get; set; }
+
+            [JsonPropertyName("vnp_TransactionType")]
+            public string TransactionType { get; set; }
+
+            [JsonPropertyName("vnp_TransactionStatus")]
+            public string TransactionStatus { get; set; }
+
+            [JsonPropertyName("vnp_SecureHash")]
+            public string SecureHash { get; set; }
+        }
     }
-
-
 }
