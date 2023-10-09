@@ -99,7 +99,7 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(
+            var user = await _context.Users.FirstOrDefaultAsync( //qwdqwdqwdqwdwqd
                 row =>
                 row.Id == id
                 //
