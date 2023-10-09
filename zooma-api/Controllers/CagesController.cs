@@ -21,7 +21,7 @@ namespace zooma_api.Controllers
         }
         //Hàm lấy tất cả cage
         [HttpGet]
-        [Route("api/GetAllCage")]
+        [Route("api/GetAllCages")]
         public async Task<ActionResult<IEnumerable<CagesDTO>>> GetAllCages()
         {
             if (_context.Cages == null)
@@ -86,12 +86,12 @@ namespace zooma_api.Controllers
                 return BadRequest("Cage is full");
             }
         }
+               
+           
 
-
-
-        //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
-
-
+          //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
+         
+           
         //Hàm xóa cage
         [HttpDelete]
         [Route("api/DeleteCage/{id}")]

@@ -11,10 +11,8 @@ using zooma_api.DTO;
 
 namespace zooma_api.Controllers
 {
-    
     public class AreaController : Controller
     {
-
         private readonly ZoomaContext _context;
 
         public AreaController(ZoomaContext context)
