@@ -11,8 +11,10 @@ using zooma_api.DTO;
 
 namespace zooma_api.Controllers
 {
+    
     public class AreaController : Controller
     {
+
         private readonly ZoomaContext _context;
 
         public AreaController(ZoomaContext context)
@@ -22,7 +24,7 @@ namespace zooma_api.Controllers
         // Get all areas in the system
         [HttpGet]
         [Route("api/areas")]
-        public async Task<ActionResult<IEnumerable<AreasDTO>>> GetAreas()
+        public async Task<ActionResult<IEnumerable<AreaDTO>>> GetAreas()
 
         {
             if (_context.Areas == null)
@@ -30,12 +32,12 @@ namespace zooma_api.Controllers
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
 
-            return await _context.Areas.Select(a => new AreasDTO(a)).ToListAsync();
+            return await _context.Areas.Select(a => new AreaDTO(a)).ToListAsync();
         }
         // Get detailed information of an area
         [HttpGet]
         [Route("api/areas/{id}")]
-        public async Task<ActionResult<AreasDTO>> GetArea(short id)
+        public async Task<ActionResult<AreaDTO>> GetArea(short id)
         {
             if (_context.Areas == null)
             {
@@ -48,12 +50,12 @@ namespace zooma_api.Controllers
                 return NotFound("Area not found");
             }
 
-            return new AreasDTO(area);
+            return new AreaDTO(area);
         }
         // Create a new area
         [HttpPost]
         [Route("api/areas")]
-        public async Task<ActionResult<AreasDTO>> PostArea(Area area)
+        public async Task<ActionResult<AreaDTO>> PostArea(Area area)
         {
 
             if (_context.Areas == null)
@@ -63,7 +65,7 @@ namespace zooma_api.Controllers
             _context.Areas.Add(area);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetArea", new { id = area.Id }, new AreasDTO(area));
+            return CreatedAtAction("GetArea", new { id = area.Id }, new AreaDTO(area));
         }
         // Update an area
         [HttpPut]

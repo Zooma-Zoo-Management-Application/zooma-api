@@ -20,7 +20,8 @@ namespace zooma_api.Controllers
             _context = context;
         }
         //Hàm lấy tất cả cage
-        [HttpGet("GetAll")]
+        [HttpGet]
+        [Route("api/GetAllCage")]
         public async Task<ActionResult<IEnumerable<CagesDTO>>> GetAllCages()
         {
             if (_context.Cages == null)
@@ -40,7 +41,8 @@ namespace zooma_api.Controllers
             return Ok(cagesDTO);
         }
         //Hàm tạo cage mới
-        [HttpPost("CreateCage")]
+        [HttpPost]
+        [Route("api/CreateCage")]
         public async Task<ActionResult<CagesDTO>> CreateCage(CagesDTO createCage)
         {
             if (_context.Cages == null)
@@ -62,7 +64,8 @@ namespace zooma_api.Controllers
             return CreatedAtAction("GetCage", new { id = cage.Id }, cage);
         }
         //select an animal from the database and assign to the cage 
-        [HttpPut("AssignAnimal/{id}")]
+        [HttpPut]
+        [Route("api/AssignAnimal/{id}/{cageID}")]
         public async Task<IActionResult> AssignAnimal(int id, int cageID)
         {
             var animal = await _context.Animals.FindAsync(id);
@@ -83,14 +86,15 @@ namespace zooma_api.Controllers
                 return BadRequest("Cage is full");
             }
         }
-               
-           
 
-          //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
-         
-           
+
+
+        //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
+
+
         //Hàm xóa cage
-        [HttpDelete("DeleteCage/{id}")]
+        [HttpDelete]
+        [Route("api/DeleteCage/{id}")]
             public async Task<IActionResult> DeleteCage(int id)
         {
             if (_context.Cages == null)
