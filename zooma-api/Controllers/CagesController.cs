@@ -13,9 +13,9 @@ namespace zooma_api.Controllers
 {
     public class CagesController : Controller
     {
-        private readonly ZoomaContext _context;
+        private readonly zoomadbContext _context;
 
-        public CagesController(ZoomaContext context)
+        public CagesController(zoomadbContext context)
         {
             _context = context;
         }

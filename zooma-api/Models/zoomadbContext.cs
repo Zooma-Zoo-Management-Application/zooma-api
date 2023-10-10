@@ -80,7 +80,7 @@ namespace zooma_api.Models
                     .HasForeignKey(d => d.DietId)
                     .HasConstraintName("FKAnimal242590");
 
-                entity.HasOne(d => d.Spiecies)
+                entity.HasOne(d => d.Species)
                     .WithMany(p => p.Animals)
                     .HasForeignKey(d => d.SpieciesId)
                     .OnDelete(DeleteBehavior.ClientSetNull)

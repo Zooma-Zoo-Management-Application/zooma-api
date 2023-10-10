@@ -15,7 +15,7 @@ namespace zooma_api.DTO
         // trả về kèm thêm
         public UserDTO User { get; set; } = null!;
         public ICollection<OrderDetailDTO> OrderDetails { get; set; } = new List<OrderDetailDTO>();
-        public  ICollection<TransactionDTO> Transactions { get; set; } = new List<TransactionDTO>();
+        public ICollection<TransactionDTO> Transactions { get; set; } = new List<TransactionDTO>();
 
 
 

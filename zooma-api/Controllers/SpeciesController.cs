@@ -15,7 +15,7 @@ namespace zooma_api.Controllers
     [ApiController]
     public class SpeciesController : ControllerBase
     {
-        public ZoomaContext _context = new ZoomaContext();
+        public zoomadbContext _context = new zoomadbContext();
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
@@ -23,18 +23,6 @@ namespace zooma_api.Controllers
         {
             _config = config;
             _mapper = mapper;
-        }
-        //Hàm lấy tất cả species
-        [HttpGet("GetAll")]
-        public async Task<ActionResult<IEnumerable<SpeciesDTO>>> GetAllSpecies()
-        {
-            if (_context.Species == null)
-            {
-                return NotFound();
-            }
-            var speciesDTO = _mapper.Map<ICollection<SpeciesDTO>>(await _context.Species.ToListAsync());
-
-            return Ok(speciesDTO);
         }
 
         //Hàm tạo species mới

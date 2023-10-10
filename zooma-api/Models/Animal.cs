@@ -25,7 +25,7 @@ namespace zooma_api.Models
 
         public virtual Cage? Cage { get; set; }
         public virtual Diet? Diet { get; set; }
-        public virtual Species Spiecies { get; set; } = null!;
+        public virtual Species Species { get; set; } = null!;
         public virtual TrainingPlan? TrainingPlan { get; set; }
         public virtual ICollection<AnimalUser> AnimalUsers { get; set; }
     }
