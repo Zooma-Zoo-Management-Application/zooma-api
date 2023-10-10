@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using zooma_api.DTO;
 using zooma_api.Models;
+using zooma_api.DTO;
+
 
 namespace zooma_api.Controllers
 {
@@ -18,105 +19,112 @@ namespace zooma_api.Controllers
         {
             _context = context;
         }
-        //GET: GetAllAreas
+        // Get all areas in the system
         [HttpGet]
-        [Route("GetAllAreas")]
-        public async Task<IActionResult> GetAllAreas()
+        [Route("api/areas")]
+        public async Task<ActionResult<IEnumerable<AreaDTO>>> GetAreas()
+
         {
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
-            return Ok(await _context.Areas.ToListAsync());
+
+            return await _context.Areas.Select(a => new AreaDTO(a)).ToListAsync();
         }
-        //POST: AddArea
-        [HttpPost]
-        [Route("AddArea")]
-        public async Task<IActionResult> AddArea([FromBody] Area area)
+        // Get detailed information of an area
+        [HttpGet]
+        [Route("api/areas/{id}")]
+        public async Task<ActionResult<AreaDTO>> GetArea(short id)
         {
+            if (_context.Areas == null)
+            {
+                return Problem("Entity set 'ZoomaContext.Areas'  is null.");
+            }
+            var area = await _context.Areas.FindAsync(id);
+
             if (area == null)
             {
-                return BadRequest("No area available");
+                return NotFound("Area not found");
             }
+
+            return new AreaDTO(area);
+        }
+        // Create a new area
+        [HttpPost]
+        [Route("api/areas")]
+        public async Task<ActionResult<AreaDTO>> PostArea(Area area)
+        {
+
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
             _context.Areas.Add(area);
             await _context.SaveChangesAsync();
-            return Ok(area);
+
+            return CreatedAtAction("GetArea", new { id = area.Id }, new AreaDTO(area));
         }
-        //PUT: UpdateArea
+        // Update an area
         [HttpPut]
-        [Route("UpdateArea")]
-        public async Task<IActionResult> UpdateArea([FromBody] Area area)
+        [Route("api/areas/{id}")]
+        public async Task<IActionResult> UpdateArea(short id, Area area)
         {
-            if (area == null)
+            if (id != area.Id)
             {
-                return BadRequest("No area available");
+                return BadRequest("Area id does not match");
             }
+
+
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'ZoomaContext.Areas'  is null.");
             }
-            var existingArea = await _context.Areas.FirstOrDefaultAsync(a => a.Id == area.Id);
-            if (existingArea == null)
+            _context.Entry(area).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException) when (!AreaExists(id))
             {
                 return NotFound("Area not found");
             }
-            existingArea.Name = area.Name;
-            existingArea.Description = area.Description;
-            existingArea.Status = area.Status;
-            await _context.SaveChangesAsync();
-            return Ok(existingArea);
+
+            return NoContent();
         }
-        //GET: GetCages from CageController
-        [HttpGet]
-        [Route("GetCages")]
-        public async Task<IActionResult> GetCages()
+        //Assign cage to an area
+        [HttpPut]
+        [Route("api/areas/{id}/cages")]
+        public async Task<IActionResult> AssignCage(short id, Cage cage)
         {
+            if (_context.Areas == null)
+            {
+                return Problem("Entity set 'ZoomaContext.Areas'  is null.");
+            }
+
             if (_context.Cages == null)
             {
                 return Problem("Entity set 'ZoomaContext.Cages'  is null.");
             }
-            return Ok(await _context.Cages.ToListAsync());
-        }
-        //PUT: Assign Cage to Area
-        [HttpPut]
-        [Route("AssignCageToArea")]
-        public async Task<IActionResult> AssignCageToArea([FromBody] AreaCage areaCage)
-        {
-            if (areaCage == null)
-            {
-                return BadRequest("No area cage available");
-            }
-            if (_context.Areas == null)
-            {
-                return Problem("Entity set 'ZoomaContext.Areas'  is null.");
-            }
-           
-            var existingArea = await _context.Areas.FirstOrDefaultAsync(a => a.Id == areaCage.AreaId);
-            if (existingArea == null)
+            var area = await _context.Areas.FindAsync(id);
+            if (area == null)
             {
                 return NotFound("Area not found");
             }
-            var existingCage = await _context.Cages.FirstOrDefaultAsync(c => c.Id == areaCage.CageId);
-            if (existingCage == null)
+            var c = _context.Cages.FindAsync(cage.Id);
+            try
             {
-                return NotFound("Cage not found");
+                await _context.SaveChangesAsync();
             }
-            existingArea.Cage = existingCage;
-            _context.Entry(existingArea).State = EntityState.Modified; // tao thong bao thay doi trang thai vi update
+            catch (DbUpdateConcurrencyException) when (!AreaExists(id))
+            {
+                return NotFound("Area not found");
+            }
 
-            await _context.SaveChangesAsync();
-            return Ok(existingArea);
-            
+            return NoContent();
         }
 
-        
-
-
-        // GET: Area
         public async Task<IActionResult> Index()
         {
               return _context.Areas != null ? 
@@ -124,7 +132,8 @@ namespace zooma_api.Controllers
                           Problem("Entity set 'ZoomaContext.Areas'  is null.");
         }
 
-        // GET: Area/Details/5
+        // GET: Areas/Details/5
+
         public async Task<IActionResult> Details(short? id)
         {
             if (id == null || _context.Areas == null)
@@ -142,13 +151,15 @@ namespace zooma_api.Controllers
             return View(area);
         }
 
-        // GET: Area/Create
+        // GET: Areas/Create
+
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Area/Create
+        // POST: Areas/Create
+
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -164,7 +175,8 @@ namespace zooma_api.Controllers
             return View(area);
         }
 
-        // GET: Area/Edit/5
+        // GET: Areas/Edit/5
+
         public async Task<IActionResult> Edit(short? id)
         {
             if (id == null || _context.Areas == null)
@@ -180,7 +192,8 @@ namespace zooma_api.Controllers
             return View(area);
         }
 
-        // POST: Area/Edit/5
+        // POST: Areas/Edit/5
+
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -215,7 +228,8 @@ namespace zooma_api.Controllers
             return View(area);
         }
 
-        // GET: Area/Delete/5
+        // GET: Areas/Delete/5
+
         public async Task<IActionResult> Delete(short? id)
         {
             if (id == null || _context.Areas == null)
@@ -233,7 +247,8 @@ namespace zooma_api.Controllers
             return View(area);
         }
 
-        // POST: Area/Delete/5
+        // POST: Areas/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(short id)
@@ -256,5 +271,6 @@ namespace zooma_api.Controllers
         {
           return (_context.Areas?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-    }
+    } 
 }
+
