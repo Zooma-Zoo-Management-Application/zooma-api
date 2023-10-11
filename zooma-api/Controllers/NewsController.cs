@@ -57,7 +57,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy News dựa trên staffid
-        [HttpGet("{staffId}")]
+        [HttpGet("{staffId}/GetNewsByStaffId")]
         public async Task<ActionResult<NewsDTO>> GetNewsByStaffId(short staffId)
         {
             var user = await _context.Users.Include(n => n.News).FirstOrDefaultAsync(n => n.Id == staffId);
