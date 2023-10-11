@@ -14,13 +14,13 @@ namespace zooma_api.Controllers
     public class AccountsController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly ZoomaContext _context;
+        private readonly zoomadbContext _context;
         private readonly IMapper _mapper;
 
         private IOrderRepository repository = new OrderRepository();
 
 
-        public AccountsController(IConfiguration configuration, ZoomaContext context, IMapper mapper)
+        public AccountsController(IConfiguration configuration, zoomadbContext context, IMapper mapper)
         {
             _configuration = configuration;
             _context = context;
