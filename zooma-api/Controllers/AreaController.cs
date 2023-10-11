@@ -13,9 +13,9 @@ namespace zooma_api.Controllers
 {
     public class AreaController : Controller
     {
-        private readonly ZoomaContext _context;
+        private readonly zoomadbContext _context;
 
-        public AreaController(ZoomaContext context)
+        public AreaController(zoomadbContext context)
         {
             _context = context;
         }

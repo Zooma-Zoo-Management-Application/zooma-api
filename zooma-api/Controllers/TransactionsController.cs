@@ -15,11 +15,11 @@ namespace zooma_api.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-        private readonly ZoomaContext _context;
+        private readonly zoomadbContext _context;
         private readonly IMapper _mapper;
 
 
-        public TransactionsController(ZoomaContext context, IMapper mapper)
+        public TransactionsController(zoomadbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

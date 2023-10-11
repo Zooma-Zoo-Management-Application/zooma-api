@@ -17,7 +17,7 @@ namespace zooma_api.Controllers
     [ApiController]
     public class AnimalsController : ControllerBase
     {
-        public ZoomaContext _context = new ZoomaContext();
+        public zoomadbContext _context = new zoomadbContext();
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
@@ -27,11 +27,19 @@ namespace zooma_api.Controllers
             _mapper = mapper;
         }
 
-        // GET: api/Animals
+        // Ham lay tat ca animal
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimals()
         {
-            var animals = await _context.Animals.ToListAsync();
+            var animals = await _context.Animals.
+                Include(n => n.TrainingPlan).
+                Include(n => n.Diet).
+            //    Include(n => n.Cage).
+                Include(n => n.Species).
+                ToListAsync(); 
+
+      //     var animals = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
+      //          (x, y) => new { x, y }).ToListAsync(); 
 
             var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
 
@@ -43,40 +51,78 @@ namespace zooma_api.Controllers
             return animalDTOs;
         }
 
-        // GET: api/Animals/5
-        [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<Animal>>> GetAnimalByName([FromQuery]string? name)
+        // ham lay animal dua tren Id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AnimalDTO>> GetAnimalById(int id)
         {
-          if (_context.Animals == null)
-          {
-                return NotFound();
-          }
-
-          if(string.IsNullOrEmpty(name))
-          {
-                return await _context.Animals.ToListAsync();
-          } else
+            if (_context.Animals == null)
             {
-                List<Animal> animals = await _context.Animals.Where(a => a.Name.Contains(name)).ToListAsync();
+                return NotFound();
+            }
 
-                if (animals.IsNullOrEmpty())
+            var animal = await _context.Animals.
+                                                Include(n => n.TrainingPlan).
+                                                Include(n => n.Diet).
+                                                Include(n => n.Species).
+                                             //   Include(n => n.Cage).
+                                                FirstOrDefaultAsync(e => e.Id == id);
+
+            if (animal == null)
+            {
+                return NotFound();
+            }
+
+            var animalDTO = _mapper.Map<AnimalDTO>(animal);
+
+            return animalDTO;
+        }
+
+        // Ham lay animal dua tren name
+        [HttpGet("name")]
+        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalByName([FromQuery] string? name)
+        {
+            if (_context.Animals == null)
+            {
+                return NotFound();
+            }
+
+            List<Animal> animals = new List<Animal>();
+
+            List<AnimalDTO> animalsDTO;
+
+            if (string.IsNullOrEmpty(name))
+            {
+                animals = await _context.Animals.ToListAsync();
+                animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
+                return animalsDTO;
+            }
+            else
+            {
+                animals = await _context.Animals.Where(a => a.Name.Contains(name)).ToListAsync();
+
+                animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
+
+                if (animalsDTO.IsNullOrEmpty())
                 {
                     return NotFound();
                 }
 
-                return animals;
+                return animalsDTO;
             }
         }
 
-        // PUT: api/Animals/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-       /* [HttpPut("{id}")]
-        public async Task<IActionResult> PutAnimal(int id, Animal animal)
+        // Ham update thong tin cua animal
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAnimalDetails(int id, [FromBody] AnimalUpdate animalUpdate)
         {
-            if (id != animal.Id)
+            var animal = _context.Animals.FirstOrDefault(a => a.Id == id);
+
+            if (animal == null)
             {
-                return BadRequest();
+                return NotFound("NOT FOUND");
             }
+
+            _mapper.Map(animal, animalUpdate);
 
             _context.Entry(animal).State = EntityState.Modified;
 
@@ -96,22 +142,24 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok("Update succesfully");
+                
         }
 
         // POST: api/Animals
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Animal>> PostAnimal(Animal animal)
+        public async Task<ActionResult<AnimalUpdate>> AddAnimal(AnimalUpdate animalDTO)
         {
-          if (_context.Animals == null)
-          {
-              return Problem("Entity set 'ZoomaContext.Animals'  is null.");
-          }
+            if (_context.Animals == null)
+            {
+                return Problem("Entity set 'ZoomaContext.Animals'  is null.");
+            }
+            var animal = _mapper.Map<Animal>(animalDTO);
             _context.Animals.Add(animal);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAnimal", new { id = animal.Id }, animal);
+            return CreatedAtAction("GetAnimalById", new { id = animal.Id }, animal);
         }
 
         // DELETE: api/Animals/5
@@ -125,15 +173,15 @@ namespace zooma_api.Controllers
             var animal = await _context.Animals.FindAsync(id);
             if (animal == null)
             {
-                return NotFound();
+                return NotFound("Can't found the animal");
             }
 
             _context.Animals.Remove(animal);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Create successfully");
         }
-       */
+
         private bool AnimalExists(int id)
         {
             return (_context.Animals?.Any(e => e.Id == id)).GetValueOrDefault();

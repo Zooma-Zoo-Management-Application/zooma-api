@@ -22,7 +22,7 @@ namespace zooma_api.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ZoomaContext _context = new ZoomaContext();
+        private readonly zoomadbContext _context = new zoomadbContext();
 
         private readonly IConfiguration _config;//token jwt
         private readonly IMapper _mapper;

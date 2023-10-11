@@ -15,10 +15,10 @@ namespace zooma_api.Controllers
     [ApiController]
     public class TicketsController : ControllerBase
     {
-        private readonly ZoomaContext _context;
+        private readonly zoomadbContext _context;
         private readonly IMapper _mapper;
 
-        public TicketsController(ZoomaContext context, IMapper mapper)
+        public TicketsController(zoomadbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;

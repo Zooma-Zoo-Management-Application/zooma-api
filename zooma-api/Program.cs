@@ -45,7 +45,7 @@ builder.Services.AddSwaggerGen(c =>
   });
 });
 
-builder.Services.AddDbContext<ZoomaContext>(options => {
+builder.Services.AddDbContext<zoomadbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"));
 });
 

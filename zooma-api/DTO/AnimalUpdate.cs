@@ -1,10 +1,7 @@
-﻿using zooma_api.Models;
-
-namespace zooma_api.DTO
+﻿namespace zooma_api.DTO
 {
-    public class AnimalDTO
+    public class AnimalUpdate
     {
-        public int? Id { get; set; }
         public string? Name { get; set; }
         public DateTime ArrivalDate { get; set; }
         public DateTime DateOfBirth { get; set; }
@@ -16,11 +13,5 @@ namespace zooma_api.DTO
         public int? DietId { get; set; }
         public short? CageId { get; set; }
         public short? TrainingPlanId { get; set; }
-
-        public DietDTO diet { get; set; }
-        public CagesDTO cages { get; set; }
-        public SpeciesDTO species { get; set; }
-        public TrainingPlanDTO trainingPlan { get; set; }
-
     }
 }

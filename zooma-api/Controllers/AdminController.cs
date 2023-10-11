@@ -11,7 +11,7 @@ namespace zooma_api.Controllers
     [ApiController]
     public class AdminController : ControllerBase // TEST AUTHORIZE ADMIN
     {
-        private readonly ZoomaContext _context = new ZoomaContext();
+        private readonly zoomadbContext _context = new zoomadbContext();
 
         //For admin Only
         [HttpGet]

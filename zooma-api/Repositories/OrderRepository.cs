@@ -10,7 +10,7 @@ namespace zooma_api.Repositories
     {
         public int CreateOrder(short userID, List<CartItemDTO> cartItems)
         {
-            using (var context = new ZoomaContext())
+            using (var context = new zoomadbContext())
             {
                 var order = new Order
                 {
@@ -56,7 +56,7 @@ namespace zooma_api.Repositories
 
         public List<OrderDetail> GetOrderDetailsByOrderId(int orderId)
         {
-            using (var context = new ZoomaContext())
+            using (var context = new zoomadbContext())
             {
                 return context.OrderDetails.Where(o => o.OrderId == orderId).ToList();
             }
@@ -64,7 +64,7 @@ namespace zooma_api.Repositories
 
         public List<Order> GetOrdersByCustomerId(int userID)
         {
-            using (var context = new ZoomaContext())
+            using (var context = new zoomadbContext())
             {
                 return context.Orders.Where(o => o.UserId == userID).ToList();
             }
@@ -73,7 +73,7 @@ namespace zooma_api.Repositories
 
         public Order GetOrdersById(int orderId)
         {
-            using (var context = new ZoomaContext())
+            using (var context = new zoomadbContext())
             {
                 return context.Orders.SingleOrDefault(o => o.Id == orderId);
             }
@@ -82,7 +82,7 @@ namespace zooma_api.Repositories
 
         public void updateRefundOrder(int orderId)
         {
-            using (var context = new ZoomaContext())
+            using (var context = new zoomadbContext())
             {
                 try
                 {

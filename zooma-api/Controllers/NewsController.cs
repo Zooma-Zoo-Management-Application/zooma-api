@@ -15,7 +15,8 @@ namespace zooma_api.Controllers
     [ApiController]
     public class NewsController : ControllerBase
     {
-        public ZoomaContext _context = new ZoomaContext();
+        public zoomadbContext _context = new zoomadbContext();
+
         private readonly IMapper _mapper;
 
         public NewsController(IMapper mapper)
@@ -56,7 +57,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy News dựa trên staffid
-        [HttpGet("/Staffs/{staffId}")]
+        [HttpGet("{staffId}")]
         public async Task<ActionResult<NewsDTO>> GetNewsByStaffId(short staffId)
         {
             var user = await _context.Users.Include(n => n.News).FirstOrDefaultAsync(n => n.Id == staffId);
