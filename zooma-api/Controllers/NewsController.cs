@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using zooma_api.DTO;
 using zooma_api.Models;
 
@@ -140,13 +141,12 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok(new { news = _mapper.Map<NewsDTO>(existingNews), message = "Update Successfully" });
         }
 
         // Hàm tạo news 
         [HttpPost()]
-        public async Task<ActionResult<News>> CreateNews(NewsBody newsBody)
+        public async Task<ActionResult<NewsDTO>> CreateNews(NewsBody newsBody)
         {
           if (_context.News == null)
           {
@@ -157,7 +157,8 @@ namespace zooma_api.Controllers
             _context.News.Add(news);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNewsById", new { id = news.Id }, news);
+           // return CreatedAtAction("GetNewsById", new { id = news.Id }, news);
+           return Ok(new { newsDTO = _mapper.Map<NewsDTO>(news), message = "News created successfully"});
         }
 
         //Hàm Pin News
@@ -183,6 +184,7 @@ namespace zooma_api.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -195,7 +197,7 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok(existingNews);
         }
 
         [HttpPut("{id}/unpin-news")]
@@ -231,7 +233,7 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok(existingNews);
         }
 
 
