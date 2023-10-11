@@ -1,4 +1,6 @@
-﻿namespace zooma_api.DTO
+﻿using zooma_api.Models;
+
+namespace zooma_api.DTO
 {
     public class CagesDTO
     {

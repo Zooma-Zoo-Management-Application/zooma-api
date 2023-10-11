@@ -38,17 +38,17 @@ namespace zooma_api.Controllers
                 Include(n => n.Species).
                 ToListAsync();
 
-            var animalss = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
-                 (x, y) => new { x, y }).ToListAsync();
+            //     var animalss = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
+            //         (x, y) => new { x, y }).ToListAsync();
 
             var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
 
-            if (animalDTOs == null || animalDTOs.Count == 0)
-            {
-                return NotFound("No animals found.");
-            }
+                if (animalDTOs == null || animalDTOs.Count == 0)
+                {
+                    return NotFound("No animals found.");
+                }
 
-            return animalDTOs;
+                return animalDTOs;
         }
 
         // ham lay animal dua tren Id
@@ -64,7 +64,7 @@ namespace zooma_api.Controllers
                                                 Include(n => n.TrainingPlan).
                                                 Include(n => n.Diet).
                                                 Include(n => n.Species).
-                                             //   Include(n => n.Cage).
+                                                Include(n => n.Cage).
                                                 FirstOrDefaultAsync(e => e.Id == id);
 
             if (animal == null)
@@ -98,13 +98,17 @@ namespace zooma_api.Controllers
             }
             else
             {
-                animals = await _context.Animals.Where(a => a.Name.Contains(name)).ToListAsync();
+                animals = await _context.Animals.Where(a => a.Name.Contains(name)).
+                                                                                    Include(n => n.TrainingPlan).
+                                                                                    Include(n => n.Diet).
+                                                                                    Include(n => n.Species).
+                                                                                    Include(n => n.Cage).ToListAsync();
 
                 animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
 
                 if (animalsDTO.IsNullOrEmpty())
                 {
-                    return NotFound();
+                    return NotFound("We can't found the animal that match your search");
                 }
 
                 return animalsDTO;

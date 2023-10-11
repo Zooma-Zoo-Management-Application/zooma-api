@@ -17,10 +17,10 @@ namespace zooma_api.DTO
         public short? CageId { get; set; }
         public short? TrainingPlanId { get; set; }
 
-        public DietDTO diet { get; set; }
-        public CagesDTO cages { get; set; }
-        public SpeciesDTO species { get; set; }
-        public TrainingPlanDTO trainingPlan { get; set; }
+        public DietDTO? diet { get; set; }
+        public CagesDTO? cage { get; set; }
+        public SpeciesDTO? species { get; set; }
+        public TrainingPlanDTO? trainingPlan { get; set; }
 
     }
 }
