@@ -11,9 +11,9 @@ namespace zooma_api.Controllers
 {
     public class DietsController : Controller
     {
-        private readonly ZoomaContext _context;
+        private readonly zoomadbContext _context;
 
-        public DietsController(ZoomaContext context)
+        public DietsController(zoomadbContext context)
         {
             _context = context;
         }

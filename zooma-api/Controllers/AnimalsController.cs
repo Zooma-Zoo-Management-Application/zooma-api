@@ -34,12 +34,12 @@ namespace zooma_api.Controllers
             var animals = await _context.Animals.
                 Include(n => n.TrainingPlan).
                 Include(n => n.Diet).
-            //    Include(n => n.Cage).
+                Include(n => n.Cage).
                 Include(n => n.Species).
-                ToListAsync(); 
+                ToListAsync();
 
-      //     var animals = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
-      //          (x, y) => new { x, y }).ToListAsync(); 
+            var animalss = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
+                 (x, y) => new { x, y }).ToListAsync();
 
             var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
 
