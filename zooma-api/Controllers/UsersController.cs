@@ -244,9 +244,9 @@ namespace zooma_api.Controllers
         }
         // ==================================== UPDATE API ===========================//
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(UpdateUserBody updateUserBody)
+        public async Task<IActionResult> UpdateUser(short id, UpdateUserBody updateUserBody)
         {
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == updateUserBody.id);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
 
             if (existingUser == null)
