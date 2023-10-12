@@ -4,7 +4,9 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    public class AreaController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AreaController : ControllerBase
     {
         private readonly zoomadbContext _context;
 
@@ -12,10 +14,8 @@ namespace zooma_api.Controllers
         {
             _context = context;
         }
-
         //get all
-        [HttpGet]
-        [Route("api/GetAllAreas")]
+        [HttpGet("GetAllAreas")]
         public async Task<ActionResult<IEnumerable<Area>>> GetAllAreas()
         {
             if (_context.Areas == null)
@@ -25,8 +25,7 @@ namespace zooma_api.Controllers
             return Ok(_context.Areas);
         }
         //get area by id
-        [HttpGet]
-        [Route("api/GetAreaById/{id}")]
+        [HttpGet("GetAreaById/{id}")]
         public async Task<ActionResult<Area>> GetAreaById(short id)
         {
             if (_context.Areas == null)
@@ -41,21 +40,20 @@ namespace zooma_api.Controllers
             return Ok(area);
         }
         //create area
-        [HttpPost]
-        [Route("api/CreateArea")]
+        [HttpPost("CreateArea")]
         public async Task<ActionResult<Area>> CreateArea(Area area)
         {
             if (_context.Areas == null)
             {
-                return NotFound("No area available");
+                return Problem("Entity set 'zoomadbContext.Areas'  is null.");
             }
             _context.Areas.Add(area);
             await _context.SaveChangesAsync();
-            return CreatedAtAction("GetAreaById", new { id = area.Id }, area);
+
+            return CreatedAtAction("GetArea", new { id = area.Id }, area);
         }
         //update area
-        [HttpPut]
-        [Route("api/UpdateArea/{id}")]
+        [HttpPut("UpdateArea/{id}")]
         public async Task<IActionResult> UpdateArea(short id, Area area)
         {
             if (id != area.Id)
@@ -82,141 +80,99 @@ namespace zooma_api.Controllers
             return NoContent();
         }
 
-
-        // GET: Area
-        public async Task<IActionResult> Index()
+        // GET: api/Area
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Area>>> GetAreas()
         {
-            return _context.Areas != null ?
-                        View(await _context.Areas.ToListAsync()) :
-                        Problem("Entity set 'zoomadbContext.Areas'  is null.");
-        }
-
-        // GET: Area/Details/5
-        public async Task<IActionResult> Details(short? id)
-        {
-            if (id == null || _context.Areas == null)
+            if (_context.Areas == null)
             {
                 return NotFound();
             }
+            return await _context.Areas.ToListAsync();
+        }
 
-            var area = await _context.Areas
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (area == null)
+        // GET: api/Area/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Area>> GetArea(short id)
+        {
+            if (_context.Areas == null)
             {
                 return NotFound();
             }
-
-            return View(area);
-        }
-
-        // GET: Area/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Area/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Status")] Area area)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(area);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(area);
-        }
-
-        // GET: Area/Edit/5
-        public async Task<IActionResult> Edit(short? id)
-        {
-            if (id == null || _context.Areas == null)
-            {
-                return NotFound();
-            }
-
             var area = await _context.Areas.FindAsync(id);
+
             if (area == null)
             {
                 return NotFound();
             }
-            return View(area);
+
+            return area;
         }
 
-        // POST: Area/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(short id, [Bind("Id,Name,Description,Status")] Area area)
+        // PUT: api/Area/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutArea(short id, Area area)
         {
             if (id != area.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(area).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(area);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AreaExists(area.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(area);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AreaExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: Area/Delete/5
-        public async Task<IActionResult> Delete(short? id)
-        {
-            if (id == null || _context.Areas == null)
-            {
-                return NotFound();
-            }
-
-            var area = await _context.Areas
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (area == null)
-            {
-                return NotFound();
-            }
-
-            return View(area);
-        }
-
-        // POST: Area/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(short id)
+        // POST: api/Area
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Area>> PostArea(Area area)
         {
             if (_context.Areas == null)
             {
                 return Problem("Entity set 'zoomadbContext.Areas'  is null.");
             }
-            var area = await _context.Areas.FindAsync(id);
-            if (area != null)
+            _context.Areas.Add(area);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetArea", new { id = area.Id }, area);
+        }
+
+        // DELETE: api/Area/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteArea(short id)
+        {
+            if (_context.Areas == null)
             {
-                _context.Areas.Remove(area);
+                return NotFound();
+            }
+            var area = await _context.Areas.FindAsync(id);
+            if (area == null)
+            {
+                return NotFound();
             }
 
+            _context.Areas.Remove(area);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool AreaExists(short id)
