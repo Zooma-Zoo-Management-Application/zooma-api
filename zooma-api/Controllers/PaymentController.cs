@@ -159,19 +159,19 @@ namespace zooma_api.Controllers
         }
 
         [HttpPost]
-        [Route("checkout")]
-        public IActionResult Checkout(short userID) // ADD XONG RỒI THÌ CHECKOUT
+        [Route("checkout/{id}")]
+        public IActionResult Checkout(short id, List<CartItemDTO> list) // ADD XONG RỒI THÌ CHECKOUT
         {
             int orderId = 0;
             try
             {
-                if(ListCart.Instance.GetLists() == null)
+                if(list == null)
                 {
                     throw new Exception("vl bro you didnt add the item in cart");
                 }
                 else
                 {
-                    orderId = repository.CreateOrder(userID, ListCart.Instance.GetLists());
+                    orderId = repository.CreateOrder(id, list);
 
                     //ListCart.Instance.ClearCart();
                 }
