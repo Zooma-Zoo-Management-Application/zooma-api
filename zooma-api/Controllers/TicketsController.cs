@@ -59,16 +59,16 @@ namespace zooma_api.Controllers
 
         // PUT: api/Tickets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut]
-        public async Task<IActionResult> PutTicket(TicketBody ticketBody) // UPDATE PRICE CỦA TICKET
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTicket(short id, TicketBody ticketBody) // UPDATE PRICE CỦA TICKET
         {
-          
-
-            var ticket = await _context.Tickets.FindAsync(ticketBody.Id);
-            ticket.Price = ticketBody.Price;
+            var ticket = await _context.Tickets.FindAsync(id);
 
             if ( ticket != null)
             {
+                ticket.Price = ticketBody.Price;
+                ticket.Description = ticketBody.Description;
+                ticket.Name = ticketBody.Name;
                 _context.Entry(ticket).State = EntityState.Modified;
             }
             else
@@ -82,7 +82,7 @@ namespace zooma_api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TicketExists(ticketBody.Id))
+                if (!TicketExists(id))
                 {
                     return NotFound();
                 }
@@ -138,7 +138,8 @@ namespace zooma_api.Controllers
 
     public class TicketBody
     {
-        public int Id { get; set; }
         public float Price { get; set; }
+        public string Name { get; set; }
+        public String Description { get; set; } 
     }
 }

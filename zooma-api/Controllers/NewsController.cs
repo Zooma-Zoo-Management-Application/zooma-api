@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Plugins;
 using zooma_api.DTO;
 using zooma_api.Models;
 
@@ -112,16 +113,20 @@ namespace zooma_api.Controllers
 
         // PUT: api/News/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateNews(short id, [FromBody]NewsBody newsBody)
+        public async Task<IActionResult> UpdateNews(short id, UpdateNewsBody newsBody)
         {
             var existingNews = await _context.News.FirstOrDefaultAsync(e => e.Id == id);
 
             if (existingNews == null)
             {
-                return NotFound();
+                return NotFound("Khong tim thay news nay");
             }
 
-            _mapper.Map(newsBody, existingNews);
+            existingNews.Title = newsBody.Title;
+            existingNews.Content = newsBody.Content;
+            existingNews.Image = newsBody.Image;
+            existingNews.Date = DateTime.Now;
+            existingNews.Description = newsBody.Description;
 
             _context.Entry(existingNews).State = EntityState.Modified;
 
@@ -140,24 +145,44 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            return Ok("Update successfully!");
         }
 
         // Hàm tạo news 
         [HttpPost()]
-        public async Task<ActionResult<News>> CreateNews(NewsBody newsBody)
+        public async Task<ActionResult<NewsDTO>> CreateNews(NewsBody newsBody)
         {
           if (_context.News == null)
           {
               return Problem("Entity set 'ZoomaContext.News'  is null.");
           }
-            var news = _mapper.Map<News>(newsBody);
-            news.Date = DateTime.Now;
+
+            News news = new News
+            {
+                Title = newsBody.Title,
+                Content = newsBody.Content,
+                Date = DateTime.Now,
+                Description = newsBody.Description,
+                Image = newsBody.Image,
+                Status = false,
+                UserId = newsBody.UserId,
+            };
+
+            var user = _context.Users.FirstOrDefault(x => x.Id == news.UserId); 
+
+            if(user.RoleId != 1)
+            {
+                return BadRequest("This user can't create news");
+            }
+
             _context.News.Add(news);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNewsById", new { id = news.Id }, news);
+            /*      var news = _mapper.Map<News>(newsBody);
+                  news.Date = DateTime.Now;*/
+
+            // return CreatedAtAction("GetNewsById", new { id = news.Id }, news);
+            return Ok(new { newsDTO = _mapper.Map<NewsDTO>(news), message = "News created successfully"});
         }
 
         //Hàm Pin News
@@ -183,6 +208,7 @@ namespace zooma_api.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -195,7 +221,7 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok(existingNews);
         }
 
         [HttpPut("{id}/unpin-news")]
@@ -231,7 +257,7 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok(existingNews);
         }
 
 
@@ -261,5 +287,13 @@ namespace zooma_api.Controllers
             return (_context.News?.Any(e => e.Id == id)).GetValueOrDefault();
         }
         
+    }
+
+    public class UpdateNewsBody
+    {
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public string? Description { get; set; }
+        public string? Image { get; set; }
     }
 }
