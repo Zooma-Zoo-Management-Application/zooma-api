@@ -127,7 +127,6 @@ namespace zooma_api.Controllers
             existingNews.Image = existingNews.Image ?? newsBody.Image;
             existingNews.Date = existingNews.Date;
             existingNews.Description = existingNews.Description ?? newsBody.Description;
-            existingNews.UserId = existingNews.UserId;
 
             _context.Entry(existingNews).State = EntityState.Modified;
 
