@@ -119,14 +119,14 @@ namespace zooma_api.Controllers
 
             if (existingNews == null)
             {
-                return NotFound();
+                return NotFound("Khong tim thay news nay");
             }
 
-            existingNews.Title = existingNews.Title ?? newsBody.Title;
-            existingNews.Content = existingNews.Content ?? newsBody.Content;
-            existingNews.Image = existingNews.Image ?? newsBody.Image;
-            existingNews.Date = existingNews.Date;
-            existingNews.Description = existingNews.Description ?? newsBody.Description;
+            existingNews.Title = newsBody.Title;
+            existingNews.Content = newsBody.Content;
+            existingNews.Image = newsBody.Image;
+            existingNews.Date = DateTime.Now;
+            existingNews.Description = newsBody.Description;
 
             _context.Entry(existingNews).State = EntityState.Modified;
 
@@ -295,6 +295,5 @@ namespace zooma_api.Controllers
         public string? Content { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }
-        public short UserId { get; set; }
     }
 }
