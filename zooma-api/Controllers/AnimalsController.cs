@@ -117,7 +117,7 @@ namespace zooma_api.Controllers
 
         // Ham update thong tin cua animal
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAnimalDetails(int id, AnimalUpdate animalUpdate)
+        public async Task<IActionResult> UpdateAnimalDetails(int id, [FromBody] AnimalUpdate animalUpdate)
         {
             var animal = _context.Animals.FirstOrDefault(a => a.Id == id);
 
@@ -126,15 +126,7 @@ namespace zooma_api.Controllers
                 return NotFound("NOT FOUND");
             }
 
-            animal.Name = animal.Name ?? animalUpdate.Name;
-            animal.Height = animal.Height ?? animalUpdate.Height;
-            animal.Weight = animal.Weight ?? animalUpdate.Weight;
-            animal.Description = animal.Description ?? animalUpdate.Description;
-            animal.Status = animalUpdate.Status;
-            animal.SpieciesId = animalUpdate.SpieciesId;
-            animal.DietId = animalUpdate.DietId;
-            animal.CageId = animal.CageId ?? animalUpdate.CageId;
-            animal.TrainingPlanId = animalUpdate.TrainingPlanId;
+            _mapper.Map(animal, animalUpdate);
 
             _context.Entry(animal).State = EntityState.Modified;
 
@@ -155,39 +147,23 @@ namespace zooma_api.Controllers
             }
 
             return Ok("Update succesfully");
-            
+                
         }
 
         // POST: api/Animals
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<AnimalDTO>> AddAnimal(AnimalUpdate animalDTO)
+        public async Task<ActionResult<AnimalUpdate>> AddAnimal(AnimalUpdate animalDTO)
         {
             if (_context.Animals == null)
             {
                 return Problem("Entity set 'ZoomaContext.Animals'  is null.");
             }
-
-            Animal animal = new Animal
-            {
-                Name = animalDTO.Name,
-                ArrivalDate = animalDTO.ArrivalDate,
-                DateOfBirth = animalDTO.DateOfBirth,
-                Height = animalDTO.Height,
-                Weight = animalDTO.Weight,
-                Description = animalDTO.Description,
-                Status = animalDTO.Status,
-                SpieciesId = animalDTO.SpieciesId,
-                DietId = animalDTO.DietId,
-                CageId = animalDTO.CageId,
-                TrainingPlanId = animalDTO.TrainingPlanId,
-            };
-
-//            var animal = _mapper.Map<Animal>(animalDTO);
+            var animal = _mapper.Map<Animal>(animalDTO);
             _context.Animals.Add(animal);
             await _context.SaveChangesAsync();
 
-            return Ok(new { animalDTO = _mapper.Map<AnimalDTO>(animal), message = "Animal created successfully" });
+            return CreatedAtAction("GetAnimalById", new { id = animal.Id }, animal);
         }
 
         // DELETE: api/Animals/5
@@ -207,28 +183,12 @@ namespace zooma_api.Controllers
             _context.Animals.Remove(animal);
             await _context.SaveChangesAsync();
 
-            return Ok("Delete successfully");
+            return Ok("Create successfully");
         }
 
         private bool AnimalExists(int id)
         {
             return (_context.Animals?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-
     }
-    public class AnimalUpdate
-    {
-        public string? Name { get; set; }
-        public DateTime ArrivalDate { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public float? Height { get; set; }
-        public float? Weight { get; set; }
-        public string? Description { get; set; }
-        public bool Status { get; set; }
-        public int SpieciesId { get; set; }
-        public int? DietId { get; set; }
-        public short? CageId { get; set; }
-        public short? TrainingPlanId { get; set; }
-    }
-
 }
