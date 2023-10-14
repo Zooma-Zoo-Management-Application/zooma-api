@@ -115,6 +115,47 @@ namespace zooma_api.Controllers
             }
         }
 
+        // ham lay animal dua tren AreaId
+        [HttpGet("/get-animals-by-areaId/{id}")]
+        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalsByAreaId(int id)
+        {
+            if (_context.Animals == null)
+            {
+                return NotFound();
+            }
+
+            var areaId = _context.Areas.FirstOrDefault(a => a.Id == id);
+
+            if (areaId == null)
+            {
+                return NotFound("Khong tim thay area nay");
+            }
+
+            var cages = _context.Cages.Where(a => a.AreaId == areaId.Id).Select(a => a.Id).ToList();
+
+            if (cages.Count == 0 || cages == null)
+            {
+                return NotFound("Khong tim thay cage trong area nay");
+            }
+
+            var animals = _context.Animals
+                .Where(a => cages.Contains((short)a.CageId)).
+                                                            Include(n => n.TrainingPlan).
+                                                            Include(n => n.Diet).
+                                                            Include(n => n.Species).
+                                                            Include(n => n.Cage).
+                                                            ToList();
+
+            if (animals == null)
+            {
+                return NotFound();
+            }
+
+            var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
+
+            return animalDTOs;
+        }
+
         // Ham update thong tin cua animal
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAnimalDetails(int id, [FromBody] AnimalUpdate animalUpdate)
