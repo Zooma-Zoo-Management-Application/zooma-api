@@ -60,7 +60,7 @@ namespace zooma_api.Controllers
         // PUT: api/Tickets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTicket(short id, TicketBody ticketBody) // UPDATE PRICE CỦA TICKET
+        public async Task<IActionResult> PutTicket(int id, TicketBody ticketBody) // UPDATE PRICE CỦA TICKET
         {
             var ticket = await _context.Tickets.FindAsync(id);
 
