@@ -2,9 +2,9 @@
 {
     public interface IAnalisticRepository
     {
-        float getTotalRevenues();
-        List<MonthRevenue> GetGetSixMonthsRevenues();
-        List<TicketsQuantity> GetGetSixMonthsTicketQuantity();
+        float GetTotalRevenues();
+        List<MonthRevenue> GetSixMonthsRevenues();
+        List<TicketsQuantity> GetSixMonthsTicketQuantity();
         float RevenuesInDay { get; }
 
         TicketsQuantity TicketsQuantityInDay { get; }

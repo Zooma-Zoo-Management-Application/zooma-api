@@ -5,7 +5,7 @@ namespace zooma_api.Repositories
 {
     public class AnalisticRepository : IAnalisticRepository
     {
-        public float getTotalRevenues()
+        public float GetTotalRevenues()
         {
             float value = 0;
             using (var context = new zoomadbContext())
@@ -41,7 +41,7 @@ namespace zooma_api.Repositories
                     {
                         DateTime today = DateTime.Now;
                         var monthlyOrderDetails = _context.OrderDetails
-                                   .Where(od => od.TicketDate.Day == today.Day && od.TicketDate.Month == today.Month && od.TicketDate.Year == today.Year).Include(o => o.Ticket).ToList();
+                                   .Where(od => od.TicketDate.Day == today.Day && od.TicketDate.Month == today.Month && od.TicketDate.Year == today.Year).Include(o => o.Ticket).Include(o=>o.Order).ToList();
 
                         float revenue = 0;
                         foreach (var orderDetail in monthlyOrderDetails)
@@ -76,7 +76,7 @@ namespace zooma_api.Repositories
                     {
                         DateTime today = DateTime.Now;
                         var monthlyOrderDetails = _context.OrderDetails
-                                   .Where(od => od.TicketDate.Day == today.Day && od.TicketDate.Month == today.Month && od.TicketDate.Year == today.Year).Include(o => o.Ticket).ToList();
+                                   .Where(od => od.TicketDate.Day == today.Day && od.TicketDate.Month == today.Month && od.TicketDate.Year == today.Year).Include(o => o.Order).ToList();
 
                         int adult_ticket = 0;
                         int child_ticket = 0;
@@ -122,7 +122,7 @@ namespace zooma_api.Repositories
             }
         }
 
-        public List<MonthRevenue> GetGetSixMonthsRevenues()
+        public List<MonthRevenue> GetSixMonthsRevenues()
         {
             using (var _context = new zoomadbContext())
             {
@@ -173,7 +173,7 @@ namespace zooma_api.Repositories
             }
         }
 
-        public List<TicketsQuantity> GetGetSixMonthsTicketQuantity()
+        public List<TicketsQuantity> GetSixMonthsTicketQuantity()
         {
             using (var _context = new zoomadbContext())
             {
@@ -189,7 +189,7 @@ namespace zooma_api.Repositories
                         DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);// SET NGÀY CUỐI THÁNG
 
                         var monthlyOrderDetails = _context.OrderDetails
-                            .Where(od => od.TicketDate >= startOfMonth && od.TicketDate <= endOfMonth).Include(o => o.Ticket).ToList();
+                            .Where(od => od.TicketDate >= startOfMonth && od.TicketDate <= endOfMonth).Include(o => o.Order).ToList();
 
                         int adult_ticket = 0;
                         int child_ticket = 0;
