@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Xml.Schema;
 using zooma_api.Repositories;
 
 namespace zooma_api.Controllers
@@ -14,14 +15,37 @@ namespace zooma_api.Controllers
         [HttpGet("sixmonths-revenues")]
         public  IActionResult getRevenues()
         {
-            return  Ok( _repository.GetGetSixMonthsRevenues()); 
+            var list = _repository.GetSixMonthsRevenues();
+            double total = 0;
+
+            foreach (var revenue in list)
+            {
+                total += revenue.Revenue;
+            }
+
+            return  Ok( new { total , list}); 
         }
 
         [HttpGet("sixmonths-tickets")]
         public  IActionResult getTickets()
         {
-            return Ok(_repository.GetGetSixMonthsTicketQuantity());
+            var list = _repository.GetSixMonthsTicketQuantity();
+            int totalTicket = 0;
+            foreach (var ticket in list)
+            {
+                totalTicket += ticket.TotalTickets;
+            }
+
+            return Ok(new {totalTicket,list});
         }
+
+        [HttpGet("inday-analysis")]
+
+        public IActionResult GetIndayInformations()
+        {
+            return Ok(new { revenue = _repository.RevenuesInDay, quantityDetail = _repository.TicketsQuantityInDay });
+        }
+
 
         [HttpGet("inday-revenues")]
         public IActionResult getRevenuesInday()

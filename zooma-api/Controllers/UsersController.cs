@@ -186,13 +186,13 @@ namespace zooma_api.Controllers
 
             if (UserExists(user.Email))
             {
-                return BadRequest("Email already exists");
+                return BadRequest(new { message = "Email already exists"});
 
             }
 
             if ( user.Password != user.ConfirmPassword)
             {
-                return BadRequest("Please type the correct confirm password");
+                return BadRequest(new { message = "Please type the correct confirm password"});
 
             }
 
@@ -273,7 +273,7 @@ namespace zooma_api.Controllers
             {
                 if (!UserExists(existingUser.Email))  // Assuming email is unique
                 {
-                    return NotFound("Email đã tồn tại");
+                    return BadRequest(new { message = "Email is already exist" });
                 }
                 else
                 {
@@ -281,7 +281,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok("Update Successfully"); // Return 204 No Content to indicate the request has succeeded
+            return Ok(new { message = "Update Successfully"}); // Return 204 No Content to indicate the request has succeeded
         }
 
         [HttpPut("update-password")]
@@ -441,12 +441,18 @@ namespace zooma_api.Controllers
                 var loginUser = _mapper.Map<UserDTO>(userChecking);
                 String accessToken = GenerateToken(userChecking);
 
-                return Ok(new LoginResponse()
+                return Ok( new { loginResponse = new LoginResponse()
                 {
                     AccessToken = accessToken,
 
                     user = loginUser
                     // tạo ra accessToken dựa trên tài khoản
+                },
+                message = "Login sucessfully"
+
+
+
+
                 }); 
 
             }
@@ -456,7 +462,7 @@ namespace zooma_api.Controllers
             //    return BadRequest(ModelState);
 
             // trả về mã lỗi 404
-            return BadRequest("The User is not existed");
+            return BadRequest(new { message = "The User is not existed" });
         }
 
     }
