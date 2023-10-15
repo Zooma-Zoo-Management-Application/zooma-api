@@ -16,7 +16,7 @@ namespace zooma_api.Models
         public float TotalPrice { get; set; }
         public string? Notes { get; set; }
         public string PaymentMethod { get; set; } = null!;
-        public bool Status { get; set; }
+        public byte Status { get; set; }
         public short UserId { get; set; }
         public DateTime? LastUpdateDate { get; set; }
 

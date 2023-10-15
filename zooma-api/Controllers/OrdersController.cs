@@ -35,7 +35,7 @@ namespace zooma_api.Controllers
               return NotFound();
           }
 
-          var list = await _context.Orders.Include(o => o.OrderDetails).Include(o=>o.Transactions).Include(o => o.User).ToListAsync();
+          var list = await _context.Orders.Include(o => o.OrderDetails).Include(o=>o.Transactions).Include(o => o.User).Where(o=>o.Status==1).ToListAsync();
 
            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
 
@@ -43,6 +43,23 @@ namespace zooma_api.Controllers
             return Ok(orderDTOs);
         }
         // GET: api/Orders
+        [HttpGet("unsuccess-orders")]
+
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetUnSuccessOrders() // XỬ LÝ GET ORDERS TRẢ VỀ KÈM CHUNG
+                                                                           // VỚI DANH SÁCH CÁC ORDER DETAILS CỦA NÓ 
+        {
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+
+            var list = await _context.Orders.Include(o => o.OrderDetails).Include(o => o.Transactions).Include(o => o.User).Where(o => o.Status == 1).ToListAsync();
+
+            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
+
+
+            return Ok(orderDTOs);
+        }
 
 
         [HttpGet("userId/{id}")]
@@ -196,7 +213,7 @@ public class OrderBody
 {
     public int Id { get; set; }
     public string? Notes { get; set; }
-    public bool Status { get; set; }
+    public byte Status { get; set; }
 }
 
 public class OrderDetailsBody
