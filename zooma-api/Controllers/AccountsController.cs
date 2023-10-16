@@ -38,24 +38,24 @@ namespace zooma_api.Controllers
 
             }
 
-            var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.Where(u => u.Status==true).ToListAsync());
+            var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.ToListAsync());
 
             return Ok(list);
         }
 
-        [HttpGet("banned-users")]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetBannedUsers() // CHỈ GET USER BÌNH THƯỜNG STATUS LÀ TRUE
-        {
-            if (_context.Users == null)
-            {
-                return NotFound();
+        //[HttpGet("banned-users")]
+        //public async Task<ActionResult<IEnumerable<UserDTO>>> GetBannedUsers() // CHỈ GET USER BÌNH THƯỜNG STATUS LÀ TRUE
+        //{
+        //    if (_context.Users == null)
+        //    {
+        //        return NotFound();
 
-            }
+        //    }
 
-            var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.Where(u => u.Status == false).ToListAsync());
+        //    var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.Where(u => u.Status == false).ToListAsync());
 
-            return Ok(list);
-        }
+        //    return Ok(list);
+        //}
 
         [HttpGet]
         [Route("zoo-trainers")]
@@ -83,6 +83,20 @@ namespace zooma_api.Controllers
             }
 
             var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.Where(u => u.RoleId == 1).ToListAsync());
+
+            return Ok(list);
+        }
+        [HttpGet]
+        [Route("visitors")]
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetVisitors()
+        {
+            if (_context.Users == null)
+            {
+                return NotFound();
+
+            }
+
+            var list = _mapper.Map<ICollection<UserDTO>>(await _context.Users.Where(u => u.RoleId == 3).ToListAsync());
 
             return Ok(list);
         }

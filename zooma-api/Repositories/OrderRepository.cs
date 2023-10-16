@@ -16,7 +16,7 @@ namespace zooma_api.Repositories
                 {
                     UserId = userID,
                     OrderDate = DateTime.Now,
-                    Status = false,
+                    Status = 0,
                     TotalPrice = 0,
                     PaymentMethod = "VnPay",
                     LastUpdateDate= DateTime.Now,

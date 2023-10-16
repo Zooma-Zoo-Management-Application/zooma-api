@@ -46,7 +46,7 @@ namespace zooma_api.Repositories
                         float revenue = 0;
                         foreach (var orderDetail in monthlyOrderDetails)
                         {
-                            if (orderDetail.Order.Status)
+                            if (orderDetail.Order.Status == 1)
                             {
                                 revenue += orderDetail.Quantity * orderDetail.Ticket.Price;
 
@@ -84,7 +84,7 @@ namespace zooma_api.Repositories
                         int total = 0;
                         foreach (var orderDetail in monthlyOrderDetails)
                         {
-                            if (orderDetail.Order.Status)
+                            if (orderDetail.Order.Status == 1)
                             {
                                 total += orderDetail.Quantity;
 
@@ -146,7 +146,7 @@ namespace zooma_api.Repositories
 
                         foreach (var orderDetail in monthlyOrderDetails)
                         {
-                            if (orderDetail.Order.Status)
+                            if (orderDetail.Order.Status == 1)
                             {
                                 monthlyRevenueValue += orderDetail.Ticket.Price * orderDetail.Quantity;
                                 quantity += orderDetail.Quantity;
@@ -198,7 +198,7 @@ namespace zooma_api.Repositories
 
                         foreach (var orderDetail in monthlyOrderDetails)
                         {
-                            if (orderDetail.Order.Status)
+                            if (orderDetail.Order.Status == 1)
                             {
                                 total += orderDetail.Quantity;
 

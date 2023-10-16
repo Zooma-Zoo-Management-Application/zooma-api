@@ -90,7 +90,7 @@ namespace zooma_api.Controllers
                             TransactionNo = response.TransactionId
                         };
 
-                        order.Status = true;
+                        order.Status = 2;
                         _context.Entry(order).State = EntityState.Modified;
 
                         _context.Transactions.Add(transaction);
@@ -165,7 +165,7 @@ namespace zooma_api.Controllers
             int orderId = 0;
             try
             {
-                if(list == null)
+                if(list.Count == 0 )
                 {
                     throw new Exception("vl bro you didnt add the item in cart");
                 }
