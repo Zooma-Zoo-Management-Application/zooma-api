@@ -16,7 +16,7 @@ namespace zooma_api.Repositories
                 {
                     UserId = userID,
                     OrderDate = DateTime.Now,
-                    Status = 0,
+                    Status = 1, // ĐANG THANH TOÁN 
                     TotalPrice = 0,
                     PaymentMethod = "VnPay",
                     LastUpdateDate= DateTime.Now,
