@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
 using zooma_api.Models;
@@ -7,11 +8,13 @@ using zooma_api.Models;
 [ApiController]
 public class CageController : ControllerBase
 {
-    private readonly zoomadbContext _context;
+    public zoomadbContext _context = new zoomadbContext();
+    private readonly IMapper _mapper;
 
-    public CageController(zoomadbContext context)
+    public CageController(zoomadbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
     //Hàm lấy tất cả cage
     [HttpGet("GetAllCages")]
@@ -92,6 +95,37 @@ public class CageController : ControllerBase
         {
             return BadRequest("Cage is full");
         }
+    }
+
+    // hàm lấy Cage dựa trên AreaId kèm theo Animal
+    [HttpGet("/get-cages-by-areaId/{id}")]
+    public async Task<ActionResult<IEnumerable<CagesDTO>>> GetCagesByAreaId(int id)
+    {
+        if (_context.Cages == null)
+        {
+            return NotFound();
+        }
+
+        var area = _context.Areas.FirstOrDefault(a => a.Id == id);
+
+        if (area == null)
+        {
+            return NotFound("Khong tim thay area nay");
+        }
+
+        var cages = _context.Cages
+            .Where(a => a.AreaId == area.Id)
+            .Include(b => b.Animal)
+            .ToList();
+
+        if (cages.Count == 0 || cages == null)
+        {
+            return NotFound("Khong tim thay cage trong area nay");
+        }
+
+        var cagesDTO = _mapper.Map<List<CagesDTO>>(cages);
+
+        return cagesDTO;
     }
 
 

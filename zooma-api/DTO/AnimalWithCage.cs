@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace zooma_api.Models
+﻿namespace zooma_api.DTO
 {
-    public partial class Animal
+    public class AnimalWithCage
     {
-        public Animal()
-        {
-            AnimalUsers = new HashSet<AnimalUser>();
-        }
-
         public int Id { get; set; }
         public string? Name { get; set; }
         public DateTime ArrivalDate { get; set; }
@@ -25,11 +17,5 @@ namespace zooma_api.Models
         public string? ImageUrl { get; set; }
         public double MinRer { get; set; }
         public double MaxRer { get; set; }
-
-        public virtual Cage? Cage { get; set; }
-        public virtual Diet? Diet { get; set; }
-        public virtual Species? Species { get; set; }
-        public virtual TrainingPlan? TrainingPlan { get; set; }
-        public virtual ICollection<AnimalUser> AnimalUsers { get; set; }
     }
 }
