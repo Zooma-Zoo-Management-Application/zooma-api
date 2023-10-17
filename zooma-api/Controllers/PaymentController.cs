@@ -384,8 +384,8 @@ namespace zooma_api.Controllers
 
                     _context.Transactions.Add(_transaction);
                     order.Status = 3; // REFUND THÀNH CÔNG
+                    _context.Entry(order).State = EntityState.Modified;
                     _context.SaveChanges();
-
                     repository.updateRefundOrder(transaction.OrderId);
                     return "Refund successfully";
 
