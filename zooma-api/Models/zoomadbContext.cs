@@ -20,6 +20,7 @@ namespace zooma_api.Models
         public virtual DbSet<AnimalUser> AnimalUsers { get; set; } = null!;
         public virtual DbSet<Area> Areas { get; set; } = null!;
         public virtual DbSet<Cage> Cages { get; set; } = null!;
+        public virtual DbSet<Configuration> Configurations { get; set; } = null!;
         public virtual DbSet<Diet> Diets { get; set; } = null!;
         public virtual DbSet<DietDetail> DietDetails { get; set; } = null!;
         public virtual DbSet<Food> Foods { get; set; } = null!;
@@ -42,7 +43,7 @@ namespace zooma_api.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=tcp:zooma-db.database.windows.net,1433;Initial Catalog=zooma-db;Persist Security Info=False;User ID=zooma-db;Password=huydiet@SWP;");
+                optionsBuilder.UseSqlServer("Server=tcp:zooma-db.database.windows.net,1433;Initial Catalog=zooma-db;Persist Security Info=False;User ID=zooma-db;Password=huydiet@SWP;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             }
         }
 
@@ -64,6 +65,12 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.DietId).HasColumnName("DietID");
 
+                entity.Property(e => e.ImageUrl).HasMaxLength(255);
+
+                entity.Property(e => e.MaxRer).HasColumnName("MaxRER");
+
+                entity.Property(e => e.MinRer).HasColumnName("MinRER");
+
                 entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.Property(e => e.SpieciesId).HasColumnName("SpieciesID");
@@ -80,7 +87,7 @@ namespace zooma_api.Models
                     .HasForeignKey(d => d.DietId)
                     .HasConstraintName("FKAnimal242590");
 
-                entity.HasOne(d => d.Species)
+                entity.HasOne(d => d.Spiecies)
                     .WithMany(p => p.Animals)
                     .HasForeignKey(d => d.SpieciesId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
@@ -144,6 +151,21 @@ namespace zooma_api.Models
                     .HasConstraintName("FKCage426657");
             });
 
+            modelBuilder.Entity<Configuration>(entity =>
+            {
+                entity.ToTable("Configuration");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ConfigDataType).HasMaxLength(255);
+
+                entity.Property(e => e.DataValue).HasMaxLength(255);
+
+                entity.Property(e => e.Description).HasMaxLength(255);
+
+                entity.Property(e => e.Name).HasMaxLength(75);
+            });
+
             modelBuilder.Entity<Diet>(entity =>
             {
                 entity.ToTable("Diet");
@@ -155,10 +177,6 @@ namespace zooma_api.Models
                 entity.Property(e => e.EndAt).HasColumnType("datetime");
 
                 entity.Property(e => e.Goal).HasMaxLength(255);
-
-                entity.Property(e => e.MaxRer).HasColumnName("MaxRER");
-
-                entity.Property(e => e.MinRer).HasColumnName("MinRER");
 
                 entity.Property(e => e.Name).HasMaxLength(100);
 
@@ -211,6 +229,8 @@ namespace zooma_api.Models
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.Image).HasMaxLength(50);
+
+                entity.Property(e => e.ImageUrl).HasMaxLength(255);
 
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
@@ -340,6 +360,23 @@ namespace zooma_api.Models
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.HasMany(d => d.TrainingDetails)
+                    .WithMany(p => p.Skills)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "SkillTrainingDetail",
+                        l => l.HasOne<TrainingDetail>().WithMany().HasForeignKey("TrainingDetailId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FKSkill_Trai327970"),
+                        r => r.HasOne<Skill>().WithMany().HasForeignKey("SkillId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FKSkill_Trai990760"),
+                        j =>
+                        {
+                            j.HasKey("SkillId", "TrainingDetailId").HasName("PK__Skill_Tr__D0837DD63C16853B");
+
+                            j.ToTable("Skill_TrainingDetail");
+
+                            j.IndexerProperty<short>("SkillId").HasColumnName("SkillID");
+
+                            j.IndexerProperty<int>("TrainingDetailId").HasColumnName("TrainingDetailID");
+                        });
             });
 
             modelBuilder.Entity<Species>(entity =>
@@ -401,6 +438,8 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.Name).HasMaxLength(50);
+
                 entity.Property(e => e.TrainingPlanId).HasColumnName("TrainingPlanID");
 
                 entity.HasOne(d => d.TrainingPlan)
@@ -434,6 +473,8 @@ namespace zooma_api.Models
                 entity.Property(e => e.Date).HasColumnType("date");
 
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
+
+                entity.Property(e => e.PaymentType).HasMaxLength(50);
 
                 entity.Property(e => e.TransactionNo).HasMaxLength(50);
 

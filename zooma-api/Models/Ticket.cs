@@ -14,6 +14,7 @@ namespace zooma_api.Models
         public string Name { get; set; } = null!;
         public float Price { get; set; }
         public string? Description { get; set; }
+        public bool? Status { get; set; }
 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
