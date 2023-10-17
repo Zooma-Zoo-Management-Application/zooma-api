@@ -7,7 +7,7 @@ namespace zooma_api.Models
     {
         public Cage()
         {
-            Animals = new HashSet<Animal>();
+            Animal = new HashSet<Animal>();
         }
 
         public short Id { get; set; }
@@ -19,6 +19,6 @@ namespace zooma_api.Models
         public short AreaId { get; set; }
 
         public virtual Area Area { get; set; } = null!;
-        public virtual ICollection<Animal> Animals { get; set; }
+        public virtual ICollection<Animal> Animal { get; set; }
     }
 }

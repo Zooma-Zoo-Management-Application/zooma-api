@@ -134,7 +134,7 @@ namespace zooma_api.Controllers
             var animals = _context.Animals.Where(c => c.CageId == cages.Id).
                                                                            Include(n => n.TrainingPlan).
                                                                            Include(n => n.Diet).
-                                                                           Include(n => n.Spiecies).
+                                                                           Include(n => n.Species).
                                                                            Include(n => n.Cage).
                                                                            ToList();
 

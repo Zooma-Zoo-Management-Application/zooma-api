@@ -78,7 +78,7 @@ namespace zooma_api.Models
                 entity.Property(e => e.TrainingPlanId).HasColumnName("TrainingPlanID");
 
                 entity.HasOne(d => d.Cage)
-                    .WithMany(p => p.Animals)
+                    .WithMany(p => p.Animal)
                     .HasForeignKey(d => d.CageId)
                     .HasConstraintName("FKAnimal252210");
 
@@ -87,7 +87,7 @@ namespace zooma_api.Models
                     .HasForeignKey(d => d.DietId)
                     .HasConstraintName("FKAnimal242590");
 
-                entity.HasOne(d => d.Spiecies)
+                entity.HasOne(d => d.Species)
                     .WithMany(p => p.Animals)
                     .HasForeignKey(d => d.SpieciesId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
