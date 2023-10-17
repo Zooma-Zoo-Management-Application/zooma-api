@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Repositories;
 using System.Xml.Schema;
+using zooma_api.DTO;
+using zooma_api.Models;
 using zooma_api.Repositories;
 
 namespace zooma_api.Controllers
@@ -11,33 +16,55 @@ namespace zooma_api.Controllers
     {
 
         private IAnalisticRepository _repository = new AnalisticRepository();
+        private IOrderRepository repo = new OrderRepository();
 
-        [HttpGet("sixmonths-revenues")]
+        private readonly zoomadbContext _context;
+        private readonly IMapper _mapper;
+
+        public AnalysisController(zoomadbContext context, IMapper mapper)
+        {
+            _context = context;
+            _mapper = mapper;
+        }
+
+        [HttpGet("sixmonths-analysis")]
         public  IActionResult getRevenues()
         {
-            var list = _repository.GetSixMonthsRevenues();
             double total = 0;
+            var Revenuelist = _repository.GetSixMonthsRevenues();
+            var orderDTOs = _mapper.Map<List<OrderDTO>>(repo.GetFiveRecentOrders());
+            var Ticketlist = _repository.GetSixMonthsTicketQuantity();
 
-            foreach (var revenue in list)
+
+            foreach (var revenue in Revenuelist)
             {
                 total += revenue.Revenue;
             }
 
-            return  Ok( new { total , list}); 
+            return  Ok( new { TotalRevenue = total , Revenue = Revenuelist, Tickets = Ticketlist, RecentOrders =orderDTOs  }); 
         }
 
-        [HttpGet("sixmonths-tickets")]
-        public  IActionResult getTickets()
-        {
-            var list = _repository.GetSixMonthsTicketQuantity();
-            int totalTicket = 0;
-            foreach (var ticket in list)
-            {
-                totalTicket += ticket.TotalTickets;
-            }
+        //[HttpGet("recent-orders")]
+        //public async Task<ActionResult<IEnumerable<OrderDTO>>> GetRecentOrders()
+        //{
 
-            return Ok(new {totalTicket,list});
-        }
+        //    var orderDTOs = _mapper.Map<List<OrderDTO>>(repo.GetFiveRecentOrders());
+        //    return Ok(orderDTOs);
+        //}
+
+
+        //[HttpGet("sixmonths-tickets")]
+        //public  IActionResult getTickets()
+        //{
+        //    var list = _repository.GetSixMonthsTicketQuantity();
+        //    int totalTicket = 0;
+        //    foreach (var ticket in list)
+        //    {
+        //        totalTicket += ticket.TotalTickets;
+        //    }
+
+        //    return Ok(new {totalTicket,list});
+        //}
 
         [HttpGet("inday-analysis")]
 
