@@ -35,7 +35,7 @@ namespace zooma_api.Controllers
                 Include(n => n.TrainingPlan).
                 Include(n => n.Diet).
                 Include(n => n.Cage).
-                Include(n => n.Species).
+                Include(n => n.Spiecies).
                 ToListAsync();
 
             //     var animalss = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
@@ -63,7 +63,7 @@ namespace zooma_api.Controllers
             var animal = await _context.Animals.
                                                 Include(n => n.TrainingPlan).
                                                 Include(n => n.Diet).
-                                                Include(n => n.Species).
+                                                Include(n => n.Spiecies).
                                                 Include(n => n.Cage).
                                                 FirstOrDefaultAsync(e => e.Id == id);
 
@@ -101,7 +101,7 @@ namespace zooma_api.Controllers
                 animals = await _context.Animals.Where(a => a.Name.Contains(name)).
                                                                                     Include(n => n.TrainingPlan).
                                                                                     Include(n => n.Diet).
-                                                                                    Include(n => n.Species).
+                                                                                    Include(n => n.Spiecies).
                                                                                     Include(n => n.Cage).ToListAsync();
 
                 animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
@@ -113,6 +113,34 @@ namespace zooma_api.Controllers
 
                 return animalsDTO;
             }
+        }
+
+        // ham lay animal dua tren CageId
+        [HttpGet("/get-animals-by-cageId/{id}")]
+        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalsByCageId(int id)
+        {
+            if (_context.Animals == null)
+            {
+                return NotFound();
+            }
+
+            var cages = _context.Cages.FirstOrDefault(a => a.Id == id);
+
+            if (cages == null)
+            {
+                return NotFound("Cage Not Found!!");
+            }
+
+            var animals = _context.Animals.Where(c => c.CageId == cages.Id).
+                                                                           Include(n => n.TrainingPlan).
+                                                                           Include(n => n.Diet).
+                                                                           Include(n => n.Spiecies).
+                                                                           Include(n => n.Cage).
+                                                                           ToList();
+
+            var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
+
+            return animalDTOs;
         }
 
         // ham lay animal dua tren AreaId
@@ -142,7 +170,7 @@ namespace zooma_api.Controllers
                 .Where(a => cages.Contains((short)a.CageId)).
                                                             Include(n => n.TrainingPlan).
                                                             Include(n => n.Diet).
-                                                            Include(n => n.Species).
+                                                            Include(n => n.Spiecies).
                                                             Include(n => n.Cage).
                                                             ToList();
 
