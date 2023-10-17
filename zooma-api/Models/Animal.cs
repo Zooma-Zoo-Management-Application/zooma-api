@@ -22,10 +22,13 @@ namespace zooma_api.Models
         public int? DietId { get; set; }
         public short? CageId { get; set; }
         public short? TrainingPlanId { get; set; }
+        public string? ImageUrl { get; set; }
+        public double MinRer { get; set; }
+        public double MaxRer { get; set; }
 
         public virtual Cage? Cage { get; set; }
         public virtual Diet? Diet { get; set; }
-        public virtual Species Species { get; set; } = null!;
+        public virtual Species Spiecies { get; set; } = null!;
         public virtual TrainingPlan? TrainingPlan { get; set; }
         public virtual ICollection<AnimalUser> AnimalUsers { get; set; }
     }

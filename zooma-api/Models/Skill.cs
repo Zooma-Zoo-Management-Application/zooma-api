@@ -8,6 +8,7 @@ namespace zooma_api.Models
         public Skill()
         {
             TrainerExps = new HashSet<TrainerExp>();
+            TrainingDetails = new HashSet<TrainingDetail>();
         }
 
         public short Id { get; set; }
@@ -16,5 +17,7 @@ namespace zooma_api.Models
         public bool Status { get; set; }
 
         public virtual ICollection<TrainerExp> TrainerExps { get; set; }
+
+        public virtual ICollection<TrainingDetail> TrainingDetails { get; set; }
     }
 }

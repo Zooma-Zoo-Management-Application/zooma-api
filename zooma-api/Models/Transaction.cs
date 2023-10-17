@@ -13,6 +13,7 @@ namespace zooma_api.Models
         public bool Status { get; set; }
         public int OrderId { get; set; }
         public string? TransactionNo { get; set; }
+        public string? PaymentType { get; set; }
 
         public virtual Order Order { get; set; } = null!;
     }
