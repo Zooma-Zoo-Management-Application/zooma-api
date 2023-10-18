@@ -16,27 +16,28 @@ namespace zooma_api.Models
         {
         }
 
-        public virtual DbSet<Animal> Animals { get; set; } = null!;
-        public virtual DbSet<AnimalUser> AnimalUsers { get; set; } = null!;
-        public virtual DbSet<Area> Areas { get; set; } = null!;
-        public virtual DbSet<Cage> Cages { get; set; } = null!;
-        public virtual DbSet<Configuration> Configurations { get; set; } = null!;
-        public virtual DbSet<Diet> Diets { get; set; } = null!;
-        public virtual DbSet<DietDetail> DietDetails { get; set; } = null!;
-        public virtual DbSet<Food> Foods { get; set; } = null!;
-        public virtual DbSet<FoodSpecy> FoodSpecies { get; set; } = null!;
-        public virtual DbSet<News> News { get; set; } = null!;
-        public virtual DbSet<Order> Orders { get; set; } = null!;
-        public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
-        public virtual DbSet<Role> Roles { get; set; } = null!;
-        public virtual DbSet<Skill> Skills { get; set; } = null!;
-        public virtual DbSet<Species> Species { get; set; } = null!;
-        public virtual DbSet<Ticket> Tickets { get; set; } = null!;
-        public virtual DbSet<TrainerExp> TrainerExps { get; set; } = null!;
-        public virtual DbSet<TrainingDetail> TrainingDetails { get; set; } = null!;
-        public virtual DbSet<TrainingPlan> TrainingPlans { get; set; } = null!;
-        public virtual DbSet<Transaction> Transactions { get; set; } = null!;
-        public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<Animal> Animals { get; set; }
+        public virtual DbSet<AnimalUser> AnimalUsers { get; set; }
+        public virtual DbSet<Area> Areas { get; set; }
+        public virtual DbSet<Cage> Cages { get; set; }
+        public virtual DbSet<Configuration> Configurations { get; set; }
+        public virtual DbSet<Diet> Diets { get; set; }
+        public virtual DbSet<DietDetail> DietDetails { get; set; }
+        public virtual DbSet<Food> Foods { get; set; }
+        public virtual DbSet<FoodSpecy> FoodSpecies { get; set; }
+        public virtual DbSet<News> News { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<OrderDetail> OrderDetails { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Skill> Skills { get; set; }
+        public virtual DbSet<Species> Species { get; set; }
+        public virtual DbSet<Ticket> Tickets { get; set; }
+        public virtual DbSet<TrainerExp> TrainerExps { get; set; }
+        public virtual DbSet<TrainingDetail> TrainingDetails { get; set; }
+        public virtual DbSet<TrainingPlan> TrainingPlans { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<Type> Types { get; set; }
+        public virtual DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -73,7 +74,7 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Name).HasMaxLength(100);
 
-                entity.Property(e => e.SpieciesId).HasColumnName("SpieciesID");
+                entity.Property(e => e.SpeciesId).HasColumnName("SpeciesID");
 
                 entity.Property(e => e.TrainingPlanId).HasColumnName("TrainingPlanID");
 
@@ -89,7 +90,7 @@ namespace zooma_api.Models
 
                 entity.HasOne(d => d.Species)
                     .WithMany(p => p.Animals)
-                    .HasForeignKey(d => d.SpieciesId)
+                    .HasForeignKey(d => d.SpeciesId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FKAnimal821690");
 
@@ -129,7 +130,9 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.Status).HasColumnName("status");
             });
@@ -142,7 +145,9 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.AreaId).HasColumnName("AreaID");
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.HasOne(d => d.Area)
                     .WithMany(p => p.Cages)
@@ -157,13 +162,21 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
-                entity.Property(e => e.ConfigDataType).HasMaxLength(255);
+                entity.Property(e => e.ConfigDataType)
+                    .IsRequired()
+                    .HasMaxLength(255);
 
-                entity.Property(e => e.DataValue).HasMaxLength(255);
+                entity.Property(e => e.DataValue)
+                    .IsRequired()
+                    .HasMaxLength(255);
 
-                entity.Property(e => e.Description).HasMaxLength(255);
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasMaxLength(255);
 
-                entity.Property(e => e.Name).HasMaxLength(75);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(75);
             });
 
             modelBuilder.Entity<Diet>(entity =>
@@ -176,9 +189,13 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.EndAt).HasColumnType("datetime");
 
-                entity.Property(e => e.Goal).HasMaxLength(255);
+                entity.Property(e => e.Goal)
+                    .IsRequired()
+                    .HasMaxLength(255);
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.ScheduleAt).HasColumnType("datetime");
 
@@ -201,7 +218,9 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.FoodId).HasColumnName("FoodID");
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.ScheduleAt).HasColumnType("datetime");
 
@@ -228,11 +247,11 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.Image).HasMaxLength(50);
-
                 entity.Property(e => e.ImageUrl).HasMaxLength(255);
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
             });
 
             modelBuilder.Entity<FoodSpecy>(entity =>
@@ -273,7 +292,9 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Image).HasMaxLength(255);
 
-                entity.Property(e => e.Title).HasMaxLength(255);
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(255);
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
@@ -294,9 +315,11 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Notes).HasColumnType("text");
 
-                entity.Property(e => e.OrderDate).HasColumnType("date");
+                entity.Property(e => e.OrderDate).HasColumnType("datetime");
 
-                entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+                entity.Property(e => e.PaymentMethod)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.UserId).HasColumnName("UserID");
 
@@ -348,7 +371,9 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Skill>(entity =>
@@ -359,7 +384,9 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.HasMany(d => d.TrainingDetails)
                     .WithMany(p => p.Skills)
@@ -385,7 +412,18 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.ImageUrl).HasMaxLength(255);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.TypeId).HasColumnName("TypeID");
+
+                entity.HasOne(d => d.Type)
+                    .WithMany(p => p.Species)
+                    .HasForeignKey(d => d.TypeId)
+                    .HasConstraintName("FKSpecies125886");
             });
 
             modelBuilder.Entity<Ticket>(entity =>
@@ -403,6 +441,7 @@ namespace zooma_api.Models
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.Name)
+                    .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
@@ -457,9 +496,13 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(100);
 
-                entity.Property(e => e.TrainingGoal).HasColumnType("text");
+                entity.Property(e => e.TrainingGoal)
+                    .IsRequired()
+                    .HasColumnType("text");
             });
 
             modelBuilder.Entity<Transaction>(entity =>
@@ -487,6 +530,19 @@ namespace zooma_api.Models
                     .HasConstraintName("FKTransactio146432");
             });
 
+            modelBuilder.Entity<Type>(entity =>
+            {
+                entity.ToTable("Type");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.ImageUrl).HasMaxLength(255);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
@@ -503,19 +559,25 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.DateOfBirth).HasColumnType("date");
 
-                entity.Property(e => e.Email).HasMaxLength(50);
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.FullName).HasMaxLength(150);
 
                 entity.Property(e => e.Gender).HasMaxLength(20);
 
-                entity.Property(e => e.Password).HasMaxLength(50);
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.PhoneNumber).HasMaxLength(20);
 
                 entity.Property(e => e.RoleId).HasColumnName("RoleID");
 
-                entity.Property(e => e.UserName).HasMaxLength(50);
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)

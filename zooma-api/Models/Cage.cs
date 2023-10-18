@@ -11,14 +11,14 @@ namespace zooma_api.Models
         }
 
         public short Id { get; set; }
-        public string Name { get; set; } = null!;
+        public string Name { get; set; }
         public byte AnimalLimit { get; set; }
         public byte AnimalCount { get; set; }
-        public string? Description { get; set; }
+        public string Description { get; set; }
         public bool Status { get; set; }
         public short AreaId { get; set; }
 
-        public virtual Area Area { get; set; } = null!;
+        public virtual Area Area { get; set; }
         public virtual ICollection<Animal> Animal { get; set; }
     }
 }

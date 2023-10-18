@@ -12,7 +12,7 @@ namespace zooma_api.Models
         public int OrderId { get; set; }
         public int TicketId { get; set; }
 
-        public virtual Order Order { get; set; } = null!;
-        public virtual Ticket Ticket { get; set; } = null!;
+        public virtual Order Order { get; set; }
+        public virtual Ticket Ticket { get; set; }
     }
 }
