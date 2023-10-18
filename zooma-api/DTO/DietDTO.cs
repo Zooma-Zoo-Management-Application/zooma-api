@@ -11,7 +11,6 @@
         public bool Status { get; set; }
         public string Goal { get; set; } = null!;
         public DateTime EndAt { get; set; }
-        public double MinRer { get; set; }
-        public double MaxRer { get; set; }
+        public double TotalEnergyValue { get; set; }
     }
 }
