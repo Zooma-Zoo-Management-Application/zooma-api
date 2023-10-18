@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace zooma_api.Models
+﻿namespace zooma_api.Models
 {
     public partial class Diet
     {
@@ -20,8 +17,7 @@ namespace zooma_api.Models
         public bool Status { get; set; }
         public string Goal { get; set; } = null!;
         public DateTime EndAt { get; set; }
-        public double MinRer { get; set; }
-        public double MaxRer { get; set; }
+        public double TotalEnergyValue { get; set; }
 
         public virtual ICollection<Animal> Animals { get; set; }
         public virtual ICollection<DietDetail> DietDetails { get; set; }

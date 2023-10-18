@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace zooma_api.Models
 {
@@ -156,9 +153,7 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.Goal).HasMaxLength(255);
 
-                entity.Property(e => e.MaxRer).HasColumnName("MaxRER");
-
-                entity.Property(e => e.MinRer).HasColumnName("MinRER");
+                entity.Property(e => e.TotalEnergyValue).HasColumnType("float");
 
                 entity.Property(e => e.Name).HasMaxLength(100);
 
