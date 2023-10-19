@@ -91,6 +91,7 @@ namespace zooma_api.Controllers
                         };
 
                         order.Status = 2; // THANH TOÁN THÀNH CÔNG
+                        order.Notes = "Payment sucessfully";
                         _context.Entry(order).State = EntityState.Modified;
 
                         _context.Transactions.Add(transaction);
@@ -384,6 +385,7 @@ namespace zooma_api.Controllers
 
                     _context.Transactions.Add(_transaction);
                     order.Status = 3; // REFUND THÀNH CÔNG
+                    order.Notes = "Refund sucessfully";
                     _context.Entry(order).State = EntityState.Modified;
                     _context.SaveChanges();
                     repository.updateRefundOrder(transaction.OrderId);
