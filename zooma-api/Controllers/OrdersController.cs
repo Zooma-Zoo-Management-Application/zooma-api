@@ -35,13 +35,15 @@ namespace zooma_api.Controllers
               return NotFound();
           }
 
-          var list = await _context.Orders.Include(o => o.OrderDetails).Include(o=>o.Transactions).Include(o => o.User).Where(o=>o.Status==1).ToListAsync();
+            var list = await _context.Orders.Include(o => o.OrderDetails).Include(o => o.User).Include(o => o.Transactions).Where(o => o.Status == 1).ToListAsync();
 
-           var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
+            //var list = await _context.Orders.ToListAsync();
+
+            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
 
 
             return Ok(orderDTOs);
-        }
+         }
         // GET: api/Orders
         [HttpGet("unsuccess-orders")]
 
@@ -53,12 +55,21 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var list = await _context.Orders.Include(o => o.OrderDetails).Include(o => o.Transactions).Include(o => o.User).Where(o => o.Status == 1).ToListAsync();
+            try
+            {
+                var list = await _context.Orders.Include(o => o.OrderDetails).Include(o => o.User).Where(o => o.Status == 1).ToListAsync();
 
-            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
-
-
+                var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
             return Ok(orderDTOs);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
         }
 
 
