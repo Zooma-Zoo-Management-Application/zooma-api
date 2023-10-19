@@ -105,7 +105,7 @@ namespace zooma_api.Controllers
                     order.Status = 0; //THANH TOÁN FAILED
                     _context.Entry(order).State = EntityState.Modified;
                     _context.SaveChanges();
-                    return BadRequest("Unsuccessfull payment, no transaction was created"); //hello
+                    return BadRequest("Unsuccessfull payment, no transaction was created");     //hello
 
                 }
 
