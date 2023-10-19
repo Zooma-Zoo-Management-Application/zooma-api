@@ -79,7 +79,7 @@ namespace zooma_api.Controllers
 
         // Ham lay animal dua tren name
         [HttpGet("name")]
-        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalByName([FromQuery] string? name)
+        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalByName(string? name)
         {
             if (_context.Animals == null)
             {
@@ -92,7 +92,7 @@ namespace zooma_api.Controllers
 
             if (string.IsNullOrEmpty(name))
             {
-                animals = await _context.Animals.ToListAsync();
+                animals = _context.Animals.ToList();
                 animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
                 return animalsDTO;
             }
@@ -200,7 +200,7 @@ namespace zooma_api.Controllers
             animal.Weight = animal.Weight ?? animalUpdate.Weight;
             animal.Description = animal.Description ?? animalUpdate.Description;
             animal.Status = animalUpdate.Status;
-            animal.SpieciesId = animalUpdate.SpieciesId;
+            animal.SpeciesId = animalUpdate.SpeciesId;
             animal.DietId = animalUpdate.DietId;
             animal.CageId = animal.CageId ?? animalUpdate.CageId;
             animal.TrainingPlanId = animalUpdate.TrainingPlanId;
@@ -246,7 +246,7 @@ namespace zooma_api.Controllers
                 Weight = animalDTO.Weight,
                 Description = animalDTO.Description,
                 Status = animalDTO.Status,
-                SpieciesId = animalDTO.SpieciesId,
+                SpeciesId = animalDTO.SpeciesId,
                 DietId = animalDTO.DietId,
                 CageId = animalDTO.CageId,
                 TrainingPlanId = animalDTO.TrainingPlanId,
@@ -294,7 +294,7 @@ namespace zooma_api.Controllers
         public float? Weight { get; set; }
         public string? Description { get; set; }
         public bool Status { get; set; }
-        public int SpieciesId { get; set; }
+        public int SpeciesId { get; set; }
         public int? DietId { get; set; }
         public short? CageId { get; set; }
         public short? TrainingPlanId { get; set; }
