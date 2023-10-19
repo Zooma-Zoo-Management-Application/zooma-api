@@ -25,7 +25,8 @@ namespace zooma_api.Helper
             CreateMap<Ticket,TicketDTO >().ReverseMap();
             CreateMap<Area, AreaDTO>().ReverseMap();
             CreateMap<Animal, AnimalWithCage>().ReverseMap();
-            CreateMap<Animal, AnimalUserDTO>().ReverseMap();
+            CreateMap<AnimalUser, AnimalUserDTO>().ReverseMap();
+            CreateMap<Skill, SkillDTO>().ReverseMap();
         }
     }
 }
