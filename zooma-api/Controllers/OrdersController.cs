@@ -34,7 +34,7 @@ namespace zooma_api.Controllers
           {
               return NotFound();
           }
-            var list = await _context.Orders.Include(o => o.OrderDetails).Include(o => o.User).Include(o => o.Transactions).Where(o => o.Status == 1).ToListAsync();
+            var list = await _context.Orders.Include(o => o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o => o.User).Include(o => o.Transactions).Where(o => o.Status == 1).ToListAsync();
 
             //var list = await _context.Orders.ToListAsync();
 
@@ -69,7 +69,7 @@ namespace zooma_api.Controllers
         //}
 
 
-        [HttpGet("userId/{id}")]
+        [HttpGet("get-orders-by-user/{id}")]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrdersWithUserID(short id) // XỬ LÝ GET ORDERS TRẢ VỀ KÈM CHUNG VỚI USER
 
         {
@@ -78,7 +78,7 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var list = await _context.Orders.Where( o => o.UserId == id ).Include(o => o.OrderDetails).Include(o => o.Transactions).Include(o => o.User).ToListAsync();
+            var list = await _context.Orders.Where( o => o.UserId == id ).Include(o => o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o => o.Transactions).Include(o => o.User).ToListAsync();
 
             var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
 
@@ -123,17 +123,17 @@ namespace zooma_api.Controllers
             {
                 if(order.Status == 1)
                 {
-                    return Ok( new { msg = "Unpaid" , status = order.Status});
+                    return Ok( new { msg = "Unpaid" , order = new { orderID = order.Id , status = order.Status} });
                 }else if ( order.Status == 2)
                 {
-                    return Ok( new { msg = "Succesfully paid" , status = order.Status});
+                    return Ok( new { msg = "Succesfully paid", order = new { orderID = order.Id, status = order.Status } });
 
                 }else if ( order.Status == 3)
                 {
-                    return Ok(new { msg = "Refund sucessfully", status = order.Status });
+                    return Ok(new { msg = "Refund sucessfully", order = new { orderID = order.Id, status = order.Status } });
                 } else if (order.Status == 0)
                 {
-                    return Ok(new { msg = "Failed", status = order.Status });
+                    return Ok(new { msg = "Failed", order = new { orderID = order.Id, status = order.Status } });
                 }
 
             }
