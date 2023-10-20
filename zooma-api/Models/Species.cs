@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace zooma_api.Models
+﻿namespace zooma_api.Models
 {
     public partial class Species
     {
@@ -18,7 +15,7 @@ namespace zooma_api.Models
         public bool Status { get; set; }
         public int? TypeId { get; set; }
 
-        public virtual Type Type { get; set; }
+        public virtual Type? Type { get; set; }
         public virtual ICollection<Animal> Animals { get; set; }
         public virtual ICollection<FoodSpecy> FoodSpecies { get; set; }
     }
