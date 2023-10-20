@@ -21,7 +21,7 @@ namespace zooma_api.Repositories
                     TotalPrice = 0,
                     PaymentMethod = "VnPay",
                     LastUpdateDate= DateTime.Now,
-                    Notes="Thanh toan hoa don thanh cong"
+                    Notes="Payment in progress"
 
                 };
                 context.Orders.Add(order);
@@ -40,8 +40,7 @@ namespace zooma_api.Repositories
                         TicketDate = cartItem.TicketDate,
                         Quantity = cartItem.quantity,
                         UsedTicket= 0,
-                        TicketId = cartItem.Id,
-                        
+                        TicketId = cartItem.Id,                     
                     };
 
                     context.OrderDetails.Add(orderDetail);
