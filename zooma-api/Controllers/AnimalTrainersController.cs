@@ -56,12 +56,12 @@ namespace zooma_api.Controllers
 
               if(zooTrainer == null)
               {
-                  return NotFound("Khong tim thay user nay");
+                  return NotFound("Can't find this trainer");
               }
 
               if (zooTrainer.RoleId != 2)
               {
-                 return BadRequest("Nguoi nay khong phai zootrainer");
+                 return BadRequest("This user is not a trainer");
               }
 
               var animalOfZooTrainer = await _context.AnimalUsers.Where(a => a.UserId == zooTrainerId).
@@ -71,7 +71,7 @@ namespace zooma_api.Controllers
 
              if (animalOfZooTrainer.Count == 0)
              {
-                return NotFound("Khong tim thay animal cua nhung zootrainer nay");
+                return NotFound("Can't find trainer's animals");
              }
 
              var animalOfZooTrainerDTO = _mapper.Map<List<AnimalUserDTO>>(animalOfZooTrainer);
@@ -92,7 +92,7 @@ namespace zooma_api.Controllers
 
             if(animal == null)
             {
-                return NotFound("Khong tim thay animal nay");
+                return NotFound("Can't find this animal");
             }
 
             var zooTrainersOfAnimals = await _context.AnimalUsers.Where(a => a.AnimalId == animalId).
@@ -102,7 +102,7 @@ namespace zooma_api.Controllers
 
             if (zooTrainersOfAnimals.Count == 0)
             {
-                return NotFound("Khong tim thay zootrainer cua animal nay");
+                return NotFound("Can't find trainers of this animal");
             }
 
             var zooTrainersOfAnimalsDTO = _mapper.Map<List<AnimalUserDTO>>(zooTrainersOfAnimals);
@@ -111,57 +111,56 @@ namespace zooma_api.Controllers
         }
 
         // Hàm thay đổi trainer cho 1 con animal
-  /*      [HttpPut("/update-animal-trainers-by-animalId/{animalId}")]
-        public async Task<IActionResult> UpdateAnimalAssignToTrainerByAnimalId(int animalId, AnimalWithZooTrainerUpdate animalUser)
-        {
-            var animal = _context.Animals.FirstOrDefault(a => a.Id == animalId);
+        /*      [HttpPut("/update-animal-trainers-by-animalId/{animalId}")]
+              public async Task<IActionResult> UpdateAnimalAssignToTrainerByAnimalId(int animalId, AnimalWithZooTrainerUpdate animalUser)
+              {
+                  var animal = _context.Animals.FirstOrDefault(a => a.Id == animalId);
 
-            if(animal == null)
-            {
-                return NotFound("Khong tim thay animal nay");
-            }
+                  if(animal == null)
+                  {
+                      return NotFound("Khong tim thay animal nay");
+                  }
 
-            var animalWithTrainer = _context.AnimalUsers.FirstOrDefault(a => a.AnimalId == animalId);
+                  var animalWithTrainer = _context.AnimalUsers.FirstOrDefault(a => a.AnimalId == animalId);
 
-            animalWithTrainer.UserId = animalUser.UserId;
-            animalWithTrainer.MainTrainer = animalUser.MainTrainer;
+                  animalWithTrainer.UserId = animalUser.UserId;
+                  animalWithTrainer.MainTrainer = animalUser.MainTrainer;
 
-            _context.Entry(animalWithTrainer).State = EntityState.Modified;
+                  _context.Entry(animalWithTrainer).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AnimalUserExists(animalId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                  try
+                  {
+                      await _context.SaveChangesAsync();
+                  }
+                  catch (DbUpdateConcurrencyException)
+                  {
+                      if (!AnimalUserExists(animalId))
+                      {
+                          return NotFound();
+                      }
+                      else
+                      {
+                          throw;
+                      }
+                  }
 
-            return Ok("Update succesfully");
-        } */
+                  return Ok("Update succesfully");
+              } */
 
         // Hàm thay đổi animal cho zootrainers
         [HttpPut("/update-animal-trainers-by-trainerId/{zooTrainerId}")]
         public async Task<IActionResult> UpdateAnimalAssignToTrainerByTrainerId(int zooTrainerId, ZooTrainerWithAnimalUpdate animalUser)
         {
-
             var zootrainer = _context.Users.FirstOrDefault(a => a.Id == zooTrainerId);
 
             if (zootrainer == null)
             {
-                return NotFound("Khong tim thay user nay");
+                return NotFound("Can't found this zoo trainer");
             }
 
             if(zootrainer.RoleId != 2)
             {
-                return BadRequest("Nguoi nay khong phai la zoo trainer");
+                return BadRequest("This user is not a trainer");
             }
 
             var trainerWithAnimal = _context.AnimalUsers.FirstOrDefault(a => a.UserId == zooTrainerId);
@@ -210,19 +209,19 @@ namespace zooma_api.Controllers
 
             if (animal == null)
             {
-                return NotFound("Khong tim thay con animal nay");
+                return NotFound("Can't found this animal");
             }
 
             var zootrainer = _context.Users.FirstOrDefault(x => x.Id == newAnimalWithUser.UserId);
 
             if(zootrainer == null)
             {
-                return NotFound("Khong tim thay zootrainer nay");
+                return NotFound("Can't found this trainer");
             }
 
             if(zootrainer.RoleId != 2)
             {
-                return BadRequest("Nguoi nay khong phai zootrainer");
+                return BadRequest("This user is not a trainer");
             }
 
             _context.AnimalUsers.Add(newAnimalWithUser);
@@ -234,7 +233,7 @@ namespace zooma_api.Controllers
             {
                 if (AnimalUserExists(newAnimalWithUser.AnimalId))
                 {
-                    return Conflict();
+                    return Conflict("This animal has been assigned to this trainer");
                 }
                 else
                 {
@@ -245,24 +244,29 @@ namespace zooma_api.Controllers
             return Ok(new { newAnimalWithUserDTO = _mapper.Map<AnimalUserDTO>(newAnimalWithUser), message = "Assign animal successfully" });
         }
 
-        // DELETE: api/ZooTrainers/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAnimalUser(int id)
+        // DELETE
+        [HttpDelete("/delete-zootrainer-with-animal")]
+        public async Task<IActionResult> DeleteAnimalUser(int animalId, int zooTrainerId)
         {
             if (_context.AnimalUsers == null)
             {
                 return NotFound();
             }
-            var animalUser = await _context.AnimalUsers.FindAsync(id);
+
+            var animalUser = await _context.AnimalUsers.
+                                                        Where(a => a.AnimalId == animalId).
+                                                        Where(b => b.UserId == zooTrainerId).
+                                                        FirstOrDefaultAsync();
+                                                       
             if (animalUser == null)
             {
-                return NotFound();
+                return NotFound("NOT FOUND!");
             }
 
             _context.AnimalUsers.Remove(animalUser);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Delete successfully");
         }
 
         private bool AnimalUserExists(int id)
