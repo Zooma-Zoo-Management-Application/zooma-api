@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Repositories;
 using zooma_api.DTO;
 using zooma_api.Models;
+using zooma_api.Repositories;
 
 namespace zooma_api.Controllers
 {
@@ -17,7 +14,7 @@ namespace zooma_api.Controllers
     {
         private readonly zoomadbContext _context;
         private readonly IMapper _mapper;
-
+        IOrderRepository _repo = new OrderRepository();
 
         public OrdersController(zoomadbContext context, IMapper mapper)
         {
@@ -34,11 +31,11 @@ namespace zooma_api.Controllers
           {
               return NotFound();
           }
-            var list = await _context.Orders.Include(o => o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o => o.User).Include(o => o.Transactions).Where(o => o.Status == 1).ToListAsync();
+            var list = await _context.Orders.Include(o => o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o => o.User).Include(o => o.Transactions).Where(o => o.Status == 1).OrderByDescending(o => o.OrderDate).ToListAsync();
 
             //var list = await _context.Orders.ToListAsync();
 
-            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
+            var orderDTOs = _mapper.Map<IEnumerable<OrderDTO>>(list);
 
 
             return Ok(orderDTOs);
@@ -78,9 +75,9 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var list = await _context.Orders.Where( o => o.UserId == id ).Include(o => o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o => o.Transactions).Include(o => o.User).ToListAsync();
+            var list = _repo.GetOrdersByCustomerId(id);
 
-            var orderDTOs = _mapper.Map<ICollection<OrderDTO>>(list);
+            var orderDTOs = _mapper.Map<IEnumerable<OrderDTO>>(list);
 
 
             return Ok(orderDTOs);
