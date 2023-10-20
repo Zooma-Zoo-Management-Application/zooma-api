@@ -281,7 +281,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok(new { message = "Update Successfully"}); // Return 204 No Content to indicate the request has succeeded
+            return Ok(new { user = _mapper.Map<UserDTO>(existingUser), msg = "Update Successfully" }); // Return 204 No Content to indicate the request has succeeded
         }
 
         [HttpPut("update-password")]
@@ -297,7 +297,7 @@ namespace zooma_api.Controllers
 
             if (existingUser.Password != updatePassword.currentPassword)
             {
-                return BadRequest("Your old password is wrong!!");
+                return BadRequest(new { msg = "Your old password is wrong!!" });
             }
             else
             {
@@ -322,10 +322,10 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok("Update Password Successfully"); // Return 204 No Content to indicate the request has succeeded
+            return Ok(new { msg = "Update Password Successfully" }); // Return 204 No Content to indicate the request has succeeded
         }
         // ==================================== LOGIN API ===========================//
-        
+
 
         // xác thực bởi token, và sẽ lấy body token ra làm dữ diệu 
         [HttpGet]

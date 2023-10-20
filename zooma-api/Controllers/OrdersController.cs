@@ -150,6 +150,7 @@ namespace zooma_api.Controllers
             {
                 order.PaymentMethod=orderUpdate.PaymentMethod;
                 if ( orderUpdate.Notes == "string" || orderUpdate.Notes == "") order.Notes = orderUpdate.Notes;
+                order.Status = (orderUpdate.Status == 0) ? orderUpdate.Status : order.Status;
                 _context.Entry(order).State = EntityState.Modified;
 
             }
@@ -163,7 +164,7 @@ namespace zooma_api.Controllers
             {
                 if (!OrderExists(id))
                 {
-                    return NotFound();
+                    return NotFound(new { msg = "Order is not existed"});
                 }
                 else
                 {
@@ -174,16 +175,32 @@ namespace zooma_api.Controllers
             return Ok(_mapper.Map<Order>(order));
         }
 
-        [HttpPut("update-used-tickets/{id}")]
-        public async Task<IActionResult> PutOrderDetails(int id,OrderDetailsBody update) // UPDATE ORDER DETAILS 
+        [HttpPut("{id}/update-used-tickets")]
+        public async Task<IActionResult> PutOrderDetails(int id,List<OrderDetailsBody> update) // UPDATE ORDER DETAILS 
         {
-            var orderDetail = await _context.OrderDetails.SingleOrDefaultAsync(o => o.Id == id);
+            var orderDetail = await _context.OrderDetails.Where(o => o.OrderId == id).Include(detail => detail.Ticket).ToListAsync();
 
             if (orderDetail != null)
             {
-                orderDetail.UsedTicket=update.UsedTicket;
-                _context.Entry(orderDetail).State = EntityState.Modified;
+                if (update.Count == 0) return BadRequest("empty update details");
+                foreach (var item in update)
+                {
+                    foreach (var detail in orderDetail)
+                    {
+                        if(item.Id == detail.Id)
+                        {
+                            //if(item.UsedTicket < detail.Quantity) // FE HANDLE
+                            detail.UsedTicket = item.UsedTicket;
+                            _context.Entry(detail).State = EntityState.Modified;
+                            break;
 
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception();
             }
 
             try
@@ -192,9 +209,9 @@ namespace zooma_api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.OrderDetails.Any(o => o.Id == id))
+                if (!_context.OrderDetails.Any(o => o.OrderId == id))
                 {
-                    return NotFound();
+                    return NotFound("Order details is not existed");
                 }
                 else
                 {
@@ -202,7 +219,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok(_mapper.Map<OrderDetailDTO>(orderDetail));
+            return Ok(new { detailList = _mapper.Map<OrderDTO>(_repo.GetOrdersById(id)) , msg = "Updated successfully"});
         }
 
         //// POST: api/Orders
@@ -250,14 +267,18 @@ namespace zooma_api.Controllers
 public class OrderBody
 {
 
+
     public string PaymentMethod { get; set; }
     public string? Notes { get; set; }
+
+    public byte Status { get; set; }
 
 
 }
 
 public class OrderDetailsBody
 {
+    public int Id { get; set; }
     public byte UsedTicket { get; set; }
 
 
