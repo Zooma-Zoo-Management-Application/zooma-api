@@ -88,15 +88,15 @@ namespace zooma_api.Repositories
         {
             using (var context = new zoomadbContext())
             {
-                return context.OrderDetails.Where(o => o.OrderId == orderId).ToList();
+                return context.OrderDetails.Where(o => o.OrderId == orderId).Include(o => o.Ticket).ToList();
             }
         }
 
-        public List<Order> GetOrdersByCustomerId(int userID)
+        public List<Order> GetOrdersByCustomerId(short userID)
         {
             using (var context = new zoomadbContext())
             {
-                return context.Orders.Where(o => o.UserId == userID).ToList();
+                return context.Orders.Where(o => o.UserId == userID).OrderByDescending(o => o.OrderDate).ToList();
             }
 
         }
