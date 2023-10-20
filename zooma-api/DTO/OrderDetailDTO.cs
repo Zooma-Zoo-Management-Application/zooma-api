@@ -1,4 +1,6 @@
-﻿namespace zooma_api.DTO
+﻿using zooma_api.Models;
+
+namespace zooma_api.DTO
 {
     public class OrderDetailDTO
     {
@@ -8,5 +10,8 @@
         public byte UsedTicket { get; set; }
         public int OrderId { get; set; }
         public int TicketId { get; set; }
+
+        public TicketDTO Ticket { get; set; } = null!;
+
     }
 }
