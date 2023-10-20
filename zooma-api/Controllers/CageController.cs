@@ -54,25 +54,25 @@ public class CageController : ControllerBase
     }
     //Hàm tạo cage mới
     [HttpPost("CreateCage")]
-    public async Task<ActionResult<CagesDTO>> CreateCage(CagesDTO createCage)
+    public async Task<ActionResult<CagesDTO>> CreateCage(CageUpdate cage)
     {
         if (_context.Cages == null)
         {
             return NotFound();
         }
-        var cage = new Cage
+        Cage cageUpdate = new Cage
         {
-            Name = createCage.Name,
-            AnimalLimit = createCage.AnimalLimit,
-            AnimalCount = createCage.AnimalCount,
-            Description = createCage.Description,
-            Status = createCage.Status,
-            AreaId = createCage.AreaId
+            Name = cage.Name,
+            AnimalLimit = (byte)cage.AnimalLimit,
+            AnimalCount = (byte)cage.AnimalCount,
+            Description = cage.Description,
+            Status = cage.Status,
+            AreaId = (short)cage.AreaId
         };
-        _context.Cages.Add(cage);
+        _context.Cages.Add(cageUpdate);
         await _context.SaveChangesAsync();
+        return CreatedAtAction("GetCageById", new { id = cageUpdate.Id }, cageUpdate);
 
-        return CreatedAtAction("GetCage", new { id = cage.Id }, cage);
     }
     //select an animal from the database and assign to the cage 
     [HttpPut("AssignAnimal/{id}/{cageID}")]
@@ -149,5 +149,33 @@ public class CageController : ControllerBase
 
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+    //Hàm update cage
+    [HttpPut("UpdateCage/{id}")]
+    public async Task<IActionResult> UpdateCage(int id, CageUpdate cage)
+    {
+        var cageUpdate = await _context.Cages.SingleOrDefaultAsync(c => c.Id == id);
+        if (id != cage.Id)
+        {
+            return BadRequest();
+        }
+        cageUpdate.Name = cageUpdate.Name ?? cage.Name;
+        cageUpdate.AnimalLimit = (byte)cage.AnimalLimit;
+        cageUpdate.AnimalCount = (byte)cage.AnimalCount;
+        cageUpdate.Description = cageUpdate.Description ?? cage.Description;
+        cageUpdate.Status = cage.Status;
+        cageUpdate.AreaId = (short)cage.AreaId;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+    public class CageUpdate
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public short AnimalLimit { get; set; }
+        public short AnimalCount { get; set; }
+        public string Description { get; set; }
+        public bool Status { get; set; }
+        public int AreaId { get; set; }
     }
 }

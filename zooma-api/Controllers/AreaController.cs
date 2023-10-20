@@ -44,15 +44,16 @@ namespace zooma_api.Controllers
         }
         //update area
         [HttpPut("UpdateArea/{id}")]
-        public async Task<IActionResult> UpdateArea(short id, string Name, string Description)
+        public async Task<IActionResult> UpdateArea(int id, AreaUpdate areaUpdate)
         {
             var area = await _context.Areas.FindAsync(id);
             if (id != area.Id)
             {
                 return BadRequest();
             }
-            area.Name = Name;
-            area.Description = Description;
+            area.Name = area.Name ?? areaUpdate.Name;
+            area.Description = area.Description ?? areaUpdate.Description;
+
             _context.Entry(area).State = EntityState.Modified;
             try
             {
@@ -71,9 +72,14 @@ namespace zooma_api.Controllers
             }
             return NoContent();
         }
-        private bool AreaExists(short id)
+        private bool AreaExists(int id)
         {
             return _context.Areas.Any(e => e.Id == id);
+        }
+        public class AreaUpdate
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
         }
     }
 }

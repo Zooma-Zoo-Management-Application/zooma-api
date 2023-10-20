@@ -43,6 +43,23 @@ namespace zooma_api.Controllers
 
             return diet;
         }
+        // GET: api/Diets/5
+        [HttpGet("GetDietByName/{name}")]
+        public async Task<ActionResult<Diet>> GetDietByName(string name)
+        {
+            if (_context.Diets == null)
+            {
+                return NotFound();
+            }
+            var diet = await _context.Diets.SingleOrDefaultAsync(d => d.Name == name);
+
+            if (diet == null)
+            {
+                return NotFound();
+            }
+
+            return diet;
+        }
 
         // PUT: api/Diets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -112,6 +129,7 @@ namespace zooma_api.Controllers
             return CreatedAtAction("GetDiet", new { id = diet.Id }, diet);
 
         }
+
         private bool DietExists(int id)
         {
             return (_context.Diets?.Any(e => e.Id == id)).GetValueOrDefault();
