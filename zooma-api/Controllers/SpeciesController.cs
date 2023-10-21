@@ -20,7 +20,7 @@ namespace zooma_api.Controllers
             _mapper = mapper;
         }
         // GET: api/Species
-        [HttpGet("GetAllSpecies")]
+        [HttpGet()]
         public async Task<ActionResult<IEnumerable<SpeciesDTO>>> GetAllSpecies()
         {
             var species = await _context.Species.ToListAsync();
@@ -41,7 +41,7 @@ namespace zooma_api.Controllers
         }
 
         // GET: api/Species/5
-        [HttpGet("GetSpeciesById/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Species>> GetSpecies(int id)
         {
             if (_context.Species == null)
@@ -60,7 +60,7 @@ namespace zooma_api.Controllers
 
         // PUT: api/Species/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("UpdateSpecies/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSpecies(int id, CreateSpecies species)
         {
             var speciesUpdate = await _context.Species.FindAsync(id);
