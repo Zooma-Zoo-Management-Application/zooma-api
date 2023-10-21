@@ -28,7 +28,8 @@ namespace zooma_api.Helper
             CreateMap<AnimalUser, AnimalUserDTO>().ReverseMap();
             CreateMap<Skill, SkillDTO>().ReverseMap();
             CreateMap<TrainerExp, TrainerExpDTO>().ReverseMap();
-            CreateMap<Models.Type, TypeDTO>().ReverseMap();    
+            CreateMap<Models.Type, TypeDTO>().ReverseMap();
+            CreateMap<Food, FoodDTO>().ReverseMap();
         }
     }
 }
