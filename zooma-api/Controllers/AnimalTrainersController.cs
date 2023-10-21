@@ -25,7 +25,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy tất cả zootrainer với những animal phụ trách
-        [HttpGet("/get-all-animals-with-trainers")]
+        [HttpGet()]
         public async Task<ActionResult<IEnumerable<AnimalUserDTO>>> GetAnimalUsers()
         {
             if (_context.AnimalUsers == null)
@@ -44,7 +44,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy tất cả animal do 1 user phụ trách
-        [HttpGet("/get-animal-by-zootrainerid/{zooTrainerId}")]
+        [HttpGet("{zooTrainerId}")]
         public async Task<ActionResult<IEnumerable<AnimalUserDTO>>> GetZooTrainerWithAnimalByUserId(int zooTrainerId)
         {
               if (_context.AnimalUsers == null)
@@ -148,7 +148,7 @@ namespace zooma_api.Controllers
               } */
 
         // Hàm thay đổi animal cho zootrainers
-        [HttpPut("/update-animal-trainers-by-trainerId/{zooTrainerId}")]
+        [HttpPut("{zooTrainerId}")]
         public async Task<IActionResult> UpdateAnimalAssignToTrainerByTrainerId(int zooTrainerId, ZooTrainerWithAnimalUpdate animalUser)
         {
             var zootrainer = _context.Users.FirstOrDefault(a => a.Id == zooTrainerId);
@@ -190,7 +190,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm assign animal to zootrainer
-        [HttpPost("assign-animal-to-zootrainer")]
+        [HttpPost()]
         public async Task<ActionResult<AnimalUserDTO>> AssignAnimalToZooTrainer(AnimalWithZooTrainer animalUser)
         {   
             if (_context.AnimalUsers == null)
@@ -245,7 +245,7 @@ namespace zooma_api.Controllers
         }
 
         // DELETE
-        [HttpDelete("/delete-zootrainer-with-animal")]
+        [HttpDelete()]
         public async Task<IActionResult> DeleteAnimalUser(int animalId, int zooTrainerId)
         {
             if (_context.AnimalUsers == null)
