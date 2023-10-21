@@ -64,19 +64,22 @@ namespace zooma_api.Controllers
         public async Task<IActionResult> UpdateSpecies(int id, CreateSpecies species)
         {
             var speciesUpdate = await _context.Species.FindAsync(id);
-            if (id != species.Id)
+            if (id != speciesUpdate.Id)
             {
                 return BadRequest();
             }
-            if (speciesUpdate == null)
+            if (speciesUpdate != null)
             {
-                return NotFound();
+                speciesUpdate.Name = species.Name;
+                speciesUpdate.Description = species.Description;
+                speciesUpdate.ImageUrl = species.ImageUrl;
+                speciesUpdate.TypeId = species.TypeId;
+                _context.Entry(speciesUpdate).State = EntityState.Modified;
             }
-            speciesUpdate.Name = speciesUpdate.Name ?? species.Name;
-            speciesUpdate.Description = speciesUpdate.Description ?? species.Description;
-            speciesUpdate.ImageUrl = speciesUpdate.ImageUrl ?? species.ImageUrl;
-            speciesUpdate.Status = species.Status;
-            speciesUpdate.TypeId = speciesUpdate.TypeId ?? species.TypeId;
+            else
+            {
+                BadRequest("wrong id species");
+            }
             try
             {
                 await _context.SaveChangesAsync();
@@ -92,34 +95,30 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
-
-
+            return Ok(speciesUpdate);
         }
 
         // POST: api/Species
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Species>> PostSpecies(CreateSpecies species)
+        public async Task<ActionResult<Species>> PostSpecies(SpeciesBody species)
         {
             if (_context.Species == null)
             {
-                return BadRequest("Species already exists.");
+                return NotFound();
             }
-            Species newSpecies = new Species()
+            var speciesCreate = new Species
             {
                 Name = species.Name,
                 Description = species.Description,
                 ImageUrl = species.ImageUrl,
-                Status = species.Status,
                 TypeId = species.TypeId
             };
-            _context.Species.Add(newSpecies);
+            _context.Species.Add(speciesCreate);
             await _context.SaveChangesAsync();
 
+            return CreatedAtAction("GetSpecies", new { id = speciesCreate.Id }, speciesCreate);
 
-            return CreatedAtAction("GetSpecies", new { id = species.Id }, species);
         }
 
         private bool SpeciesExists(int id)
@@ -128,12 +127,18 @@ namespace zooma_api.Controllers
         }
         public class CreateSpecies
         {
-            public int Id { get; set; }
             public string? Name { get; set; }
             public string? Description { get; set; }
             public string? ImageUrl { get; set; }
-            public bool Status { get; set; }
             public int? TypeId { get; set; }
+        }
+        public class SpeciesBody
+        {
+            public string? Name { get; set; }
+            public string? Description { get; set; }
+            public string? ImageUrl { get; set; }
+            public int? TypeId { get; set; }
+
         }
     }
 }

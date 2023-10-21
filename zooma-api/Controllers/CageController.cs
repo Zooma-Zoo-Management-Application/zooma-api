@@ -155,22 +155,48 @@ public class CageController : ControllerBase
     public async Task<IActionResult> UpdateCage(int id, CageUpdate cage)
     {
         var cageUpdate = await _context.Cages.SingleOrDefaultAsync(c => c.Id == id);
-        if (id != cage.Id)
+        if (cageUpdate == null)
         {
             return BadRequest();
         }
-        cageUpdate.Name = cageUpdate.Name ?? cage.Name;
-        cageUpdate.AnimalLimit = (byte)cage.AnimalLimit;
-        cageUpdate.AnimalCount = (byte)cage.AnimalCount;
-        cageUpdate.Description = cageUpdate.Description ?? cage.Description;
-        cageUpdate.Status = cage.Status;
-        cageUpdate.AreaId = (short)cage.AreaId;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        else
+        {
+            cageUpdate.Name = cageUpdate.Name ?? cage.Name;
+            cageUpdate.AnimalLimit = (byte)cage.AnimalLimit;
+            cageUpdate.AnimalCount = (byte)cage.AnimalCount;
+            cageUpdate.Description = cageUpdate.Description ?? cage.Description;
+            cageUpdate.Status = cage.Status;
+            cageUpdate.AreaId = (short)cage.AreaId;
+            _context.Entry(cageUpdate).State = EntityState.Modified;
+        }
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!CageExists(id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+        return Ok(new { cage = _mapper.Map<CagesDTO>(cageUpdate), message = "Cage updated successfully" });
+
+
     }
+
+    private bool CageExists(int id)
+    {
+        return _context.Cages.Any(e => e.Id == id);
+    }
+
     public class CageUpdate
     {
-        public int Id { get; set; }
+
         public string Name { get; set; }
         public short AnimalLimit { get; set; }
         public short AnimalCount { get; set; }

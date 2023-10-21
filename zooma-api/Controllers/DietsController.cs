@@ -66,8 +66,8 @@ namespace zooma_api.Controllers
         [HttpPut("UpdateDiet/{id}")]
         public async Task<IActionResult> PutDiet(int id, DietUpdate diet)
         {
-            var dietUpdate = await _context.Diets.SingleOrDefaultAsync(d => d.Id == id);
-            if (id != diet.Id)
+            var dietUpdate = await _context.Diets.FindAsync(id);
+            if (dietUpdate == null)
             {
                 return BadRequest();
             }
@@ -98,7 +98,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(dietUpdate);
         }
 
         // POST: api/Diets
@@ -136,7 +136,6 @@ namespace zooma_api.Controllers
         }
         public class DietUpdate
         {
-            public int Id { get; set; }
             public string Name { get; set; } = null!;
             public string? Description { get; set; }
             public DateTime CreateAt { get; set; }
@@ -146,6 +145,19 @@ namespace zooma_api.Controllers
             public string Goal { get; set; } = null!;
             public DateTime EndAt { get; set; }
             public double TotalEnergyValue { get; set; }
+        }
+        public class DietBody
+        {
+            public string Name { get; set; } = null!;
+            public string? Description { get; set; }
+            public DateTime CreateAt { get; set; }
+            public DateTime UpdateAt { get; set; }
+            public DateTime ScheduleAt { get; set; }
+            public bool Status { get; set; }
+            public string Goal { get; set; } = null!;
+            public DateTime EndAt { get; set; }
+            public double TotalEnergyValue { get; set; }
+
         }
 
     }

@@ -70,7 +70,7 @@ namespace zooma_api.Controllers
                     throw;
                 }
             }
-            return NoContent();
+            return Ok(area);
         }
         private bool AreaExists(int id)
         {
