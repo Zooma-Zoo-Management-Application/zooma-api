@@ -211,6 +211,7 @@ namespace zooma_api.Controllers
             //                var loginUser = _mapper.Map<UserDTO>(userChecking);
 
 
+
             if (_context.Users == null)
             {
                 return Problem("Entity set 'ZoomaContext.Users'  is null.");
@@ -218,16 +219,15 @@ namespace zooma_api.Controllers
 
             if (UserExists(user.Email))
             {
-                return BadRequest("Email already exists");
+                return BadRequest(new { message = "Email already exists" });
 
             }
 
             if (user.Password != user.ConfirmPassword)
             {
-                return BadRequest("Please type the correct confirm password");
+                return BadRequest(new { message = "Please type the correct confirm password" });
 
             }
-
 
             User signUpUser = new User
             {
@@ -282,7 +282,8 @@ namespace zooma_api.Controllers
             {
                 if (!UserExists(existingUser.Email))  // Assuming email is unique
                 {
-                    return NotFound("Email đã tồn tại");
+                    return BadRequest(new { message = "Email is already exist" });
+
                 }
                 else
                 {
@@ -306,7 +307,7 @@ namespace zooma_api.Controllers
 
             if (existingUser.Password != updatePassword.currentPassword)
             {
-                return BadRequest("Your old password is wrong!!");
+                return BadRequest(new { msg = "Your old password is wrong!!" });
             }
             else
             {
@@ -331,7 +332,7 @@ namespace zooma_api.Controllers
                 }
             }
 
-            return Ok("Update Password Successfully"); // Return 204 No Content to indicate the request has succeeded
+            return Ok(new {msg = "Update Password Successfully" }); // Return 204 No Content to indicate the request has succeeded
         }
     }
 
