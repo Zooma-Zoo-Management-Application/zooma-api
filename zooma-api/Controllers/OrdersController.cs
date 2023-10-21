@@ -149,7 +149,7 @@ namespace zooma_api.Controllers
             if (order != null)
             {
                 order.PaymentMethod=orderUpdate.PaymentMethod;
-                if (orderUpdate.Notes !== "") order.Notes = orderUpdate.Notes;
+                if (orderUpdate.Notes != "") order.Notes = orderUpdate.Notes;
                 order.Status = orderUpdate.Status;
                 _context.Entry(order).State = EntityState.Modified;
 
