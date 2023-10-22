@@ -43,6 +43,30 @@ namespace zooma_api.Controllers
             return Ok(trainerExpDTO);
         }
 
+        //Hàm lấy kinh nghiệm bởi Id
+        [HttpGet("{Id}")]
+        public async Task<ActionResult<TrainerExpDTO>> GetTrainerExp(int Id)
+        {
+            if (_context.TrainerExps == null)
+            {
+                return NotFound();
+            }
+
+            var trainerExp = await _context.TrainerExps.
+                                            Include(a => a.Skill).
+                                            Include(a => a.User).
+                                            FirstOrDefaultAsync(a => a.Id == Id);
+
+            if (trainerExp == null)
+            {
+                return NotFound("Can't found");
+            }
+
+            var trainerExpDTO = _mapper.Map<TrainerExpDTO>(trainerExp);
+
+            return trainerExpDTO;
+        }
+
         // Hàm lấy kinh nghiệm của trainer bởi trainerId
         [HttpGet("/get-trainerexp-by-trainerId/{trainerId}")]
         public async Task<ActionResult<IEnumerable<TrainerExpDTO>>> GetTrainerExpByTrainerId(int trainerId)

@@ -30,6 +30,7 @@ namespace zooma_api.Helper
             CreateMap<TrainerExp, TrainerExpDTO>().ReverseMap();
             CreateMap<Models.Type, TypeDTO>().ReverseMap();
             CreateMap<Food, FoodDTO>().ReverseMap();
+            CreateMap<FoodSpecy, FoodSpecyDTO>().ReverseMap();
         }
     }
 }
