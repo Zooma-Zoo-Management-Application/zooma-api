@@ -78,15 +78,7 @@ namespace zooma_api.Controllers
             food.ImageUrl = foodUpdate.ImageUrl;
             food.Status = foodUpdate.Status;
 
-            var existingFood = _context.Foods.FirstOrDefault(f => f.Name == food.Name);
-
-            if (existingFood != null)
-            {
-                return BadRequest("This food has added before!");
-            } else
-            {
-                _context.Entry(food).State = EntityState.Modified;
-            }
+            _context.Entry(food).State = EntityState.Modified;
 
             try
             {
