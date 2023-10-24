@@ -40,6 +40,48 @@ namespace zooma_api.Controllers
             return Ok(speciesDTO);
         }
 
+
+        // GET: api/Species
+        [HttpGet("get-species-in-area/{id}")]
+        public async Task<ActionResult<IEnumerable<Species>>> GetSpeciesInArea(int id)
+        {
+            // CAGES LÀM DB VÀ CODE CỨNG THÌ KHÔNG CẦN PHẢI CHECK LỖI, CHECK CAGE LÀ ĐƯỢC
+            try
+            {
+                var cages =  _context.Cages.Where(a => a.AreaId == id).Select(a => a.Id).ToList();
+
+                if (cages.Count == 0 || cages == null)
+                {
+                    return NotFound(new { msg = "No cages have founded" });
+
+                }
+                //EAGER ONLY SPECIES FOR BETTER SPEED
+                var animals = await _context.Animals.Where(a => cages.Contains((short)a.CageId)).Include(n => n.Species).ToListAsync();
+
+                if (animals.Count == 0)
+                {
+                    return BadRequest(new { msg = "This area dont have any animals in cages" });
+                }
+
+                if (animals != null)
+                {
+                    var species = animals.Select(a => a.Species).DistinctBy(x => x.Id).ToList(); // LINQ DISTINCT                 
+                    return Ok(new { species = _mapper.Map<List<SpeciesDTO>>(species) });
+                }             
+                else
+                {
+                    return NotFound(new { msg = "No species have founded" });
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { msg = "Nhìn quanh lần cuối" });
+            }
+            
+
+
+        }
+
         // GET: api/Species/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Species>> GetSpecies(int id)
