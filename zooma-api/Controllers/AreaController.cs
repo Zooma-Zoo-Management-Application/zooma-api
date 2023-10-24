@@ -52,7 +52,7 @@ namespace zooma_api.Controllers
                 return NotFound("No area available");
             }
 
-            var species = await _context.Areas.FirstOrDefaultAsync(n => n.Id == speciesId);
+            var species = await _context.Species.FirstOrDefaultAsync(n => n.Id == speciesId);
 
             if (species == null)
             {
