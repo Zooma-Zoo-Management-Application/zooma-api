@@ -42,6 +42,37 @@ namespace zooma_api.Controllers
             }
             return Ok(area);
         }
+
+        //get area by speciesId
+        [HttpGet("GetAreaBySpeciesId/{speciesId}")]
+        public async Task<IActionResult> GetAreaBySpeciesId(short speciesId)
+        {
+            if (_context.Areas == null)
+            {
+                return NotFound("No area available");
+            }
+
+            var species = await _context.Areas.FirstOrDefaultAsync(n => n.Id == speciesId);
+
+            if (species == null)
+            {
+                return NotFound("Can't found this species");
+            }
+
+            var cageOfSpecies = _context.Animals.Where(e => e.SpeciesId == speciesId).Select(e => e.CageId).ToList();
+
+            var areaId = _context.Cages.Where(e => cageOfSpecies.Contains(e.AreaId)).Select(e => e.AreaId).Distinct().ToArray();
+
+
+            if (areaId == null)
+            {
+                return NotFound("No area having that ID");
+            }
+
+            return Ok(areaId);
+        }
+
+
         //update area
         [HttpPut("UpdateArea/{id}")]
         public async Task<IActionResult> UpdateArea(int id, AreaUpdate areaUpdate)
