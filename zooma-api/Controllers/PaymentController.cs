@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Repositories;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -10,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using VNPayDemo;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 using zooma_api.Repositories;
 

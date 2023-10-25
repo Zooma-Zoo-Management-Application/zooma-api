@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Repositories;
 using System.Text;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 using zooma_api.Repositories;
 

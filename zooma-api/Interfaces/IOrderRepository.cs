@@ -2,7 +2,7 @@
 using zooma_api.DTO;
 using zooma_api.Models;
 
-namespace Repositories
+namespace zooma_api.Interfaces
 {
     public interface IOrderRepository
     {
