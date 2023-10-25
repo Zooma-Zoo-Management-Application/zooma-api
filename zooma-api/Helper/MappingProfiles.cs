@@ -15,7 +15,6 @@ namespace zooma_api.Helper
             CreateMap<Species, SpeciesDTO>().ReverseMap();
             CreateMap<Cage, CagesDTO>().ReverseMap();
             CreateMap<TrainingPlan, TrainingPlanDTO>().ReverseMap();
-            CreateMap<CreateSpecies, Species>().ReverseMap();
             CreateMap<Diet, DietDTO>().ReverseMap();
             CreateMap<News, NewsDTO>().ReverseMap();
             CreateMap<Ticket, CartItemDTO>().ReverseMap();
@@ -32,6 +31,8 @@ namespace zooma_api.Helper
             CreateMap<Food, FoodDTO>().ReverseMap();
             CreateMap<FoodSpecy, FoodSpecyDTO>().ReverseMap();
             CreateMap<DietDetail, DietDetailDTO>().ReverseMap();
+            CreateMap<Cage, CageOnly>().ReverseMap();
+            CreateMap<Diet, DietOnly>().ReverseMap();
         }
     }
 }

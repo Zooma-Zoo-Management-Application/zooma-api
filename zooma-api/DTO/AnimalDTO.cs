@@ -18,8 +18,8 @@ namespace zooma_api.DTO
         public short? TrainingPlanId { get; set; }
         public double MinRer { get; set; }
         public double MaxRer { get; set; }
-        public DietDTO? diet { get; set; }
-        public CagesDTO? cage { get; set; }
+        public DietOnly? diet { get; set; }
+        public CageOnly? cage { get; set; }
         public SpeciesDTO? species { get; set; }
         public TrainingPlanDTO? trainingPlan { get; set; }
 
