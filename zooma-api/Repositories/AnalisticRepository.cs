@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Repositories

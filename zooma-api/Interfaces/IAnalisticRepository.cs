@@ -1,4 +1,6 @@
-﻿namespace zooma_api.Repositories
+﻿using zooma_api.Repositories;
+
+namespace zooma_api.Interfaces
 {
     public interface IAnalisticRepository
     {

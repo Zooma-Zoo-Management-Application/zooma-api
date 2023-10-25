@@ -1,8 +1,8 @@
 using AutoMapper.Execution;
 using Microsoft.EntityFrameworkCore;
-using Repositories;
 using System.Collections;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Repositories
