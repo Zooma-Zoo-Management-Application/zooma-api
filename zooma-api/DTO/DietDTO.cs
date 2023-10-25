@@ -1,9 +1,11 @@
-﻿namespace zooma_api.DTO
+﻿using zooma_api.Models;
+
+namespace zooma_api.DTO
 {
     public class DietDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; } = null!;
+        public string? Name { get; set; }
         public string? Description { get; set; }
         public DateTime CreateAt { get; set; }
         public DateTime UpdateAt { get; set; }
@@ -12,5 +14,6 @@
         public string Goal { get; set; } = null!;
         public DateTime EndAt { get; set; }
         public double TotalEnergyValue { get; set; }
+        public ICollection<AnimalWithCage> Animals { get; set; }
     }
 }
