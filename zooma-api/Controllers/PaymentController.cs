@@ -427,6 +427,20 @@ namespace zooma_api.Controllers
             public string RefundBy { get; set; }
         }
 
+        public class VnPayResponseUrlModel
+        {
+            public string vnp_Amount { get; set; }
+            public string vnp_BankTranNo { get; set; }
+            public string vnp_OrderInfo { get; set; }
+            public string vnp_ResponseCode { get; set; }
+            public string vnp_TransactionNo { get; set; }
+            public string vnp_TransactionStatus { get; set; }
+            public string vnp_TxnRef { get; set; }
+            public string vnp_SecureHash { get; set; }
+
+
+        }
+
         public class VnPayResponse
         {
             [JsonPropertyName("vnp_ResponseId")]
