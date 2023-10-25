@@ -150,7 +150,7 @@ namespace zooma_api.Controllers
 
         // Hàm tạo news 
         [HttpPost()]
-        public async Task<ActionResult<NewsDTO>> CreateNews(NewsBody newsBody)
+        public async Task<ActionResult<NewsDTO>> CreateNews(CreateNewsBody newsBody)
         {
           if (_context.News == null)
           {
@@ -295,5 +295,14 @@ namespace zooma_api.Controllers
         public string? Content { get; set; }
         public string? Description { get; set; }
         public string? Image { get; set; }
+    }
+
+    public class CreateNewsBody
+    {
+        public string? Title { get; set; }
+        public string? Content { get; set; }
+        public string? Description { get; set; }
+        public string? Image { get; set; }
+        public short UserId { get; set; }
     }
 }
