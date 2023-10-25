@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -20,26 +21,20 @@ namespace zooma_api.Controllers
         public zoomadbContext _context = new zoomadbContext();
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
+        private readonly IAnimalRepository _animalRepository;
 
-        public AnimalsController(IConfiguration config, IMapper mapper)
+        public AnimalsController(IConfiguration config, IMapper mapper, IAnimalRepository animalRepository)
         {
             _config = config;
             _mapper = mapper;
+            _animalRepository = animalRepository;
         }
 
         // Ham lay tat ca animal
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimals()
+        public ActionResult<IEnumerable<AnimalDTO>> GetAnimals()
         {
-            var animals = await _context.Animals.
-                Include(n => n.TrainingPlan).
-                Include(n => n.Diet).
-                Include(n => n.Cage).
-                Include(n => n.Species).
-                ToListAsync();
-
-            //     var animalss = await _context.Animals.Join(_context.Cages, x => x.CageId, y => y.Id,
-            //         (x, y) => new { x, y }).ToListAsync();
+            var animals = _animalRepository.GetAllAnimals();
 
             var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
 
@@ -53,23 +48,18 @@ namespace zooma_api.Controllers
 
         // ham lay animal dua tren Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<AnimalDTO>> GetAnimalById(int id)
+        public ActionResult<AnimalDTO> GetAnimalById(int id)
         {
             if (_context.Animals == null)
             {
                 return NotFound();
             }
 
-            var animal = await _context.Animals.
-                                                Include(n => n.TrainingPlan).
-                                                Include(n => n.Diet).
-                                                Include(n => n.Species).
-                                                Include(n => n.Cage).
-                                                FirstOrDefaultAsync(e => e.Id == id);
+            var animal = _animalRepository.GetAnimalById(id); 
 
             if (animal == null)
             {
-                return NotFound();
+                return NotFound("Can't found this animal");
             }
 
             var animalDTO = _mapper.Map<AnimalDTO>(animal);
@@ -79,45 +69,23 @@ namespace zooma_api.Controllers
 
         // Ham lay animal dua tren name
         [HttpGet("name")]
-        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalByName(string? name)
+        public ActionResult<IEnumerable<AnimalDTO>> GetAnimalByName(string? name)
         {
             if (_context.Animals == null)
             {
                 return NotFound();
             }
 
-            List<Animal> animals = new List<Animal>();
+            var animals = _animalRepository.GetAnimalByName(name);
 
-            List<AnimalDTO> animalsDTO;
+            var animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
 
-            if (string.IsNullOrEmpty(name))
-            {
-                animals = _context.Animals.ToList();
-                animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
-                return animalsDTO;
-            }
-            else
-            {
-                animals = await _context.Animals.Where(a => a.Name.Contains(name)).
-                                                                                    Include(n => n.TrainingPlan).
-                                                                                    Include(n => n.Diet).
-                                                                                    Include(n => n.Species).
-                                                                                    Include(n => n.Cage).ToListAsync();
-
-                animalsDTO = _mapper.Map<List<AnimalDTO>>(animals);
-
-                if (animalsDTO.IsNullOrEmpty())
-                {
-                    return NotFound("We can't found the animal that match your search");
-                }
-
-                return animalsDTO;
-            }
+            return animalsDTO;
         }
 
         // ham lay animal dua tren CageId
         [HttpGet("/get-animals-by-cageId/{id}")]
-        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalsByCageId(int id)
+        public ActionResult<IEnumerable<AnimalDTO>> GetAnimalsByCageId(int id)
         {
             if (_context.Animals == null)
             {
@@ -131,12 +99,7 @@ namespace zooma_api.Controllers
                 return NotFound("Cage Not Found!!");
             }
 
-            var animals = _context.Animals.Where(c => c.CageId == cages.Id).
-                                                                           Include(n => n.TrainingPlan).
-                                                                           Include(n => n.Diet).
-                                                                           Include(n => n.Species).
-                                                                           Include(n => n.Cage).
-                                                                           ToList();
+            var animals = _animalRepository.GetAnimalsByCageId(id);
 
             var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
 
@@ -159,20 +122,7 @@ namespace zooma_api.Controllers
                 return NotFound("Khong tim thay area nay");
             }
 
-            var cages = _context.Cages.Where(a => a.AreaId == areaId.Id).Select(a => a.Id).ToList();
-
-            if (cages.Count == 0 || cages == null)
-            {
-                return NotFound("Khong tim thay cage trong area nay");
-            }
-
-            var animals = _context.Animals
-                .Where(a => cages.Contains((short)a.CageId)).
-                                                            Include(n => n.TrainingPlan).
-                                                            Include(n => n.Diet).
-                                                            Include(n => n.Species).
-                                                            Include(n => n.Cage).
-                                                            ToList();
+            var animals = _animalRepository.GetAnimalsByAreaId(id);
 
             if (animals == null)
             {
