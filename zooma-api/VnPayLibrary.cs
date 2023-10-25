@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using zooma_api.DTO;
-using static zooma_api.Controllers.PaymentController;
 
 namespace zooma_api
 {
@@ -118,43 +117,6 @@ namespace zooma_api
             var vnpSecureHash =
                 collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value; //hash của dữ liệu trả về
             var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
-
-            var checkSignature =
-                vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
-
-            var banKTranNo = vnPay.GetResponseData("vnp_BankTranNo");
-
-            if (!checkSignature)
-                return new PaymentResponseModel()
-                {
-                    Success = false
-                };
-
-            return new PaymentResponseModel()
-            {
-                Success = true,
-                PaymentMethod = "VnPay",
-                OrderDescription = orderInfo,
-                OrderId = orderId.ToString(),
-                PaymentId = vnPayTranId.ToString(),
-                TransactionId = vnPayTranId.ToString(),
-                Token = vnpSecureHash,
-                VnPayResponseCode = vnpResponseCode,
-                BanKTranNo = banKTranNo
-            };
-        }
-
-        public PaymentResponseModel GetFullResponseData(VnPayResponseUrlModel url, string hashSecret)
-        {
-            var vnPay = new VnPayLibrary();
-
-
-            var orderId = Convert.ToInt64(url.vnp_TxnRef); //mã tham chiếu được gửi về VNPay lúc tạo url
-            var vnPayTranId = Convert.ToInt64(url.vnp_TransactionNo);
-            var vnpResponseCode = url.vnp_ResponseCode;
-            var vnpSecureHash =
-                url.vnp_SecureHash; //hash của dữ liệu trả về
-            var orderInfo = url.vnp_OrderInfo;
 
             var checkSignature =
                 vnPay.ValidateSignature(vnpSecureHash, hashSecret); //check Signature
