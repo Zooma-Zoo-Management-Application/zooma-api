@@ -148,13 +148,42 @@ namespace zooma_api.Controllers
 
             if (order != null)
             {
-                order.PaymentMethod=orderUpdate.PaymentMethod;
+                if( order.Status != orderUpdate.Status) {
+                    if (orderUpdate.Status == 1)
+                    {
+                        order.Status = orderUpdate.Status;
+                        order.Notes = "Unpaid";
+                        
+                    }
+                    else if (orderUpdate.Status == 2)
+                    {
+                        order.Status = orderUpdate.Status;
+                        order.Notes = "Successfully paid";
+
+
+                    }
+                    else if (orderUpdate.Status == 3)
+                    {
+                        order.Status = orderUpdate.Status;
+                        order.Notes = "Refund successfully";
+
+                    }
+                    else if (orderUpdate.Status == 0)
+                    {
+                        order.Status = orderUpdate.Status;
+                        order.Notes = "Failed";
+                    }
+                }
+
+                if (order.PaymentMethod != orderUpdate.PaymentMethod && orderUpdate.PaymentMethod != "")
+                {
+                    order.PaymentMethod = orderUpdate.PaymentMethod;
+
+                }
                 if (orderUpdate.Notes != "") order.Notes = orderUpdate.Notes;
-                order.Status = orderUpdate.Status;
-                _context.Entry(order).State = EntityState.Modified;
-
+                  //  order.Status = orderUpdate.Status;
+                  //  _context.Entry(order).State = EntityState.Modified SAI LẦM TUỔI TRẺ 
             }
-
 
             try
             {
