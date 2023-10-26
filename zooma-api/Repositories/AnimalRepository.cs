@@ -28,6 +28,24 @@ namespace zooma_api.Repositories
             }
         }
 
+        public List<Animal> GetAllAnimalsWithNoCage()
+        {
+            using (var _context = new zoomadbContext())
+            {
+                try
+                {
+                    var animal = _context.Animals.Where(e => e.CageId == null).ToList();
+
+                    return animal;
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+        }
+
         public Animal GetAnimalById(int id)
         {
             using(var _context = new zoomadbContext())

@@ -134,6 +134,27 @@ namespace zooma_api.Controllers
             return animalDTOs;
         }
 
+        // ham lay animal dua tren CageId = null
+        [HttpGet("/animal-no-cage")]
+        public ActionResult<IEnumerable<AnimalDTO>> GetAllAnimalNoCage()
+        {
+            if (_context.Animals == null)
+            {
+                return NotFound();
+            }
+
+            var animal = _animalRepository.GetAllAnimalsWithNoCage();
+
+            if (animal == null)
+            {
+                return NotFound("Can't found this animal");
+            }
+
+            var animalDTO = _mapper.Map<List<AnimalDTO>>(animal);
+
+            return animalDTO;
+
+        }
         // Ham update thong tin cua animal
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAnimalDetails(int id, AnimalUpdate animalUpdate)
