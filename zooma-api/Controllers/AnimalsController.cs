@@ -135,7 +135,7 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren CageId = null
-        [HttpGet("/animal-no-cage")]
+        [HttpGet("/animal-without-cage")]
         public ActionResult<IEnumerable<AnimalDTO>> GetAllAnimalNoCage()
         {
             if (_context.Animals == null)
