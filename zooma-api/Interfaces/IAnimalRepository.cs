@@ -10,5 +10,6 @@ namespace zooma_api.Interfaces
         List<Animal> GetAnimalByName(string name);
         List<Animal> GetAnimalsByCageId(int id);
         List<Animal> GetAnimalsByAreaId(int id);
+        List<Animal> GetAllAnimalsWithNoCage();
     }
 }
