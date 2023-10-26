@@ -96,7 +96,7 @@ namespace zooma_api.Repositories
         {
             using (var context = new zoomadbContext())
             {
-                return context.Orders.Where(o => o.UserId == userID).Include(o=>o.OrderDetails).Include(o=>o.Transactions).OrderByDescending(o => o.OrderDate).ToList();
+                return context.Orders.Where(o => o.UserId == userID).Include(o=>o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o=>o.Transactions).OrderByDescending(o => o.OrderDate).ToList();
             }
 
         }

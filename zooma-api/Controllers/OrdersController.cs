@@ -74,13 +74,18 @@ namespace zooma_api.Controllers
             {
                 return NotFound();
             }
+            try
+            {
+                var list = _repo.GetOrdersByCustomerId(id);
+                var orderDTOs = _mapper.Map<IEnumerable<OrderDTO>>(list);
+                return Ok(orderDTOs);
 
-            var list = _repo.GetOrdersByCustomerId(id);
+            }
+            catch (Exception)
+            {
 
-            var orderDTOs = _mapper.Map<IEnumerable<OrderDTO>>(list);
-
-
-            return Ok(orderDTOs);
+                throw;
+            }
         }
 
 
