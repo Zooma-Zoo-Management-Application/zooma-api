@@ -149,8 +149,9 @@ namespace zooma_api.Controllers
 
         // Hàm thay đổi animal cho zootrainers
         [HttpPut("{zooTrainerId}")]
-        public async Task<IActionResult> UpdateAnimalAssignToTrainerByTrainerId(int zooTrainerId, ZooTrainerWithAnimalUpdate animalUser)
+        public async Task<IActionResult> UpdateAnimalAssignToTrainerByTrainerId(int zooTrainerId, int animalId, ZooTrainerWithAnimalUpdate animalUser)
         {
+
             var zootrainer = _context.Users.FirstOrDefault(a => a.Id == zooTrainerId);
 
             if (zootrainer == null)
@@ -163,7 +164,16 @@ namespace zooma_api.Controllers
                 return BadRequest("This user is not a trainer");
             }
 
-            var trainerWithAnimal = _context.AnimalUsers.FirstOrDefault(a => a.UserId == zooTrainerId);
+            var animal = _context.Animals.FirstOrDefault(a => a.Id == animalId);
+
+            if (animal == null)
+            {
+                return NotFound("Can't found this animal");
+            }
+
+            var trainerWithAnimal = _context.AnimalUsers.Where(a => a.AnimalId == animalId).
+                                                         Where(b => b.UserId == zooTrainerId).
+                                                         FirstOrDefault();
 
             trainerWithAnimal.AnimalId = animalUser.AnimalId;
             trainerWithAnimal.MainTrainer = animalUser.MainTrainer;
