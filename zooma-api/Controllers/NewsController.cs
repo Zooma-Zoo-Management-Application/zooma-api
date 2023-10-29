@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -19,22 +20,24 @@ namespace zooma_api.Controllers
         public zoomadbContext _context = new zoomadbContext();
 
         private readonly IMapper _mapper;
+        private readonly INewRepository _newRepository;
 
-        public NewsController(IMapper mapper)
+        public NewsController(IMapper mapper, INewRepository newRepository)
         {
             _mapper = mapper;
+            _newRepository = newRepository;
         }
 
         // Hàm lấy tất cả News
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<NewsDTO>>> GetAllNews()
+        public ActionResult<IEnumerable<NewsDTO>> GetAllNews()
         {
-          if (_context.News == null)
-          {
-              return NotFound();
-          }
+            if (_context.News == null)
+            {
+                return NotFound();
+            }
 
-            var news = await _context.News.Include(n => n.User).ToListAsync();
+            var news = _newRepository.GetAllNews();
 
             var newsDTO = _mapper.Map<ICollection<NewsDTO>>(news);
 
@@ -43,13 +46,13 @@ namespace zooma_api.Controllers
 
         // Hàm lấy News dựa trên Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<NewsDTO>> GetNewsById(short id)
+        public ActionResult<NewsDTO> GetNewsById(short id)
         {
-            var news = await _context.News.Include(n => n.User).FirstOrDefaultAsync(n => n.Id == id);
+            var news = _newRepository.GetNewById(id);   
 
             if (news == null)
             {
-                return NotFound();
+                return NotFound("Can't found this new");
             }
 
             var newsDTO = _mapper.Map<NewsDTO>(news);
@@ -59,13 +62,18 @@ namespace zooma_api.Controllers
 
         // Hàm lấy News dựa trên staffid
         [HttpGet("get-news-by-staffId/{staffId}")]
-        public async Task<ActionResult<NewsDTO>> GetNewsByStaffId(short staffId)
+        public ActionResult<NewsDTO> GetNewsByStaffId(short staffId)
         {
-            var user = await _context.Users.Include(n => n.News).FirstOrDefaultAsync(n => n.Id == staffId);
+            var user = _newRepository.GetNewsByStaffId(staffId);
 
             if (user == null)
             {
-                return NotFound();
+                return NotFound("Can't find this user");
+            }
+
+            if (user.RoleId != 1)
+            {
+                return BadRequest("This user is not allowed to manage news");
             }
 
             var newsDTO = _mapper.Map<List<NewsDTO>>(user.News);
@@ -75,14 +83,16 @@ namespace zooma_api.Controllers
 
         //Hàm lấy các pinned news
         [HttpGet("pin-news")]
-        public async Task<ActionResult<NewsDTO>> GetPinNews()
+        public ActionResult<NewsDTO> GetPinNews()
         {
             if (_context.News == null)
             {
                 return NotFound();
             }
 
-            List<NewsDTO> pinnedNews = _mapper.Map<List<NewsDTO>>(await _context.News.Where(a => a.Status == true).ToListAsync());
+            var news = _newRepository.GetPinNews();
+
+            List<NewsDTO> pinnedNews = _mapper.Map<List<NewsDTO>>(news).ToList();
 
             if (pinnedNews == null)
             {
@@ -94,14 +104,16 @@ namespace zooma_api.Controllers
 
         //Hàm lấy các unpinned news
         [HttpGet("unpin-news")]
-        public async Task<ActionResult<NewsDTO>> GetUnpinNews()
+        public ActionResult<NewsDTO> GetUnpinNews()
         {
             if (_context.News == null)
             {
                 return NotFound();
             }
 
-            List<NewsDTO> unpinNews = _mapper.Map<List<NewsDTO>>(await _context.News.Where(a => a.Status == false).ToListAsync());
+            var news = _newRepository.GetUnpinNews();
+
+            List<NewsDTO> unpinNews = _mapper.Map<List<NewsDTO>>(news).ToList();
 
             if (unpinNews == null)
             {
