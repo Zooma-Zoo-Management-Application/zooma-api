@@ -111,7 +111,7 @@ namespace zooma_api.Repositories
                             AdultTickets = adult_ticket,
                             ChildTickets = child_ticket,
                             SeniorTickets = senior_ticket,
-                            TotalTickets = total,
+                            TotalMonth = total,
                         };
                     }
                     catch (Exception)
@@ -226,7 +226,7 @@ namespace zooma_api.Repositories
                             AdultTickets = adult_ticket,
                             ChildTickets = child_ticket,
                             SeniorTickets = senior_ticket,
-                            TotalTickets = total,
+                            TotalMonth = total,
 
                         }); ;
 
@@ -257,7 +257,7 @@ namespace zooma_api.Repositories
         public int AdultTickets { get; set; }
         public int ChildTickets { get; set; }
         public int SeniorTickets { get; set; }
-        public int TotalTickets { get; set; }
+        public int TotalMonth { get; set; }
 
     }
 }
