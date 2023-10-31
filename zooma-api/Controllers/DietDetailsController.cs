@@ -68,6 +68,38 @@ namespace zooma_api.Controllers
             return dietDetailDTO;
         }
 
+        // Hàm lấy Diet Details Bằng DietId
+        [HttpGet("/get-diet-details-by-diet-Id/{id}")]
+        public async Task<ActionResult<IEnumerable<DietDetailDTO>>> GetDietDetailByDietId(int id)
+        {
+            if (_context.DietDetails == null)
+            {
+                return NotFound();
+            }
+
+            var dietDetail = await _context.DietDetails.
+                                                        Include(e => e.Diet).
+                                                        Include(e => e.Food).
+                                                        Where(e => e.DietId == id).
+                                                        ToListAsync();
+
+
+            if (dietDetail == null)
+            {
+                return NotFound("Can't found this diet detail");
+            }
+
+            if(dietDetail.Count == 0)
+            {
+                return NotFound("This diet is empty");
+            }
+
+            var dietDetailDTO = _mapper.Map<List<DietDetailDTO>>(dietDetail);
+
+            return dietDetailDTO;
+        }
+
+
         // Hàm cập nhật diet detail
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDietDetails(int id, DietDetailUpdate dietDetailUpdate)
