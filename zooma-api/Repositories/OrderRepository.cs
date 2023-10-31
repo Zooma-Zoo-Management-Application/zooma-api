@@ -63,7 +63,7 @@ namespace zooma_api.Repositories
                     var currentDate = DateTime.Now; // Lấy thời điểm hiện tại
 
                     var recentOrders = _context.Orders
-                                        .Where(o => o.Status == 1 && o.OrderDate <= currentDate) // Lọc các đơn hàng có Status=1 và OrderDate không lớn hơn thời điểm hiện tại
+                                        .Where(o => o.Status == 2 && o.OrderDate <= currentDate) // Lọc các đơn hàng có Status=1 và OrderDate không lớn hơn thời điểm hiện tại
                                         .OrderByDescending(o => o.OrderDate) // Sắp xếp theo OrderDate giảm dần để lấy các đơn hàng gần đây nhất trước
                                         .Take(5) // Lấy ra 5 đơn hàng
                                         .Include(o => o.OrderDetails)

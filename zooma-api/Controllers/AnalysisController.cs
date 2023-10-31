@@ -17,6 +17,8 @@ namespace zooma_api.Controllers
 
         private IAnalisticRepository _repository = new AnalisticRepository();
         private IOrderRepository repo = new OrderRepository();
+        private IUserRepository user_repo = new UserRepository();
+
 
         private readonly zoomadbContext _context;
         private readonly IMapper _mapper;
@@ -28,12 +30,15 @@ namespace zooma_api.Controllers
         }
 
         [HttpGet("sixmonths-analysis")]
-        public  IActionResult getRevenues()
+        public  async Task<IActionResult> getRevenues()
         {
             double total = 0;
+            int totalTicket = 0;
             var Revenuelist = _repository.GetSixMonthsRevenues();
             var orderDTOs = _mapper.Map<List<OrderDTO>>(repo.GetFiveRecentOrders());
             var Ticketlist = _repository.GetSixMonthsTicketQuantity();
+            AllUsersQuantity UsersQuantity = await user_repo.GetUsersQuantityAsync();
+
 
 
             foreach (var revenue in Revenuelist)
@@ -41,7 +46,12 @@ namespace zooma_api.Controllers
                 total += revenue.Revenue;
             }
 
-            return  Ok( new { TotalRevenue = total , Revenue = Revenuelist, Tickets = Ticketlist, RecentOrders =orderDTOs  }); 
+            foreach( var ticket in Ticketlist)
+            {
+                totalTicket += ticket.TotalMonth;
+            }
+
+            return  Ok( new { TotalRevenue = total , TotalTickets = totalTicket, Revenue = Revenuelist, Tickets = Ticketlist, RecentOrders =orderDTOs , UsersQuantity = UsersQuantity }); 
         }
 
         //[HttpGet("recent-orders")]
