@@ -141,5 +141,39 @@ namespace zooma_api.Repositories
 
             }
         }
+
+        public async Task<List<Order>> GetAllSuccessOrders()
+        {
+            using (var context = new zoomadbContext())
+            {
+                try
+                {
+                    return await context.Orders.Where(o => o.Status == 2).Include(o => o.OrderDetails).ThenInclude(o => o.Ticket).Include(o => o.Transactions).OrderByDescending(o => o.OrderDate).ToListAsync();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+
+        }
+
+        public int GetQuantityOfSuccessOrders()
+        {
+            using (var context = new zoomadbContext())
+            {
+                try
+                {
+                    var quantity = context.Orders.Where(o => o.Status == 2).ToList();
+                    return quantity.Count;
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+        }
+
+
     }
 }
