@@ -16,7 +16,8 @@ namespace zooma_api.Interfaces
         IEnumerable<Order> GetFiveRecentOrders(); // ASYNCHRONOUS METHOD ???
 
 
+        int GetQuantityOfSuccessOrders();
 
-
+        Task<List<Order>> GetAllSuccessOrders();
     }
 }

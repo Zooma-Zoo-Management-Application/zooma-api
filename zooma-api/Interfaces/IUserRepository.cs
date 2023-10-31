@@ -7,11 +7,7 @@ namespace zooma_api.Interfaces
     public interface IUserRepository
     {
         Task<AllUsersQuantity> GetUsersQuantityAsync();
-       
-
-     
-
-
+    
     }
 
    

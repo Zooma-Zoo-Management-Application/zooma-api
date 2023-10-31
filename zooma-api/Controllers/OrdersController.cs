@@ -66,6 +66,30 @@ namespace zooma_api.Controllers
         //}
 
 
+        [HttpGet("success-orders")]
+        public async Task<ActionResult<List<OrderDTO>>> GetAllSuccessOrders() // XỬ LÝ GET ORDERS TRẢ VỀ KÈM CHUNG VỚI USER
+
+        {
+            if (_context.Orders == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                var list = await _repo.GetAllSuccessOrders();
+                var orderDTOs = _mapper.Map<List<OrderDTO>>(list);
+                return Ok(orderDTOs);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
+
+
         [HttpGet("get-orders-by-user/{id}")]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrdersWithUserID(short id) // XỬ LÝ GET ORDERS TRẢ VỀ KÈM CHUNG VỚI USER
 

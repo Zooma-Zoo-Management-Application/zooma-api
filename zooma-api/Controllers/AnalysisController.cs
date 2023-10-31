@@ -38,6 +38,7 @@ namespace zooma_api.Controllers
             var orderDTOs = _mapper.Map<List<OrderDTO>>(repo.GetFiveRecentOrders());
             var Ticketlist = _repository.GetSixMonthsTicketQuantity();
             AllUsersQuantity UsersQuantity = await user_repo.GetUsersQuantityAsync();
+            int quantity =  repo.GetQuantityOfSuccessOrders();
 
 
 
@@ -51,7 +52,7 @@ namespace zooma_api.Controllers
                 totalTicket += ticket.TotalMonth;
             }
 
-            return  Ok( new { TotalRevenue = total , TotalTickets = totalTicket, Revenue = Revenuelist, Tickets = Ticketlist, RecentOrders =orderDTOs , UsersQuantity = UsersQuantity }); 
+            return  Ok( new { TotalRevenue = total , TotalTickets = totalTicket, TotalSuccessOrders = quantity, Revenue = Revenuelist, Tickets = Ticketlist, RecentOrders =orderDTOs , UsersQuantity = UsersQuantity }); 
         }
 
         //[HttpGet("recent-orders")]
