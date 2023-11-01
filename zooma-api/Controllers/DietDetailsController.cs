@@ -33,12 +33,20 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var dietDetails = await _context.DietDetails.
-                                                        Include(e => e.Diet).
-                                                        Include(e => e.Food).
-                                                        ToListAsync();
+            var dietDetails = _context.DietDetails.
+                                                   Include(e => e.Diet).
+                                                   Include(e => e.Food).
+                                                   ToList();
 
             var dietDetailsDTO = _mapper.Map<List<DietDetailDTO>>(dietDetails);
+
+            foreach (var dietDetailDTO in dietDetailsDTO)
+            {
+                if (!string.IsNullOrEmpty(dietDetailDTO.FeedingDate))
+                {
+                    dietDetailDTO.FeedingDateArray = dietDetailDTO.FeedingDate.Split(',');
+                }
+            }
 
             return dietDetailsDTO;
         }
@@ -63,7 +71,12 @@ namespace zooma_api.Controllers
                 return NotFound("Can't found this diet detail");
             }
 
-            var dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail); 
+            var dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail);
+
+            if (!string.IsNullOrEmpty(dietDetailDTO.FeedingDate))
+            {
+                dietDetailDTO.FeedingDateArray = dietDetailDTO.FeedingDate.Split(',');
+            }
 
             return dietDetailDTO;
         }
@@ -94,9 +107,17 @@ namespace zooma_api.Controllers
                 return NotFound("This diet is empty");
             }
 
-            var dietDetailDTO = _mapper.Map<List<DietDetailDTO>>(dietDetail);
+            var dietDetailsDTO = _mapper.Map<List<DietDetailDTO>>(dietDetail);
 
-            return dietDetailDTO;
+            foreach (var dietDetailDTO in dietDetailsDTO)
+            {
+                if (!string.IsNullOrEmpty(dietDetailDTO.FeedingDate))
+                {
+                    dietDetailDTO.FeedingDateArray = dietDetailDTO.FeedingDate.Split(',');
+                }
+            }
+
+            return dietDetailsDTO;
         }
 
 
@@ -104,7 +125,7 @@ namespace zooma_api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDietDetails(int id, DietDetailUpdate dietDetailUpdate)
         {
-            var  dietDetail = await _context.DietDetails.FirstOrDefaultAsync(e => e.Id == id);
+            var dietDetail = await _context.DietDetails.FirstOrDefaultAsync(e => e.Id == id);
 
             if(dietDetail == null)
             {
@@ -114,8 +135,13 @@ namespace zooma_api.Controllers
             dietDetail.Name = dietDetail.Name ?? dietDetailUpdate.Name;
             dietDetail.Description = dietDetail.Description ?? dietDetailUpdate.Description;
             dietDetail.UpdateAt = DateTime.Now;
+            dietDetail.ScheduleAt = dietDetailUpdate.ScheduleAt;
             dietDetail.EndAt = dietDetailUpdate.EndAt;
-          //  dietDetail.FeedingInterval = dietDetailUpdate.FeedingInterval;
+            
+            dietDetail.FeedingDate = string.Join(",", dietDetailUpdate.FeedingDate);
+
+            dietDetail.FeedingTime = dietDetailUpdate.ScheduleAt.Value.TimeOfDay;
+            
             dietDetail.Status = dietDetailUpdate.Status;
             dietDetail.FoodId = dietDetailUpdate.FoodId;
             dietDetail.DietId = dietDetailUpdate.DietId;
@@ -151,6 +177,13 @@ namespace zooma_api.Controllers
               return Problem("Entity set 'zoomadbContext.DietDetails'  is null.");
             }
 
+            TimeSpan? feedingTime = dietDetailCreate.ScheduleAt.Value.TimeOfDay;
+
+            if (feedingTime < TimeSpan.Zero)
+            {
+                feedingTime = TimeSpan.Zero; 
+            }
+
             DietDetail dietDetail = new DietDetail
             {
                 Name = dietDetailCreate.Name,
@@ -159,7 +192,8 @@ namespace zooma_api.Controllers
                 UpdateAt = DateTime.Now,
                 ScheduleAt = dietDetailCreate.ScheduleAt,
                 EndAt = dietDetailCreate.EndAt,
-        //        FeedingInterval = dietDetailCreate.FeedingInterval,
+                FeedingTime = feedingTime,
+                FeedingDate = string.Join(",", dietDetailCreate.FeedingDate),
                 Status = dietDetailCreate.Status,
                 FoodId = dietDetailCreate.FoodId,
                 DietId = dietDetailCreate.DietId,
@@ -171,6 +205,7 @@ namespace zooma_api.Controllers
             {
                 return BadRequest("This diet exists before!");
             }
+
 
             _context.DietDetails.Add(dietDetail);
             await _context.SaveChangesAsync();
@@ -208,11 +243,10 @@ namespace zooma_api.Controllers
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public DateTime CreateAt { get; set; }
         public DateTime UpdateAt { get; set; }
         public DateTime? ScheduleAt { get; set; }
         public DateTime? EndAt { get; set; }
-        public short FeedingInterval { get; set; }
+        public int[]? FeedingDate { get; set; }
         public bool Status { get; set; }
         public int DietId { get; set; }
         public int FoodId { get; set; }
@@ -222,9 +256,10 @@ namespace zooma_api.Controllers
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
+        public DateTime UpdateAt { get; set; }
         public DateTime? ScheduleAt { get; set; }
         public DateTime? EndAt { get; set; }
-        public short FeedingInterval { get; set; }
+        public int[]? FeedingDate { get; set; }
         public bool Status { get; set; }
         public int DietId { get; set; }
         public int FoodId { get; set; }
