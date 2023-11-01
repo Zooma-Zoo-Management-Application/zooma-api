@@ -71,7 +71,12 @@ namespace zooma_api.Controllers
                 return NotFound("Can't found this diet detail");
             }
 
-            var dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail); 
+            var dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail);
+
+            if (!string.IsNullOrEmpty(dietDetailDTO.FeedingDate))
+            {
+                dietDetailDTO.FeedingDateArray = dietDetailDTO.FeedingDate.Split(',');
+            }
 
             return dietDetailDTO;
         }
