@@ -102,6 +102,18 @@ namespace zooma_api.Controllers
                     }
                 }
 
+                DateTime startDay = diet.ScheduleAt;
+                DateTime endDay = diet.EndAt;
+                TimeSpan allDay = endDay - startDay;
+                if (allDay < TimeSpan.Zero)
+                {
+                    allDay = TimeSpan.FromDays(1);
+                }
+
+                double totalDay = (double) allDay.TotalDays; 
+
+                totalEnergy = totalEnergy / totalDay; 
+
                 diet.Name = dietUpdate.Name ?? diet.Name;
                 diet.Description = dietUpdate.Description;
                 //        dietUpdate.CreateAt = dietUpdate.CreateAt;
