@@ -141,7 +141,7 @@ namespace zooma_api.Controllers
             dietDetail.FeedingDate = string.Join(",", dietDetailUpdate.FeedingDate);
 
             dietDetail.FeedingTime = dietDetailUpdate.ScheduleAt.Value.TimeOfDay;
-            
+            dietDetail.Quantity = dietDetailUpdate.Quantity;
             dietDetail.Status = dietDetailUpdate.Status;
             dietDetail.FoodId = dietDetailUpdate.FoodId;
             dietDetail.DietId = dietDetailUpdate.DietId;
@@ -194,6 +194,7 @@ namespace zooma_api.Controllers
                 EndAt = dietDetailCreate.EndAt,
                 FeedingTime = feedingTime,
                 FeedingDate = string.Join(",", dietDetailCreate.FeedingDate),
+                Quantity = dietDetailCreate.Quantity,
                 Status = dietDetailCreate.Status,
                 FoodId = dietDetailCreate.FoodId,
                 DietId = dietDetailCreate.DietId,
@@ -247,6 +248,7 @@ namespace zooma_api.Controllers
         public DateTime? ScheduleAt { get; set; }
         public DateTime? EndAt { get; set; }
         public int[]? FeedingDate { get; set; }
+        public double? Quantity { get; set; }
         public bool Status { get; set; }
         public int DietId { get; set; }
         public int FoodId { get; set; }
@@ -260,6 +262,7 @@ namespace zooma_api.Controllers
         public DateTime? ScheduleAt { get; set; }
         public DateTime? EndAt { get; set; }
         public int[]? FeedingDate { get; set; }
+        public double? Quantity { get; set; }
         public bool Status { get; set; }
         public int DietId { get; set; }
         public int FoodId { get; set; }

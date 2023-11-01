@@ -14,6 +14,7 @@ namespace zooma_api.DTO
         [JsonIgnore]
         public string? FeedingDate { get; set; }
         public TimeSpan? FeedingTime { get; set; }
+        public double? Quantity { get; set; }
         public bool Status { get; set; }
         public int DietId { get; set; }
         public int FoodId { get; set; }
