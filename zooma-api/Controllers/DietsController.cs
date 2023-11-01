@@ -98,7 +98,7 @@ namespace zooma_api.Controllers
                 {
                     if (item != null && item.Food != null)
                     {
-                        totalEnergy += item.Food.EnergyValue * item.FeedingInterval;
+                        totalEnergy += item.Food.EnergyValue;
                     }
                 }
 

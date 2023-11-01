@@ -44,16 +44,8 @@ namespace zooma_api.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer(GetConnectionString());
+                optionsBuilder.UseSqlServer("Server=tcp:zooma-db.database.windows.net,1433;Initial Catalog=Zooma;Persist Security Info=False;User ID=zooma-db;Password=huydiet@SWP;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             }
-        }
-
-        private static string GetConnectionString()
-        {
-            IConfiguration builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true, true).Build();
-            return builder["ConnectionStrings:DefaultConnectionString"];
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -111,7 +103,7 @@ namespace zooma_api.Models
             modelBuilder.Entity<AnimalUser>(entity =>
             {
                 entity.HasKey(e => new { e.AnimalId, e.UserId })
-                    .HasName("PK__Animal_U__7362FFED604B3315");
+                    .HasName("PK__Animal_U__7362FFEDD0AC7CEA");
 
                 entity.ToTable("Animal_User");
 
@@ -222,7 +214,11 @@ namespace zooma_api.Models
 
                 entity.Property(e => e.DietId).HasColumnName("DietID");
 
-                entity.Property(e => e.EndAt).HasColumnType("datetime");
+                entity.Property(e => e.EndAt).HasColumnType("date");
+
+                entity.Property(e => e.FeedingDate)
+                    .IsRequired()
+                    .HasMaxLength(20);
 
                 entity.Property(e => e.FoodId).HasColumnName("FoodID");
 
@@ -230,7 +226,7 @@ namespace zooma_api.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.ScheduleAt).HasColumnType("datetime");
+                entity.Property(e => e.ScheduleAt).HasColumnType("date");
 
                 entity.Property(e => e.UpdateAt).HasColumnType("datetime");
 
@@ -265,7 +261,7 @@ namespace zooma_api.Models
             modelBuilder.Entity<FoodSpecy>(entity =>
             {
                 entity.HasKey(e => new { e.Id, e.SpeciesId, e.FoodId })
-                    .HasName("PK__Food_Spe__120201D39B673BD6");
+                    .HasName("PK__Food_Spe__120201D3BE2F7C4D");
 
                 entity.ToTable("Food_Species");
 
@@ -367,10 +363,10 @@ namespace zooma_api.Models
             {
                 entity.ToTable("Role");
 
-                entity.HasIndex(e => e.Name, "UQ__Role__737584F655DF86C7")
+                entity.HasIndex(e => e.Name, "UQ__Role__737584F638DED4A7")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Name, "UQ__Role__737584F6A6EA5EAC")
+                entity.HasIndex(e => e.Name, "UQ__Role__737584F6F8245417")
                     .IsUnique();
 
                 entity.Property(e => e.Id)
@@ -404,7 +400,7 @@ namespace zooma_api.Models
                         r => r.HasOne<Skill>().WithMany().HasForeignKey("SkillId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FKSkill_Trai990760"),
                         j =>
                         {
-                            j.HasKey("SkillId", "TrainingDetailId").HasName("PK__Skill_Tr__D0837DD63C16853B");
+                            j.HasKey("SkillId", "TrainingDetailId").HasName("PK__Skill_Tr__D0837DD69C9D4FBF");
 
                             j.ToTable("Skill_TrainingDetail");
 
@@ -438,10 +434,10 @@ namespace zooma_api.Models
             {
                 entity.ToTable("Ticket");
 
-                entity.HasIndex(e => e.Name, "UQ__Ticket__737584F6C377995B")
+                entity.HasIndex(e => e.Name, "UQ__Ticket__737584F648DA99FA")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Name, "UQ__Ticket__737584F6E85A4188")
+                entity.HasIndex(e => e.Name, "UQ__Ticket__737584F6AA93F658")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("ID");
@@ -555,10 +551,10 @@ namespace zooma_api.Models
             {
                 entity.ToTable("User");
 
-                entity.HasIndex(e => e.UserName, "UQ__User__C9F284566AD80713")
+                entity.HasIndex(e => e.UserName, "UQ__User__C9F284564C48295A")
                     .IsUnique();
 
-                entity.HasIndex(e => e.UserName, "UQ__User__C9F28456F4319729")
+                entity.HasIndex(e => e.UserName, "UQ__User__C9F284568520A550")
                     .IsUnique();
 
                 entity.Property(e => e.Id).HasColumnName("ID");

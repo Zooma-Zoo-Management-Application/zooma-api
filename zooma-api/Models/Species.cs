@@ -1,4 +1,7 @@
-﻿namespace zooma_api.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace zooma_api.Models
 {
     public partial class Species
     {
