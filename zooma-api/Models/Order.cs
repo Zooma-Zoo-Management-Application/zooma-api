@@ -20,7 +20,7 @@ namespace zooma_api.Models
         public byte Status { get; set; }
         public short UserId { get; set; }
 
-        public virtual User User { get; set; } = null!; 
+        public virtual User User { get; set; } = null!;
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; }
     }

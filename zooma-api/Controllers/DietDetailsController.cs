@@ -111,11 +111,11 @@ namespace zooma_api.Controllers
                 return NotFound("Can't found this diet detail");
             }
 
-            dietDetail.Name = dietDetailUpdate.Name;
-            dietDetail.Description = dietDetailUpdate.Description;
+            dietDetail.Name = dietDetail.Name ?? dietDetailUpdate.Name;
+            dietDetail.Description = dietDetail.Description ?? dietDetailUpdate.Description;
             dietDetail.UpdateAt = DateTime.Now;
             dietDetail.EndAt = dietDetailUpdate.EndAt;
-            dietDetail.FeedingInterval = dietDetailUpdate.FeedingInterval;
+          //  dietDetail.FeedingInterval = dietDetailUpdate.FeedingInterval;
             dietDetail.Status = dietDetailUpdate.Status;
             dietDetail.FoodId = dietDetailUpdate.FoodId;
             dietDetail.DietId = dietDetailUpdate.DietId;
@@ -159,7 +159,7 @@ namespace zooma_api.Controllers
                 UpdateAt = DateTime.Now,
                 ScheduleAt = dietDetailCreate.ScheduleAt,
                 EndAt = dietDetailCreate.EndAt,
-                FeedingInterval = dietDetailCreate.FeedingInterval,
+        //        FeedingInterval = dietDetailCreate.FeedingInterval,
                 Status = dietDetailCreate.Status,
                 FoodId = dietDetailCreate.FoodId,
                 DietId = dietDetailCreate.DietId,
@@ -220,8 +220,8 @@ namespace zooma_api.Controllers
 
     public class DietDetailUpdate
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
         public DateTime? ScheduleAt { get; set; }
         public DateTime? EndAt { get; set; }
         public short FeedingInterval { get; set; }
