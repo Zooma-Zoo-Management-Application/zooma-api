@@ -98,7 +98,7 @@ namespace zooma_api.Controllers
                 {
                     if (item != null && item.Food != null)
                     {
-                        totalEnergy += item.Food.EnergyValue;
+                        totalEnergy += item.Food.EnergyValue * (double) item.Quantity;
                     }
                 }
 
