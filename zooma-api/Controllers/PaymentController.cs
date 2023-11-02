@@ -48,7 +48,7 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
             vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
@@ -142,7 +142,7 @@ namespace zooma_api.Controllers
                 {
                     var item = _mapper.Map<CartItemDTO>(ticket);
 
-                    item.TicketDate = body.TicketDate;
+                    //item.TicketDate = body.TicketDate;
                     item.quantity = body.quantity;
 
 
@@ -158,7 +158,7 @@ namespace zooma_api.Controllers
             return Ok(ListCart.Instance.GetLists());
 
         }
-
+        
         [HttpPost]
         [Route("checkout/{id}")]
         public IActionResult Checkout(short id, List<CartItemDTO> list) // ADD XONG RỒI THÌ CHECKOUT
@@ -189,7 +189,7 @@ namespace zooma_api.Controllers
                 OrderId= order.Id,
                 Amount=order.TotalPrice,
                 OrderDesc = "Demo cart",
-                CreatedDate= DateTime.Now,
+                CreatedDate= order.OrderDate,
 
             };
 
@@ -224,7 +224,7 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
             vnpay.AddRequestData("vnp_Amount", ((double)order.TotalPrice * 100).ToString()); // CHỖ NÀY ĐỂ FLOAT LÀ NÓ RA HEX 1.8E+..
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
@@ -254,8 +254,8 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_Command", "pay");
             vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
             vnpay.AddRequestData("vnp_Amount", ((double)order.Amount * 100).ToString()); // CHỖ NÀY ĐỂ FLOAT LÀ NÓ RA HEX 1.8E+..
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
+            vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
+            vnpay.AddRequestData("vnp_CurrCode", "VND");    
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
             vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
@@ -294,7 +294,7 @@ namespace zooma_api.Controllers
             var vnp_HashSecret = _configuration["VnPayConfig:vnp_HashSecret"];
             var vnp_TmnCode = _configuration["VnPayConfig:vnp_TmnCode"];
 
-            var vnp_RequestId = DateTime.Now.Ticks.ToString();
+            var vnp_RequestId = DateTime.UtcNow.AddHours(7).Ticks.ToString();
             var vnp_Version = VnPayLibrary.VERSION;
             var vnp_Command = "refund";
             var vnp_TransactionType = "02"; // Hoàn toàn. Dùng "03" cho hoàn một phần
@@ -303,7 +303,7 @@ namespace zooma_api.Controllers
             var vnp_OrderInfo = refundRequest.Description;
             var vnp_TransactionNo = transaction.TransactionNo;
             var vnp_TransactionDate = transaction.Date.ToString("yyyyMMddHHmmss");
-            var vnp_CreateDate = DateTime.Now.ToString("yyyyMMddHHmmss");
+            var vnp_CreateDate = DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss");
             var vnp_CreateBy = refundRequest.RefundBy ;
             var vnp_IpAddr = vnppay.GetIpAddress(HttpContext);
 
@@ -416,7 +416,7 @@ namespace zooma_api.Controllers
         {
             public int ticketId { get; set; }
             public byte quantity { get; set; }
-            public DateTime TicketDate { get; set; }
+            public DateTime TicketDate = DateTime.UtcNow.AddHours(7);
 
         }
 
