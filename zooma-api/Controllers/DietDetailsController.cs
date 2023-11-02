@@ -82,7 +82,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy Diet Details Bằng DietId
-        [HttpGet("getDietDetailsByDietId/{id}")]
+        [HttpGet("{id}/getDietDetailsByDietId")]
         public async Task<ActionResult<IEnumerable<DietDetailDTO>>> GetDietDetailByDietId(int id)
         {
             if (_context.DietDetails == null)

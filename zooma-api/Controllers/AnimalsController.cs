@@ -84,7 +84,7 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren CageId
-        [HttpGet("/get-animals-by-cageId/{id}")]
+        [HttpGet("{id}/get-animals-by-cageId")]
         public ActionResult<IEnumerable<AnimalDTO>> GetAnimalsByCageId(int id)
         {
             if (_context.Animals == null)
@@ -107,7 +107,7 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren AreaId
-        [HttpGet("/get-animals-by-areaId/{id}")]
+        [HttpGet("{id}/get-animals-by-areaId")]
         public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalsByAreaId(int id)
         {
             if (_context.Animals == null)
@@ -135,7 +135,7 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren CageId = null
-        [HttpGet("/animal-without-cage")]
+        [HttpGet("animal-without-cage")]
         public ActionResult<IEnumerable<AnimalDTO>> GetAllAnimalNoCage()
         {
             if (_context.Animals == null)
