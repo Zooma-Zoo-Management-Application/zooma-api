@@ -397,7 +397,7 @@ namespace zooma_api.Controllers
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddDays(1),
                 signingCredentials: credentials);
 
 
