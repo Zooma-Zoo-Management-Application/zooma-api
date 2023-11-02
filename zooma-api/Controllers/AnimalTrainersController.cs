@@ -80,7 +80,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy tất cả user phụ trách 1 animal
-        [HttpGet("/get-zootrainer-by-animalId/{animalId}")]
+        [HttpGet("{animalId}/get-zootrainer-by-animalId")]
         public async Task<ActionResult<IEnumerable<AnimalUserDTO>>> GetAllZooTrainerByAnimalId(int animalId)
         {
             if (_context.AnimalUsers == null)
