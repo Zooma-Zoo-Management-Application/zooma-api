@@ -15,7 +15,7 @@ namespace zooma_api.Controllers
             _context = context;
         }
         //get all
-        [HttpGet("GetAllAreas")]
+        [HttpGet()]
         public async Task<ActionResult<IEnumerable<Area>>> GetAllAreas()
         {
             var areas = await _context.Areas.ToListAsync();
@@ -27,7 +27,7 @@ namespace zooma_api.Controllers
             return Ok(_context.Areas);
         }
         //get area by id
-        [HttpGet("GetAreaById/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Area>> GetAreaById(short id)
         {
             if (_context.Areas == null)
@@ -44,7 +44,7 @@ namespace zooma_api.Controllers
         }
 
         //get area by speciesId
-        [HttpGet("GetAreaBySpeciesId/{speciesId}")]
+        [HttpGet("{speciesId}/GetAreaBySpeciesId")]
         public async Task<IActionResult> GetAreaBySpeciesId(short speciesId)
         {
             if (_context.Areas == null)
@@ -74,16 +74,16 @@ namespace zooma_api.Controllers
 
 
         //update area
-        [HttpPut("UpdateArea/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateArea(int id, AreaUpdate areaUpdate)
         {
-            var area = await _context.Areas.FindAsync(id);
-            if (id != area.Id)
+            var area = await _context.Areas.FirstOrDefaultAsync(e => e.Id == id);
+            if (area == null)
             {
-                return BadRequest();
+                return NotFound("Can't found this area");
             }
-            area.Name = area.Name ?? areaUpdate.Name;
-            area.Description = area.Description ?? areaUpdate.Description;
+            area.Name = areaUpdate.Name;
+            area.Description = areaUpdate.Description;
 
             _context.Entry(area).State = EntityState.Modified;
             try
@@ -109,8 +109,8 @@ namespace zooma_api.Controllers
         }
         public class AreaUpdate
         {
-            public string Name { get; set; }
-            public string Description { get; set; }
+            public string? Name { get; set; }
+            public string? Description { get; set; }
         }
     }
 }
