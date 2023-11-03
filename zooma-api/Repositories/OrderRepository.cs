@@ -16,11 +16,11 @@ namespace zooma_api.Repositories
                 var order = new Order
                 {
                     UserId = userID,
-                    OrderDate = DateTime.Now,
+                    OrderDate = DateTime.UtcNow.AddHours(7),
                     Status = 1, // ĐANG THANH TOÁN 
                     TotalPrice = 0,
                     PaymentMethod = "VnPay",
-                    LastUpdateDate= DateTime.Now,
+                    LastUpdateDate= DateTime.UtcNow.AddHours(7),
                     Notes="Payment in progress"
 
                 };
@@ -60,7 +60,7 @@ namespace zooma_api.Repositories
             {
                 try
                 {
-                    var currentDate = DateTime.Now; // Lấy thời điểm hiện tại
+                    var currentDate = DateTime.UtcNow.AddHours(7); // Lấy thời điểm hiện tại
 
                     var recentOrders = _context.Orders
                                         .Where(o => o.Status == 2 && o.OrderDate <= currentDate) // Lọc các đơn hàng có Status=1 và OrderDate không lớn hơn thời điểm hiện tại
