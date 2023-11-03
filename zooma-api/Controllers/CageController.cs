@@ -98,7 +98,7 @@ public class CageController : ControllerBase
     }
 
     // hàm lấy Cage dựa trên AreaId kèm theo Animal
-    [HttpGet("/get-cages-by-areaId/{id}")]
+    [HttpGet("get-cages-by-areaId/{id}")]
     public async Task<ActionResult<IEnumerable<CagesDTO>>> GetCagesByAreaId(int id)
     {
         if (_context.Cages == null)
