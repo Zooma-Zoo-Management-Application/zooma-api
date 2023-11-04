@@ -64,14 +64,14 @@ public class CageController : ControllerBase
         {
             Name = cage.Name,
             AnimalLimit = (byte)cage.AnimalLimit,
-            AnimalCount = (byte)cage.AnimalCount,
+            AnimalCount = 0,
             Description = cage.Description,
-            Status = cage.Status,
+            Status = false,
             AreaId = (short)cage.AreaId
         };
         _context.Cages.Add(cageUpdate);
         await _context.SaveChangesAsync();
-        return CreatedAtAction("GetCageById", new { id = cageUpdate.Id }, cageUpdate);
+        return Ok(new {cageDTO = _mapper.Map<CagesDTO>(cage), message = "Created successfully"});
 
     }
     //select an animal from the database and assign to the cage 
@@ -163,9 +163,7 @@ public class CageController : ControllerBase
         {
             cageUpdate.Name = cageUpdate.Name ?? cage.Name;
             cageUpdate.AnimalLimit = (byte)cage.AnimalLimit;
-            cageUpdate.AnimalCount = (byte)cage.AnimalCount;
-            cageUpdate.Description = cageUpdate.Description ?? cage.Description;
-            cageUpdate.Status = cage.Status;
+            cageUpdate.Description = cage.Description;
             cageUpdate.AreaId = (short)cage.AreaId;
             _context.Entry(cageUpdate).State = EntityState.Modified;
         }
@@ -199,9 +197,7 @@ public class CageController : ControllerBase
 
         public string Name { get; set; }
         public short AnimalLimit { get; set; }
-        public short AnimalCount { get; set; }
         public string Description { get; set; }
-        public bool Status { get; set; }
         public int AreaId { get; set; }
     }
 }
