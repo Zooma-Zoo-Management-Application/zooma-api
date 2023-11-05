@@ -209,10 +209,13 @@ namespace zooma_api.Controllers
             {
                 return NotFound("order not found");
             }
-            else if ( order.Status != 1)
+            else if ( order.Status == 2)
             {
                 return BadRequest(new { msg = "can not repay this order" });
             }
+
+            int id = repository.RepayOrder(order.UserId, order);
+
             VnPayLibrary vnpay = new VnPayLibrary();
 
             string vnp_Returnurl = _configuration["VnPayConfig:vnp_Returnurl"];
@@ -228,13 +231,13 @@ namespace zooma_api.Controllers
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
             vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.Id);
+            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + id);
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-            vnpay.AddRequestData("vnp_TxnRef", order.Id.ToString());
+            vnpay.AddRequestData("vnp_TxnRef", id.ToString());
 
             var paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
-            return Ok(new { url = paymentUrl , orderID = order.Id });
+            return Ok(new { url = paymentUrl , orderID = id });
         }
 
 

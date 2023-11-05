@@ -19,5 +19,7 @@ namespace zooma_api.Interfaces
         int GetQuantityOfSuccessOrders();
 
         Task<List<Order>> GetAllSuccessOrders();
+
+        int RepayOrder(short userID, Order oldOrder);
     }
 }
