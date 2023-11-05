@@ -54,6 +54,49 @@ namespace zooma_api.Repositories
             }
         }
 
+        public int RepayOrder(short userID, Order oldOrder)
+        {
+            using (var context = new zoomadbContext())
+            {
+                var order = new Order
+                {
+                    UserId = userID,
+                    OrderDate = DateTime.UtcNow.AddHours(7),
+                    Status = 1, // ĐANG THANH TOÁN 
+                    TotalPrice = oldOrder.TotalPrice,
+                    PaymentMethod = "VnPay",
+                    LastUpdateDate = DateTime.UtcNow.AddHours(7),
+                    Notes = "Payment in progress",                 
+                };
+                context.Orders.Add(order);
+                context.SaveChanges(); // ADD TRƯỚC ORDER ĐỂ TRÁNH ENTITY CONFLICT
+
+                var oldOrderDetails = context.OrderDetails.Where(o=>o.OrderId == oldOrder.Id).ToList();
+
+                //   context.SaveChanges();
+
+                foreach (var details in oldOrderDetails)
+                {
+                    var orderDetail = new OrderDetail
+                    {// Use the generated OrderID
+                        OrderId = order.Id,
+                        TicketDate = details.TicketDate,
+                        Quantity = details.Quantity,
+                        UsedTicket = 0,
+                        TicketId = details.TicketId,
+                    };
+
+                    context.OrderDetails.Add(orderDetail);
+                }
+               // order.TotalPrice = totalPrice;
+               //context.Entry(order).State = EntityState.Modified; // TÍNH RA TỔNG SỐ TIỀN CUỐI CÙNG 
+                context.SaveChanges();
+                return order.Id;
+
+
+            }
+        }
+
         public IEnumerable<Order> GetFiveRecentOrders()
         {
             using (var _context = new zoomadbContext())
