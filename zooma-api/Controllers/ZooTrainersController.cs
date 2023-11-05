@@ -42,7 +42,7 @@ namespace zooma_api.Controllers
 
         // Hàm lấy zootrainer với id
 
-        [HttpGet("/get-zootrainer-by-id/{id}")]
+        [HttpGet("{id}/get-zootrainer-by-id")]
         public async Task<ActionResult<UserDTO>> GetZooTrainerById(int id)
         {
             if (_context.Users == null)

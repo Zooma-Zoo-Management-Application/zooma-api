@@ -68,7 +68,7 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy kinh nghiệm của trainer bởi trainerId
-        [HttpGet("/get-trainerexp-by-trainerId/{trainerId}")]
+        [HttpGet("{trainerId}/get-trainerexp-by-trainerId")]
         public async Task<ActionResult<IEnumerable<TrainerExpDTO>>> GetTrainerExpByTrainerId(int trainerId)
         {
             if (_context.TrainerExps == null)
