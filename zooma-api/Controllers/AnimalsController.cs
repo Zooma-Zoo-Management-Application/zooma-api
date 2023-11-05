@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SQLitePCL;
 using zooma_api.DTO;
 using zooma_api.Interfaces;
 using zooma_api.Models;
@@ -223,9 +224,32 @@ namespace zooma_api.Controllers
                 TrainingPlanId = animalDTO.TrainingPlanId,
             };
 
-            //            var animal = _mapper.Map<Animal>(animalDTO);
-            _context.Animals.Add(animal);
-            await _context.SaveChangesAsync();
+            var diet = await _context.Diets.FirstOrDefaultAsync(e => e.Id == animalDTO.DietId);
+
+            if (diet == null)
+            {
+                animal.Diet = null;
+            }
+
+            var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == animal.CageId);
+            if (cage != null)
+            {
+                if (cage.AnimalCount == cage.AnimalLimit)
+                {
+                    return BadRequest("This cage is full");
+                }
+                else
+                {
+                    cage.AnimalCount++;
+
+                    _context.Animals.Add(animal);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                return BadRequest("Can't found this cage");
+            }
 
             return Ok(new { animalDTO = _mapper.Map<AnimalDTO>(animal), message = "Animal created successfully" });
         }
