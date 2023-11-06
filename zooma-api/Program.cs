@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using zooma_api.Interfaces;
 using zooma_api.Models;
@@ -48,6 +49,15 @@ builder.Services.AddSwaggerGen(c =>
       new string[] { }
     }
   });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+
+    // Include the XML comments in Swagger.
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
 });
 
 builder.Services.AddDbContext<zoomadbContext>(options => {

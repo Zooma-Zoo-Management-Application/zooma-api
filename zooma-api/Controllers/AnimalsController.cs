@@ -17,14 +17,14 @@ namespace zooma_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AnimalsController : ControllerBase
+    public class animalsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAnimalRepository _animalRepository;
 
-        public AnimalsController(IConfiguration config, IMapper mapper, IAnimalRepository animalRepository)
+        public animalsController(IConfiguration config, IMapper mapper, IAnimalRepository animalRepository)
         {
             _config = config;
             _mapper = mapper;
@@ -56,7 +56,7 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var animal = _animalRepository.GetAnimalById(id); 
+            var animal = _animalRepository.GetAnimalById(id);
 
             if (animal == null)
             {
@@ -85,22 +85,27 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren CageId
-        [HttpGet("{id}/get-animals-by-cageId")]
-        public ActionResult<IEnumerable<AnimalDTO>> GetAnimalsByCageId(int id)
+        /// <summary>
+        /// Return a list of animal base on cageId
+        /// </summary>
+        /// <param name="cageId"></param>
+        /// <returns></returns>
+        [HttpGet("cage/{cageId}")]
+        public ActionResult<IEnumerable<AnimalDTO>> GetAnimalsByCageId(int cageId)
         {
             if (_context.Animals == null)
             {
                 return NotFound();
             }
 
-            var cages = _context.Cages.FirstOrDefault(a => a.Id == id);
+            var cages = _context.Cages.FirstOrDefault(a => a.Id == cageId);
 
             if (cages == null)
             {
                 return NotFound("Cage Not Found!!");
             }
 
-            var animals = _animalRepository.GetAnimalsByCageId(id);
+            var animals = _animalRepository.GetAnimalsByCageId(cageId);
 
             var animalDTOs = _mapper.Map<List<AnimalDTO>>(animals);
 
@@ -108,22 +113,27 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren AreaId
-        [HttpGet("{id}/get-animals-by-areaId")]
-        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalsByAreaId(int id)
+        /// <summary>
+        /// Return a list of animal base on area Id
+        /// </summary>
+        /// <param name="areaId"></param>
+        /// <returns></returns>
+        [HttpGet("area/{areaId}")]
+        public async Task<ActionResult<IEnumerable<AnimalDTO>>> GetAnimalsByAreaId(int areaId)
         {
             if (_context.Animals == null)
             {
                 return NotFound();
             }
 
-            var areaId = _context.Areas.FirstOrDefault(a => a.Id == id);
+            var area = _context.Areas.FirstOrDefault(a => a.Id == areaId);
 
-            if (areaId == null)
+            if (area == null)
             {
                 return NotFound("Khong tim thay area nay");
             }
 
-            var animals = _animalRepository.GetAnimalsByAreaId(id);
+            var animals = _animalRepository.GetAnimalsByAreaId(areaId);
 
             if (animals == null)
             {
@@ -136,7 +146,11 @@ namespace zooma_api.Controllers
         }
 
         // ham lay animal dua tren CageId = null
-        [HttpGet("animal-without-cage")]
+        /// <summary>
+        /// Return a list of animal without cage
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("cageless")]
         public ActionResult<IEnumerable<AnimalDTO>> GetAllAnimalNoCage()
         {
             if (_context.Animals == null)
