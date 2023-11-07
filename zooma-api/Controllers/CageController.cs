@@ -6,12 +6,12 @@ using zooma_api.Models;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CageController : ControllerBase
+public class cageController : ControllerBase
 {
     public zoomadbContext _context = new zoomadbContext();
     private readonly IMapper _mapper;
 
-    public CageController(zoomadbContext context, IMapper mapper)
+    public cageController(zoomadbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -61,7 +61,7 @@ public class CageController : ControllerBase
         {
             return NotFound();
         }
-        Cage cage= new Cage
+        Cage cage = new Cage
         {
             Name = cageCreate.Name,
             AnimalLimit = (byte)cageCreate.AnimalLimit,
@@ -72,7 +72,7 @@ public class CageController : ControllerBase
         };
 
         var cagesExist = _context.Cages.FirstOrDefault(e => e.Name == cageCreate.Name);
-            
+
         if (cagesExist != null)
         {
             return BadRequest("This cages is existed before!");
@@ -84,9 +84,14 @@ public class CageController : ControllerBase
             return Ok(new { cageDTO = _mapper.Map<CagesDTO>(cage), message = "Created successfully" });
         }
     }
+    /// <summary>
+    /// Assign animal to cage
+    /// </summary>
+    /// <param name="cageID"></param>
+    /// <returns></returns>
     //select an animal from the database and assign to the cage 
-    [HttpPut("{cageID}/assignAnimals")]
-    public async Task<IActionResult> AssignAnimal(short cageID, [FromBody] int[] id)    
+    [HttpPut("{cageID}/animals")]
+    public async Task<IActionResult> AssignAnimal(short cageID, [FromBody] int[] id)
     {
         var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == cageID);
 
@@ -101,15 +106,15 @@ public class CageController : ControllerBase
         {
             var animal = _context.Animals.FirstOrDefault(e => e.Id == item);
 
-            if(animal == null)
+            if (animal == null)
             {
-                return NotFound("Invalid Id (" + item + ")")    ;
+                return NotFound("Invalid Id (" + item + ")");
             }
 
-            if(cage.AnimalCount < cage.AnimalLimit)
+            if (cage.AnimalCount < cage.AnimalLimit)
             {
                 cage.AnimalCount++;
-                animal.CageId = cageID;         
+                animal.CageId = cageID;
                 status = true;
             }
             else
@@ -119,7 +124,7 @@ public class CageController : ControllerBase
             }
         }
 
-        if(status == true)
+        if (status == true)
         {
             await _context.SaveChangesAsync();
             return Ok("Assign successfully");
@@ -129,9 +134,13 @@ public class CageController : ControllerBase
             return BadRequest("Cage is full!");
         }
     }
-
+    /// <summary>
+    /// Return a list of cage in that area
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     // hàm lấy Cage dựa trên AreaId kèm theo Animal
-    [HttpGet("{id}/get-cages-by-areaId")]
+    [HttpGet("{cageId}/area")]
     public async Task<ActionResult<IEnumerable<CagesDTO>>> GetCagesByAreaId(int id)
     {
         if (_context.Cages == null)
@@ -168,7 +177,7 @@ public class CageController : ControllerBase
 
 
     //Hàm xóa cage
-    [HttpPut("{id}/deleteCage")]
+    [HttpPut("{id}/cage-removal")]
     public async Task<IActionResult> DeleteCage(int id)
     {
         if (_context.Cages == null)
@@ -248,7 +257,7 @@ public class CageController : ControllerBase
     }
 
     //Hàm set status của cage thành true
-    [HttpPut("{id}/updateCageStatus")]
+    [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateCageStatus(int id)
     {
         if (_context.Cages == null)
@@ -264,7 +273,7 @@ public class CageController : ControllerBase
             {
                 return BadRequest("This cage is invalid");
             }
-            
+
             cage.Status = true;
             await _context.SaveChangesAsync();
         }

@@ -6,11 +6,11 @@ namespace zooma_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AreaController : ControllerBase
+    public class areaController : ControllerBase
     {
         private readonly zoomadbContext _context;
 
-        public AreaController(zoomadbContext context)
+        public areaController(zoomadbContext context)
         {
             _context = context;
         }
@@ -26,6 +26,11 @@ namespace zooma_api.Controllers
             }
             return Ok(_context.Areas);
         }
+        /// <summary>
+        /// Return area by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         //get area by id
         [HttpGet("{id}")]
         public async Task<ActionResult<Area>> GetAreaById(short id)
@@ -42,9 +47,13 @@ namespace zooma_api.Controllers
             }
             return Ok(area);
         }
-
+        /// <summary>
+        /// Return a list of area have that species
+        /// </summary>
+        /// <param name="speciesId"></param>
+        /// <returns></returns>
         //get area by speciesId
-        [HttpGet("{speciesId}/GetAreaBySpeciesId")]
+        [HttpGet("species/{speciesId}")]
         public async Task<IActionResult> GetAreaBySpeciesId(short speciesId)
         {
             if (_context.Areas == null)
