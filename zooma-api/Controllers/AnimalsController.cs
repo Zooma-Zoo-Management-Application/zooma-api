@@ -274,6 +274,58 @@ namespace zooma_api.Controllers
             return Ok("Delete successfully");
         }
 
+        //select an animal from the database and assign to the cage
+        /// <summary>
+        /// Assign a list of animal to a cage
+        /// </summary>
+        /// <param name="cageID"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut("cage/{cageID}")]
+        public async Task<IActionResult> AssignAnimal(short cageID, [FromBody] int[] id)
+        {
+            var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == cageID);
+
+            if (cage == null)
+            {
+                return NotFound("Can't found this cage");
+            }
+
+            bool status = false;
+
+            foreach (var item in id)
+            {
+                var animal = _context.Animals.FirstOrDefault(e => e.Id == item);
+
+                if (animal == null)
+                {
+                    return NotFound("Invalid Id (" + item + ")");
+                }
+
+                if (cage.AnimalCount < cage.AnimalLimit)
+                {
+                    cage.AnimalCount++;
+                    animal.CageId = cageID;
+                    status = true;
+                }
+                else
+                {
+                    status = false;
+                    break;
+                }
+            }
+
+            if (status == true)
+            {
+                await _context.SaveChangesAsync();
+                return Ok("Assign successfully");
+            }
+            else
+            {
+                return BadRequest("Cage is full!");
+            }
+        }
+
         private bool AnimalExists(int id)
         {
             return (_context.Animals?.Any(e => e.Id == id)).GetValueOrDefault();
