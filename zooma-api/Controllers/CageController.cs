@@ -57,31 +57,29 @@ public class cageController : ControllerBase
     [HttpPost()]
     public async Task<ActionResult<CagesDTO>> CreateCage(CageUpdate cageCreate)
     {
-        if (_context.Cages == null)
+        try
         {
-            return NotFound();
-        }
-        Cage cage = new Cage
-        {
-            Name = cageCreate.Name,
-            AnimalLimit = (byte)cageCreate.AnimalLimit,
-            AnimalCount = 0,
-            Description = cageCreate.Description,
-            Status = true,
-            AreaId = (short)cageCreate.AreaId
-        };
+            if (_context.Cages == null)
+            {
+                return NotFound();
+            }
+            Cage cage = new Cage
+            {
+                Name = cageCreate.Name,
+                AnimalLimit = (byte)cageCreate.AnimalLimit,
+                AnimalCount = 0,
+                Description = cageCreate.Description,
+                Status = true,
+                AreaId = (short)cageCreate.AreaId
+            };
 
-        var cagesExist = _context.Cages.FirstOrDefault(e => e.Name == cageCreate.Name);
-
-        if (cagesExist != null)
-        {
-            return BadRequest("This cages is existed before!");
-        }
-        else
-        {
             _context.Cages.Add(cage);
             await _context.SaveChangesAsync();
             return Ok(new { cageDTO = _mapper.Map<CagesDTO>(cage), message = "Created successfully" });
+        }
+        catch (Exception)
+        {
+            return BadRequest("Something went wrong!");
         }
     }
 
@@ -188,7 +186,7 @@ public class cageController : ControllerBase
         }
         else
         {
-            cageUpdate.Name = cageUpdate.Name ?? cage.Name;
+            cageUpdate.Name = cage.Name;
             cageUpdate.AnimalLimit = (byte)cage.AnimalLimit;
             cageUpdate.Description = cage.Description;
             cageUpdate.AreaId = (short)cage.AreaId;
@@ -209,7 +207,7 @@ public class cageController : ControllerBase
                 throw;
             }
         }
-        return Ok(new { cage = _mapper.Map<CagesDTO>(cageUpdate), message = "Cage updated successfully" });
+        return Ok(new { cage = _mapper.Map<CagesDTO>(cageUpdate), message = "Cage updated successfully"});
     }
 
     /// <summary>
