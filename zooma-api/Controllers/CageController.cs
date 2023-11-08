@@ -6,12 +6,12 @@ using zooma_api.Models;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CageController : ControllerBase
+public class cageController : ControllerBase
 {
     public zoomadbContext _context = new zoomadbContext();
     private readonly IMapper _mapper;
 
-    public CageController(zoomadbContext context, IMapper mapper)
+    public cageController(zoomadbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
@@ -84,62 +84,22 @@ public class CageController : ControllerBase
             return Ok(new { cageDTO = _mapper.Map<CagesDTO>(cage), message = "Created successfully" });
         }
     }
-    //select an animal from the database and assign to the cage 
-    [HttpPut("{cageID}/assignAnimals")]
-    public async Task<IActionResult> AssignAnimal(short cageID, [FromBody] int[] id)    
-    {
-        var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == cageID);
-
-        if (cage == null)
-        {
-            return NotFound("Can't found this cage");
-        }
-
-        bool status = false;
-
-        foreach (var item in id)
-        {
-            var animal = _context.Animals.FirstOrDefault(e => e.Id == item);
-
-            if(animal == null)
-            {
-                return NotFound("Invalid Id (" + item + ")")    ;
-            }
-
-            if(cage.AnimalCount < cage.AnimalLimit)
-            {
-                cage.AnimalCount++;
-                animal.CageId = cageID;         
-                status = true;
-            }
-            else
-            {
-                status = false;
-                break;
-            }
-        }
-
-        if(status == true)
-        {
-            await _context.SaveChangesAsync();
-            return Ok("Assign successfully");
-        }
-        else
-        {
-            return BadRequest("Cage is full!");
-        }
-    }
 
     // hàm lấy Cage dựa trên AreaId kèm theo Animal
-    [HttpGet("{id}/get-cages-by-areaId")]
-    public async Task<ActionResult<IEnumerable<CagesDTO>>> GetCagesByAreaId(int id)
+    /// <summary>
+    /// Return a list of cage base on areaId
+    /// </summary>
+    /// <param name="areaId"></param>
+    /// <returns></returns>
+    [HttpGet("area/{areaId}")]
+    public async Task<ActionResult<IEnumerable<CagesDTO>>> GetCagesByAreaId(int areaId)
     {
         if (_context.Cages == null)
         {
             return NotFound();
         }
 
-        var area = await _context.Areas.FirstOrDefaultAsync(a => a.Id == id);
+        var area = await _context.Areas.FirstOrDefaultAsync(a => a.Id == areaId);
 
         if (area == null)
         {
@@ -168,7 +128,12 @@ public class CageController : ControllerBase
 
 
     //Hàm xóa cage
-    [HttpPut("{id}/deleteCage")]
+    /// <summary>
+    /// Cage-removal
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPut("removal/{id}")]
     public async Task<IActionResult> DeleteCage(int id)
     {
         if (_context.Cages == null)
@@ -248,7 +213,12 @@ public class CageController : ControllerBase
     }
 
     //Hàm set status của cage thành true
-    [HttpPut("{id}/updateCageStatus")]
+    /// <summary>
+    /// Status
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPut("status/{id}")]
     public async Task<IActionResult> UpdateCageStatus(int id)
     {
         if (_context.Cages == null)
