@@ -8,12 +8,12 @@ namespace zooma_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DietsController : ControllerBase
+    public class dietsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
 
-        public DietsController(zoomadbContext context, IMapper mapper)
+        public dietsController(zoomadbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -29,17 +29,21 @@ namespace zooma_api.Controllers
             }
 
             var diet = await _context.Diets.Include(a => a.Animals).ToListAsync();
-            
+
             if (diet == null)
             {
                 return NotFound("No diet is available");
             }
-            
+
             var dietDTO = _mapper.Map<List<DietDTO>>(diet);
 
             return dietDTO;
         }
-
+        /// <summary>
+        /// Return the diet by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // Hàm lấy Diet dựa trên Id
         [HttpGet("{id}")]
         public async Task<ActionResult<DietDTO>> GetDietById(int id)
@@ -60,8 +64,13 @@ namespace zooma_api.Controllers
 
             return dietDTO;
         }
+        /// <summary>
+        /// Return the diet by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         // GET: api/Diets/5
-        [HttpGet("GetDietByName/{name}")]
+        [HttpGet("diets/{name}")]
         public async Task<ActionResult<Diet>> GetDietByName(string name)
         {
             if (_context.Diets == null)
@@ -91,14 +100,14 @@ namespace zooma_api.Controllers
             else
             {
                 var dietDetailsId = _context.DietDetails.Where(e => e.DietId == diet.Id).Include(e => e.Food).ToList();
-                
+
                 double totalEnergy = 0;
 
                 foreach (var item in dietDetailsId)
                 {
                     if (item != null && item.Food != null)
                     {
-                        totalEnergy += item.Food.EnergyValue * (double) item.Quantity;
+                        totalEnergy += item.Food.EnergyValue * (double)item.Quantity;
                     }
                 }
 
@@ -110,9 +119,9 @@ namespace zooma_api.Controllers
                     allDay = TimeSpan.FromDays(1);
                 }
 
-                double totalDay = (double) allDay.TotalDays; 
+                double totalDay = (double)allDay.TotalDays;
 
-                totalEnergy = totalEnergy / totalDay; 
+                totalEnergy = totalEnergy / totalDay;
 
                 diet.Name = dietUpdate.Name ?? diet.Name;
                 diet.Description = dietUpdate.Description;
@@ -169,7 +178,7 @@ namespace zooma_api.Controllers
 
             var dietExists = _context.Diets.FirstOrDefault(e => e.Name == diet.Name);
 
-            if(dietExists != null)
+            if (dietExists != null)
             {
                 return BadRequest("This diets is existed");
             }
@@ -177,7 +186,7 @@ namespace zooma_api.Controllers
             _context.Diets.Add(diet);
             await _context.SaveChangesAsync();
 
-            return Ok(new {dietDTO = _mapper.Map<DietDTO>(diet), message = "Create successfully!"});
+            return Ok(new { dietDTO = _mapper.Map<DietDTO>(diet), message = "Create successfully!" });
 
         }
 
@@ -185,7 +194,7 @@ namespace zooma_api.Controllers
         {
             return (_context.Diets?.Any(e => e.Id == id)).GetValueOrDefault();
         }
-        
+
 
         public class DietUpdate
         {

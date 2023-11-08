@@ -61,7 +61,7 @@ public class cageController : ControllerBase
         {
             return NotFound();
         }
-        Cage cage= new Cage
+        Cage cage = new Cage
         {
             Name = cageCreate.Name,
             AnimalLimit = (byte)cageCreate.AnimalLimit,
@@ -72,7 +72,7 @@ public class cageController : ControllerBase
         };
 
         var cagesExist = _context.Cages.FirstOrDefault(e => e.Name == cageCreate.Name);
-            
+
         if (cagesExist != null)
         {
             return BadRequest("This cages is existed before!");
@@ -127,7 +127,7 @@ public class cageController : ControllerBase
     //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
 
 
-    //Hàm xóa cage
+
     /// <summary>
     /// Cage-removal
     /// </summary>
@@ -212,7 +212,6 @@ public class cageController : ControllerBase
         return Ok(new { cage = _mapper.Map<CagesDTO>(cageUpdate), message = "Cage updated successfully" });
     }
 
-    //Hàm set status của cage thành true
     /// <summary>
     /// Status
     /// </summary>
@@ -234,7 +233,7 @@ public class cageController : ControllerBase
             {
                 return BadRequest("This cage is invalid");
             }
-            
+
             cage.Status = true;
             await _context.SaveChangesAsync();
         }
