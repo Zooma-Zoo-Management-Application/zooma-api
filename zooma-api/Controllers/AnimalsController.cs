@@ -238,31 +238,40 @@ namespace zooma_api.Controllers
                 TrainingPlanId = animalDTO.TrainingPlanId,
             };
 
-            var diet = await _context.Diets.FirstOrDefaultAsync(e => e.Id == animalDTO.DietId);
+     /*       var diet = await _context.Diets.FirstOrDefaultAsync(e => e.Id == animalDTO.DietId);
 
             if (diet == null)
             {
-                animal.Diet = null;
-            }
+                animal.DietId = null;
+            } */
 
-            var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == animal.CageId);
-            if (cage != null)
+            if (animal.CageId == null)
             {
-                if (cage.AnimalCount == cage.AnimalLimit)
-                {
-                    return BadRequest("This cage is full");
-                }
-                else
-                {
-                    cage.AnimalCount++;
-
-                    _context.Animals.Add(animal);
-                    await _context.SaveChangesAsync();
-                }
+                animal.CageId = null;
+                _context.Animals.Add(animal);
+                await _context.SaveChangesAsync();
             }
             else
             {
-                return BadRequest("Can't found this cage");
+                var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == animal.CageId);
+
+                if (cage != null)
+                {
+                    if (cage.AnimalCount == cage.AnimalLimit)
+                    {
+                        return BadRequest("This cage is full");
+                    }
+                    else
+                    {
+                        cage.AnimalCount++;
+                        _context.Animals.Add(animal);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    return BadRequest("Can't found this cage!");
+                }
             }
 
             return Ok(new { animalDTO = _mapper.Map<AnimalDTO>(animal), message = "Animal created successfully" });

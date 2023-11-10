@@ -19,6 +19,7 @@ builder.Services.AddScoped<IAnalisticRepository, AnalisticRepository>();
 builder.Services.AddScoped<IAnimalRepository, AnimalRepository>();
 builder.Services.AddScoped<INewRepository, NewRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 
 
 builder.Services.AddEndpointsApiExplorer();

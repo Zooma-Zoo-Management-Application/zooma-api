@@ -8,33 +8,36 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FoodsController : ControllerBase
+    public class foodsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
+        private readonly IFoodRepository _foodRepository;
 
-        public FoodsController(zoomadbContext context, IMapper mapper)
+        public foodsController(zoomadbContext context, IMapper mapper, IFoodRepository foodRepository)
         {
             _context = context;
             _mapper = mapper;
+            _foodRepository = foodRepository;
         }
 
         // GET: api/Foods
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FoodDTO>>> GetFoods()
+        public ActionResult<IEnumerable<FoodDTO>> GetFoods()
         {
             if (_context.Foods == null)
             { 
                 return NotFound();
             }
             
-            var food = await _context.Foods.Include(a => a.FoodSpecies).ToListAsync();
+            var food = _foodRepository.GetAllFoods();
 
             var foodDTO = _mapper.Map<List<FoodDTO>>(food);
 
@@ -43,13 +46,13 @@ namespace zooma_api.Controllers
 
         // GET: api/Foods/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<FoodDTO>> GetFoodById(int id)
+        public ActionResult<FoodDTO> GetFoodById(int id)
         {
             if (_context.Foods == null)
             {
                 return NotFound();
             }
-            var food = await _context.Foods.FindAsync(id);
+            var food = _foodRepository.GetById(id);
 
             if (food == null)
             {
