@@ -13,12 +13,12 @@ namespace zooma_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DietDetailsController : ControllerBase
+    public class dietDetailsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
 
-        public DietDetailsController(zoomadbContext context, IMapper mapper)
+        public dietDetailsController(zoomadbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -82,7 +82,12 @@ namespace zooma_api.Controllers
         }
 
         // Hàm lấy Diet Details Bằng DietId
-        [HttpGet("{id}/getDietDetailsByDietId")]
+        /// <summary>
+        /// Return a list of diet details by dietId
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("diet-details/{id}")]
         public async Task<ActionResult<IEnumerable<DietDetailDTO>>> GetDietDetailByDietId(int id)
         {
             if (_context.DietDetails == null)
