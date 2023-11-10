@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -18,11 +19,13 @@ namespace zooma_api.Controllers
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
+        private readonly ISkillRepository _skillRepository;
 
-        public SkillsController(zoomadbContext context, IMapper mapper)
+        public SkillsController(zoomadbContext context, IMapper mapper, ISkillRepository skillRepository)
         {
             _context = context;
             _mapper = mapper;
+            _skillRepository = skillRepository;
         }
 
         // Hàm lấy tất cả skill trong database ra
@@ -34,7 +37,7 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
             
-            var skills = await _context.Skills.ToListAsync();
+            var skills = _skillRepository.GetAllSkills();
             
             var skilsDTO = _mapper.Map<List<SkillDTO>>(skills);
 
@@ -50,7 +53,7 @@ namespace zooma_api.Controllers
                 return NotFound();
             }
 
-            var skill = await _context.Skills.FirstOrDefaultAsync(a => a.Id == id);
+            var skill = _skillRepository.GetSkillById(id);
 
             if (skill == null)
             {
