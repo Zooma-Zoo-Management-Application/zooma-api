@@ -15,7 +15,7 @@ using zooma_api.Repositories;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/payment")]
     [ApiController]
     public class PaymentController : ControllerBase
     {
@@ -34,32 +34,32 @@ namespace zooma_api.Controllers
 
         }
 
-        [HttpPost("create-payment")]
-        public IActionResult CreatePaymentUrl([FromBody] OrderInfo order)
-        {
-            VnPayLibrary vnpay = new VnPayLibrary();
+        //[HttpPost("create-payment")]
+        //public IActionResult CreatePaymentUrl([FromBody] OrderInfo order)
+        //{
+        //    VnPayLibrary vnpay = new VnPayLibrary();
 
-            string vnp_Returnurl = _configuration["VnPayConfig:vnp_Returnurl"];
-            var vnp_TmnCode = _configuration["VnPayConfig:vnp_TmnCode"];
-            var vnp_Url = _configuration["VnPayConfig:vnp_Url"];
-            var vnp_HashSecret = _configuration["VnPayConfig:vnp_HashSecret"];
+        //    string vnp_Returnurl = _configuration["VnPayConfig:vnp_Returnurl"];
+        //    var vnp_TmnCode = _configuration["VnPayConfig:vnp_TmnCode"];
+        //    var vnp_Url = _configuration["VnPayConfig:vnp_Url"];
+        //    var vnp_HashSecret = _configuration["VnPayConfig:vnp_HashSecret"];
 
-            vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
-            vnpay.AddRequestData("vnp_Command", "pay");
-            vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-            vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString());
-            vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
-            vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
-            vnpay.AddRequestData("vnp_OrderType", "other");
-            vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-            vnpay.AddRequestData("vnp_TxnRef", order.OrderId.ToString());
+        //    vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
+        //    vnpay.AddRequestData("vnp_Command", "pay");
+        //    vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
+        //    vnpay.AddRequestData("vnp_Amount", (order.Amount * 100).ToString());
+        //    vnpay.AddRequestData("vnp_CreateDate", DateTime.UtcNow.AddHours(7).ToString("yyyyMMddHHmmss"));
+        //    vnpay.AddRequestData("vnp_CurrCode", "VND");
+        //    vnpay.AddRequestData("vnp_IpAddr", vnpay.GetIpAddress(HttpContext)); // LẤY RA IP ADDRESS CỦA NGƯỜI GỬI
+        //    vnpay.AddRequestData("vnp_Locale", "vn");
+        //    vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + order.OrderId);
+        //    vnpay.AddRequestData("vnp_OrderType", "other");
+        //    vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
+        //    vnpay.AddRequestData("vnp_TxnRef", order.OrderId.ToString());
 
-            var paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
-            return Ok(new { url = paymentUrl });
-        }
+        //    var paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
+        //    return Ok(new { url = paymentUrl });
+        //}
 
 
         [HttpGet]
@@ -118,47 +118,54 @@ namespace zooma_api.Controllers
 
         // ============= DEMO GIỎ HÀNG VÀ THANH TOÁN LƯU ORDER VÀO DATABASE ============= //
 
-        [HttpPost]
-        [Route("add-to-cart")]
+        //[HttpPost]
+        //[Route("add-to-cart")]
 
-        public async Task<IActionResult> AddToCart(itemBody body) // ADD NHIỀU LẦN 
-        {
-            var ticket = await _context.Tickets.FindAsync(body.ticketId);
-
-
-            try
-            {
-
-                if (ticket == null || body == null)
-                {
-                    return BadRequest("Please input valid item");
-                }
-                else if ( body.quantity == 0)
-                {
-                    return BadRequest("quantity have to be greater than 0");
-
-                }
-                else
-                {
-                    var item = _mapper.Map<CartItemDTO>(ticket);
-
-                    //item.TicketDate = body.TicketDate;
-                    item.quantity = body.quantity;
+        //public async Task<IActionResult> AddToCart(itemBody body) // ADD NHIỀU LẦN 
+        //{
+        //    var ticket = await _context.Tickets.FindAsync(body.ticketId);
 
 
+        //    try
+        //    {
 
-                    ListCart.Instance.AddToCart(item);
-                }
-            }
-            catch (Exception)
-            {
+        //        if (ticket == null || body == null)
+        //        {
+        //            return BadRequest("Please input valid item");
+        //        }
+        //        else if ( body.quantity == 0)
+        //        {
+        //            return BadRequest("quantity have to be greater than 0");
 
-                throw;
-            }
-            return Ok(ListCart.Instance.GetLists());
+        //        }
+        //        else
+        //        {
+        //            var item = _mapper.Map<CartItemDTO>(ticket);
 
-        }
-        
+        //            //item.TicketDate = body.TicketDate;
+        //            item.quantity = body.quantity;
+
+
+
+        //            ListCart.Instance.AddToCart(item);
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //        throw;
+        //    }
+        //    return Ok(ListCart.Instance.GetLists());
+
+        //}
+
+
+        /// <summary>
+        /// Checkout an order
+        /// </summary>
+        /// <param name="list" ></param>
+        /// <param name="id" ></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("checkout/{id}")]
         public IActionResult Checkout(short id, List<CartItemDTO> list) // ADD XONG RỒI THÌ CHECKOUT
@@ -200,6 +207,12 @@ namespace zooma_api.Controllers
         }
 
         //API THANH TOÁN LẠI TỪ ORDER ĐÃ CÓ
+
+        /// <summary>
+        /// Take an old order and repay it
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("repay/{orderId}")]
         public IActionResult repayUrl(int orderId )
@@ -270,7 +283,13 @@ namespace zooma_api.Controllers
             return paymentUrl;
         }
 
-        [HttpPost("refund-transaction")]
+
+        /// <summary>
+        /// Refund order that have been paid
+        /// </summary>
+        /// <param name="refundRequest"></param>
+        /// <returns></returns>
+        [HttpPost("refund")]
         public async Task<IActionResult> RefundTransaction(RefundRequest refundRequest)
         {
             VnPayLibrary vnppay = new VnPayLibrary();

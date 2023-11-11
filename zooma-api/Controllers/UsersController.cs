@@ -18,7 +18,7 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -97,25 +97,18 @@ namespace zooma_api.Controllers
         //    return NoContent();
         //}
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'ZoomaContext.Users'  is null.");
-          }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
 
         //========================= API BAN USER VỚI BODY EMAIL HOẶC USERID ==========================//
 
         // DELETE: api/Users/5
-        [HttpDelete("ban-user")]
+
+        /// <summary>
+        /// ban user by email
+        /// </summary>
+        /// <param name="body" ></param>
+        /// <returns></returns>
+        [HttpDelete]
         public async Task<IActionResult> DeleteUser(banUserBody body) 
         {
             
@@ -170,10 +163,16 @@ namespace zooma_api.Controllers
 
 
         // ==================================== SIGNUP API ===========================//
- 
+
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("sign-up")]
+
+        /// <summary>
+        /// create account for visitor, role set by default
+        /// </summary>
+        /// <param name="user" ></param>
+        /// <returns></returns>
+        [HttpPost]
         public async Task<ActionResult<LoginResponse>> SignUp(SignUpBody user)
         {
             //                var loginUser = _mapper.Map<UserDTO>(userChecking);
@@ -186,13 +185,13 @@ namespace zooma_api.Controllers
 
             if (UserExists(user.Email))
             {
-                return BadRequest(new { message = "Email already exists"});
+                return BadRequest("Email already exists");
 
             }
 
             if ( user.Password != user.ConfirmPassword)
             {
-                return BadRequest(new { message = "Please type the correct confirm password"});
+                return BadRequest("Please type the correct confirm password");
 
             }
 
@@ -212,19 +211,23 @@ namespace zooma_api.Controllers
                 RoleId = 3
             };
 
+            try
+            {
+                _context.Users.Add(signUpUser);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
 
-
-            _context.Users.Add(signUpUser);
-
-            await _context.SaveChangesAsync();
-
+                throw;
+            }
+        
             // LOGIN VÀO LUÔN 
             if (_context.Users == null)
             {
                 return Problem("Entity set from Zooma context's User is null.");
             }
-         
-           
+                   
                 // trả về mã 200, và với kết quả thành công
 
                 var loginUser = _mapper.Map<UserDTO>(signUpUser);
@@ -236,11 +239,7 @@ namespace zooma_api.Controllers
 
                     user = loginUser
                     // tạo ra accessToken dựa trên tài khoản
-                });
-
-            
-
-
+                });        
         }
         // ==================================== UPDATE API ===========================//
         [HttpPut("{id}")]
@@ -329,7 +328,7 @@ namespace zooma_api.Controllers
 
         // xác thực bởi token, và sẽ lấy body token ra làm dữ diệu 
         [HttpGet]
-        [Route("Launch")]
+        [Route("launch")]
         public async Task<ActionResult<User>> Launch()
         {
             var extractedEmail = GetCurrentEmail();
@@ -409,7 +408,7 @@ namespace zooma_api.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("Login")]
+        [HttpPost("login")]
         // dòng Task<ActionResult<Account>> hơi dài, nhưng mà ta chỉ cần để ý tới cái trong cùng, tức là Account
         // hàm này sẽ trả về 1 cái tài khoản
         public async Task<ActionResult<LoginResponse>> Login(LoginBody body)
@@ -432,9 +431,6 @@ namespace zooma_api.Controllers
                 //
                 );
 
-
-
-
             if (userChecking != null)
             {
                 // trả về mã 200, và với kết quả thành công
@@ -449,20 +445,24 @@ namespace zooma_api.Controllers
                     // tạo ra accessToken dựa trên tài khoản
                 },
                 message = "Login sucessfully"
-
-
-
-
                 }); 
+            }
+
+            if (UserExists(body.Email))
+            {
+                return BadRequest("Wrong password!");
 
             }
-                
+            else
+            {
+                return BadRequest("This email is not exist, please sign-up!");
+
+            }
 
             //if (!ModelState.IsValid)
             //    return BadRequest(ModelState);
 
             // trả về mã lỗi 404
-            return BadRequest(new { message = "The User is not existed" });
         }
 
     }
