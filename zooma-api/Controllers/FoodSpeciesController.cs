@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -17,26 +18,25 @@ namespace zooma_api.Controllers
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
+        private readonly IFoodSpecyRepository _foodSpecyRepository;
 
-        public FoodSpeciesController(zoomadbContext context, IMapper mapper)
+        public FoodSpeciesController(zoomadbContext context, IMapper mapper, IFoodSpecyRepository foodSpecyRepository)
         {
             _context = context;
             _mapper = mapper;
+            _foodSpecyRepository = foodSpecyRepository;
         }
 
         // Hàm lấy tất cả foodSpecies ra
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FoodSpecyDTO>>> GetFoodSpecies()
+        public ActionResult<IEnumerable<FoodSpecyDTO>> GetFoodSpecies()
         {
             if (_context.FoodSpecies == null)
             {
                 return NotFound();
             }
 
-            var foodSpecy = await _context.FoodSpecies.
-                                                       Include(e => e.Species).
-                                                       Include(e => e.Food).
-                                                       ToListAsync();
+            var foodSpecy = _foodSpecyRepository.GetAllFoodSpecy();
 
             var foodSpecyDTO = _mapper.Map<List<FoodSpecyDTO>>(foodSpecy);
 
@@ -45,17 +45,14 @@ namespace zooma_api.Controllers
 
         // Hàm lấy foodSpecy dựa trên Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<FoodSpecyDTO>> GetFoodSpecyById(int id)
+        public ActionResult<FoodSpecyDTO> GetFoodSpecyById(int id)
         {
             if (_context.FoodSpecies == null)
             {
                 return NotFound();
             }
 
-            var foodSpecy = await _context.FoodSpecies.
-                                                       Include(e => e.Species).
-                                                       Include(e => e.Food).
-                                                       FirstOrDefaultAsync(e => e.Id == id);
+            var foodSpecy = _foodSpecyRepository.GetFoodSpecyById(id);
 
             if (foodSpecy == null)
             {

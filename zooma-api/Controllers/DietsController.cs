@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -12,23 +13,25 @@ namespace zooma_api.Controllers
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
+        private readonly IDietRepository _dietRepository;
 
-        public dietsController(zoomadbContext context, IMapper mapper)
+        public dietsController(zoomadbContext context, IMapper mapper, IDietRepository dietRepository)
         {
             _context = context;
             _mapper = mapper;
+            _dietRepository = dietRepository;
         }
 
         //Hàm lấy tất cả các diet
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<DietDTO>>> GetDiets()
+        public ActionResult<IEnumerable<DietDTO>> GetDiets()
         {
             if (_context.Diets == null)
             {
                 return NotFound();
             }
 
-            var diet = await _context.Diets.Include(a => a.Animals).ToListAsync();
+            var diet = _dietRepository.GetAllDiets();
 
             if (diet == null)
             {
@@ -39,6 +42,7 @@ namespace zooma_api.Controllers
 
             return dietDTO;
         }
+
         /// <summary>
         /// Return the diet by id
         /// </summary>
@@ -46,14 +50,14 @@ namespace zooma_api.Controllers
         /// <returns></returns>
         // Hàm lấy Diet dựa trên Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<DietDTO>> GetDietById(int id)
+        public ActionResult<DietDTO> GetDietById(int id)
         {
             if (_context.Diets == null)
             {
                 return NotFound();
             }
 
-            var diet = await _context.Diets.Include(a => a.Animals).FirstOrDefaultAsync(e => e.Id == id);
+            var diet = _dietRepository.GetDietById(id);
 
             if (diet == null)
             {
@@ -64,6 +68,7 @@ namespace zooma_api.Controllers
 
             return dietDTO;
         }
+
         /// <summary>
         /// Return the diet by name
         /// </summary>
@@ -71,13 +76,13 @@ namespace zooma_api.Controllers
         /// <returns></returns>
         // GET: api/Diets/5
         [HttpGet("diets/{name}")]
-        public async Task<ActionResult<Diet>> GetDietByName(string name)
+        public ActionResult<Diet> GetDietByName(string name)
         {
             if (_context.Diets == null)
             {
                 return NotFound();
             }
-            var diet = await _context.Diets.SingleOrDefaultAsync(d => d.Name == name);
+            var diet = _dietRepository.GetDietByName(name);
 
             if (diet == null)
             {

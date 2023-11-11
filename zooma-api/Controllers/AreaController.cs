@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -9,22 +11,28 @@ namespace zooma_api.Controllers
     public class areaController : ControllerBase
     {
         private readonly zoomadbContext _context;
+        private readonly IMapper _mapper;
+        private readonly IAreaRepository _areaRepository;
 
-        public areaController(zoomadbContext context)
+        public areaController(zoomadbContext context, IMapper mapper, IAreaRepository areaRepository)
         {
             _context = context;
+            _mapper = mapper;
+            _areaRepository = areaRepository;
         }
         //get all
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<Area>>> GetAllAreas()
+        public ActionResult<IEnumerable<Area>> GetAllAreas()
         {
-            var areas = await _context.Areas.ToListAsync();
 
             if (_context.Areas == null)
             {
                 return NotFound("No area available");
             }
-            return Ok(_context.Areas);
+
+            var areas = _areaRepository.GetAllAreas();
+
+            return areas;
         }
         /// <summary>
         /// Return area by id
@@ -33,19 +41,20 @@ namespace zooma_api.Controllers
         /// <returns></returns>
         //get area by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Area>> GetAreaById(short id)
+        public ActionResult<Area> GetAreaById(short id)
         {
             if (_context.Areas == null)
             {
                 return NotFound("No area available");
             }
-            var area = await _context.Areas.
-                    FirstOrDefaultAsync(n => n.Id == id);
+
+            var area = _areaRepository.GetAreaById(id);
+
             if (area == null)
             {
                 return NotFound("No area having that ID");
             }
-            return Ok(area);
+            return area;
         }
         /// <summary>
         /// Return a list of area have that species
@@ -68,9 +77,7 @@ namespace zooma_api.Controllers
                 return NotFound("Can't found this species");
             }
 
-            var cageOfSpecies = _context.Animals.Where(e => e.SpeciesId == speciesId).Select(e => e.CageId).ToList();
-
-            var areaId = _context.Cages.Where(e => cageOfSpecies.Contains(e.AreaId)).Select(e => e.AreaId).Distinct().ToArray();
+            var areaId = _areaRepository.GetAreaBySpeciesId(speciesId);
 
 
             if (areaId == null)
