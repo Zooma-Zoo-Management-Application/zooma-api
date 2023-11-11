@@ -33,6 +33,7 @@ namespace zooma_api.Helper
             CreateMap<DietDetail, DietDetailDTO>().ReverseMap();
             CreateMap<Cage, CageOnly>().ReverseMap();
             CreateMap<Diet, DietOnly>().ReverseMap();
+            CreateMap<TrainerExp, TrainerExpWIthSkillName>().ReverseMap();
         }
     }
 }

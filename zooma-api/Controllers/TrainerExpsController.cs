@@ -74,7 +74,7 @@ namespace zooma_api.Controllers
         /// <param name="trainerId"></param>
         /// <returns></returns>
         [HttpGet("trainer/{trainerId}")]
-        public async Task<ActionResult<IEnumerable<TrainerExpDTO>>> GetTrainerExpByTrainerId(int trainerId)
+        public async Task<ActionResult<IEnumerable<TrainerExpWIthSkillName>>> GetTrainerExpByTrainerId(int trainerId)
         {
             if (_context.TrainerExps == null)
             {
@@ -96,7 +96,6 @@ namespace zooma_api.Controllers
             var trainerExp = await _context.TrainerExps.
                                                         Where(a => a.UserId == trainerId).
                                                         Include(a => a.Skill).
-                                                        Include(a => a.User).
                                                         ToListAsync();
 
             if (trainerExp == null)
@@ -104,7 +103,7 @@ namespace zooma_api.Controllers
                 return NotFound("Skill issue!!!");
             }
 
-            var trainerExpDTO = _mapper.Map<List<TrainerExpDTO>>(trainerExp);
+            var trainerExpDTO = _mapper.Map<List<TrainerExpWIthSkillName>>(trainerExp);
 
             return trainerExpDTO;
         }
