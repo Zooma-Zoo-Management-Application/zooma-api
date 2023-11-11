@@ -10,7 +10,7 @@ using zooma_api.Repositories;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/analysis")]
     [ApiController]
     public class AnalysisController : ControllerBase
     {

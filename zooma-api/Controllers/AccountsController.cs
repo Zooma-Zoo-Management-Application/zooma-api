@@ -9,7 +9,7 @@ using zooma_api.Repositories;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/accounts")]
     [ApiController]
     public class AccountsController : ControllerBase
     {
@@ -205,7 +205,13 @@ namespace zooma_api.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("create-account")]
+
+        /// <summary>
+        /// create account with role staff and trainer (roleid)
+        /// </summary>
+        /// <param name="user" ></param>
+        /// <returns></returns>
+        [HttpPost]
         public async Task<ActionResult<UserDTO>> CreateTrainerAndStaff(CreateAccountBody user)
         {
             //                var loginUser = _mapper.Map<UserDTO>(userChecking);
