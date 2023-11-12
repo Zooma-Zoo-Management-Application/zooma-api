@@ -11,5 +11,9 @@ namespace zooma_api.Interfaces
         List<Animal> GetAnimalsByCageId(int id);
         List<Animal> GetAnimalsByAreaId(int id);
         List<Animal> GetAllAnimalsWithNoCage();
+        bool UpdateAnimalInCage();
+        bool AssignAnimalToACage(int cageId, int animalId);
+        bool UnassignAnimal(int animalId);
+        bool Save();
     }
 }

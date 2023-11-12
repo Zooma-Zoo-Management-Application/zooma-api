@@ -297,9 +297,9 @@ namespace zooma_api.Controllers
             return Ok("Delete successfully");
         }
 
-        //select an animal from the database and assign to the cage
+        //select a list of animal from the database and unassign cage from them
         /// <summary>
-        /// Assign a list of animal to a cage
+        /// Assign a list of animal from their cage
         /// </summary>
         /// <param name="cageID"></param>
         /// <param name="id"></param>
@@ -324,17 +324,14 @@ namespace zooma_api.Controllers
                 {
                     return NotFound("Invalid Id (" + item + ")");
                 }
-
-                if (cage.AnimalCount < cage.AnimalLimit)
-                {
-                    cage.AnimalCount++;
-                    animal.CageId = cageID;
-                    status = true;
-                }
                 else
                 {
-                    status = false;
-                    break;
+                    status = _animalRepository.AssignAnimalToACage(cageID, item);
+
+                    if (status == false)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -346,6 +343,46 @@ namespace zooma_api.Controllers
             else
             {
                 return BadRequest("Cage is full!");
+            }
+        }
+        /// <summary>
+        /// Unassign from their cage
+        /// </summary>
+        /// <param name="cageID"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut("id")]
+        public async Task<IActionResult> UnssignAnimal(int[] id)
+        {
+            bool status = false;
+
+            foreach (var item in id)
+            {
+                var animal = _context.Animals.FirstOrDefault(e => e.Id == item);
+
+                if (animal == null)
+                {
+                    return NotFound("Invalid Id (" + item + ")");
+                }
+                else 
+                {
+                    status = _animalRepository.UnassignAnimal(item);
+                        
+                    if (status == false)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (status == true)
+            {
+                await _context.SaveChangesAsync();
+                return Ok("Unassign successfully");
+            }
+            else
+            {
+                return BadRequest("Something went wrong");
             }
         }
 
