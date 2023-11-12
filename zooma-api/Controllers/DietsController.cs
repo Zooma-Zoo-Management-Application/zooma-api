@@ -7,15 +7,15 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/diets")]
     [ApiController]
-    public class dietsController : ControllerBase
+    public class DietsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
         private readonly IDietRepository _dietRepository;
 
-        public dietsController(zoomadbContext context, IMapper mapper, IDietRepository dietRepository)
+        public DietsController(zoomadbContext context, IMapper mapper, IDietRepository dietRepository)
         {
             _context = context;
             _mapper = mapper;
@@ -106,9 +106,9 @@ namespace zooma_api.Controllers
             {
                 var dietDetailsId = _context.DietDetails.Where(e => e.DietId == diet.Id).Include(e => e.Food).ToList();
 
-                double totalEnergy = 0;
+                double totalEnergy = _dietRepository.CountEnergyOfDiet(id);
 
-                foreach (var item in dietDetailsId)
+           /*     foreach (var item in dietDetailsId)
                 {
                     if (item != null && item.Food != null)
                     {
@@ -126,9 +126,9 @@ namespace zooma_api.Controllers
 
                 double totalDay = (double)allDay.TotalDays;
 
-                totalEnergy = totalEnergy / totalDay;
+                totalEnergy = totalEnergy / totalDay; */
 
-                diet.Name = dietUpdate.Name ?? diet.Name;
+                diet.Name = diet.Name;
                 diet.Description = dietUpdate.Description;
                 //        dietUpdate.CreateAt = dietUpdate.CreateAt;
                 diet.UpdateAt = dietUpdate.UpdateAt;
@@ -203,12 +203,12 @@ namespace zooma_api.Controllers
 
         public class DietUpdate
         {
-            public string Name { get; set; } = null!;
+            public string? Name { get; set; } 
             public string? Description { get; set; }
             public DateTime UpdateAt { get; set; }
             public DateTime ScheduleAt { get; set; }
             public bool Status { get; set; }
-            public string Goal { get; set; } = null!;
+            public string? Goal { get; set; } 
             public DateTime EndAt { get; set; }
         }
         public class DietCreate

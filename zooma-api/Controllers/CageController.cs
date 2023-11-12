@@ -2,55 +2,56 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
-[Route("api/[controller]")]
+[Route("api/cage")]
 [ApiController]
-public class cageController : ControllerBase
+public class CageController : ControllerBase
 {
     public zoomadbContext _context = new zoomadbContext();
     private readonly IMapper _mapper;
+    private readonly ICageRepository _cageRepository;
 
-    public cageController(zoomadbContext context, IMapper mapper)
+    public CageController(zoomadbContext context, IMapper mapper, ICageRepository cageRepository)
     {
         _context = context;
         _mapper = mapper;
+        _cageRepository = cageRepository;
     }
     //Hàm lấy tất cả cage
     [HttpGet()]
-    public async Task<ActionResult<IEnumerable<CagesDTO>>> GetAllCages()
+    public ActionResult<IEnumerable<CagesDTO>> GetAllCages()
     {
-        var cages = await _context.Cages.ToListAsync();
+        var cages = _cageRepository.GetAllCages();
+
         if (cages == null)
         {
             return NotFound();
         }
-        var cagesDTO = _context.Cages.Select(c => new CagesDTO
-        {
-            Id = c.Id,
-            Name = c.Name,
-            AnimalLimit = c.AnimalLimit,
-            AnimalCount = c.AnimalCount,
-            Description = c.Description,
-            Status = c.Status,
-            AreaId = c.AreaId
-        });
-        return Ok(cagesDTO);
+        var cagesDTO = _mapper.Map<List<CagesDTO>>(cages);
+
+        return cagesDTO;
     }
     //Get cage by ID 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CagesDTO>> GetCageById(short id)
+    public ActionResult<CagesDTO> GetCageById(short id)
     {
         if (_context.Cages == null)
         {
             return NotFound();
         }
-        var cage = await _context.Cages.FindAsync(id);
+
+        var cage = _cageRepository.GetCageById(id);
+
         if (cage == null)
         {
             return NotFound();
         }
-        return Ok(cage);
+
+        var cageDTO = _mapper.Map<CagesDTO>(cage);
+
+        return cageDTO;
     }
 
     //Hàm tạo cage mới
@@ -104,11 +105,7 @@ public class cageController : ControllerBase
             return NotFound("Khong tim thay area nay");
         }
 
-        var cages = _context.Cages
-            .Where(a => a.AreaId == area.Id)
-            .Where(a => a.Status == true)
-            .Include(b => b.Animal)
-            .ToList();
+        var cages = _cageRepository.GetCageByAreaId(areaId);
 
         if (cages.Count == 0 || cages == null)
         {
@@ -142,12 +139,7 @@ public class cageController : ControllerBase
             return NotFound("Khong tim thay area nay");
         }
 
-        var cages = _context.Cages
-            .Where(a => a.AreaId == area.Id)
-            .Where(a => a.Status == true)
-            .Where(a => a.AnimalCount < a.AnimalLimit)
-            .Include(b => b.Animal)
-            .ToList();
+        var cages = _cageRepository.GetCageIsNotFullByAreaId(areaId);
 
         if (cages.Count == 0 || cages == null)
         {
