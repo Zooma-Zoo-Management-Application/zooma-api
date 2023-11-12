@@ -6,15 +6,15 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/area")]
     [ApiController]
-    public class areaController : ControllerBase
+    public class AreaController : ControllerBase
     {
         private readonly zoomadbContext _context;
         private readonly IMapper _mapper;
         private readonly IAreaRepository _areaRepository;
 
-        public areaController(zoomadbContext context, IMapper mapper, IAreaRepository areaRepository)
+        public AreaController(zoomadbContext context, IMapper mapper, IAreaRepository areaRepository)
         {
             _context = context;
             _mapper = mapper;

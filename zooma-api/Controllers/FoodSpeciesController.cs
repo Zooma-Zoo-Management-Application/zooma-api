@@ -12,7 +12,7 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/foodspecies")]
     [ApiController]
     public class FoodSpeciesController : ControllerBase
     {

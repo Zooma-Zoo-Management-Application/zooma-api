@@ -13,7 +13,7 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/skills")]
     [ApiController]
     public class SkillsController : ControllerBase
     {

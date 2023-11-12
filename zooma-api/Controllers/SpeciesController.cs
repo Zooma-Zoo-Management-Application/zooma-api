@@ -6,15 +6,15 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/species")]
     [ApiController]
-    public class speciesController : ControllerBase
+    public class SpeciesController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
-        public speciesController(IConfiguration config, IMapper mapper)
+        public SpeciesController(IConfiguration config, IMapper mapper)
         {
             _config = config;
             _mapper = mapper;
