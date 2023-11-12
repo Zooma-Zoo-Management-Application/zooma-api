@@ -121,6 +121,45 @@ public class cageController : ControllerBase
     }
 
 
+    // hàm lấy Cage dựa trên AreaId kèm theo Animal
+    /// <summary>
+    /// Return a list of cage is not full base on areaId
+    /// </summary>
+    /// <param name="areaId"></param>
+    /// <returns></returns>
+    [HttpGet("available-cage/{areaId}")]
+    public async Task<ActionResult<IEnumerable<CagesDTO>>> GetCagesIsNotFullByAreaId(int areaId)
+    {
+        if (_context.Cages == null)
+        {
+            return NotFound();
+        }
+
+        var area = await _context.Areas.FirstOrDefaultAsync(a => a.Id == areaId);
+
+        if (area == null)
+        {
+            return NotFound("Khong tim thay area nay");
+        }
+
+        var cages = _context.Cages
+            .Where(a => a.AreaId == area.Id)
+            .Where(a => a.Status == true)
+            .Where(a => a.AnimalCount < a.AnimalLimit)
+            .Include(b => b.Animal)
+            .ToList();
+
+        if (cages.Count == 0 || cages == null)
+        {
+            return NotFound("Khong tim thay cage trong area nay");
+        }
+
+        var cagesDTO = _mapper.Map<List<CagesDTO>>(cages);
+
+        return cagesDTO;
+    }
+
+
 
     //  Animal animalsByName = await _context.Animals.Where(a => a.Name.Contains(name));
 
