@@ -181,14 +181,14 @@ namespace zooma_api.Controllers
                 return NotFound("NOT FOUND");
             }
 
-            animal.Name = animal.Name ?? animalUpdate.Name;
-            animal.Height = animal.Height ?? animalUpdate.Height;
-            animal.Weight = animal.Weight ?? animalUpdate.Weight;
-            animal.Description = animal.Description ?? animalUpdate.Description;
+            animal.Name = animalUpdate.Name;
+            animal.Height = animalUpdate.Height;
+            animal.Weight = animalUpdate.Weight;
+            animal.Description = animalUpdate.Description;
             animal.Status = animalUpdate.Status;
             animal.SpeciesId = animalUpdate.SpeciesId;
             animal.DietId = animalUpdate.DietId;
-            animal.CageId = animal.CageId ?? animalUpdate.CageId;
+            animal.CageId = animalUpdate.CageId;
             animal.TrainingPlanId = animalUpdate.TrainingPlanId;
 
             _context.Entry(animal).State = EntityState.Modified;
