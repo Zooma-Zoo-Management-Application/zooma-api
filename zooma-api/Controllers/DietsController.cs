@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
 using zooma_api.Interfaces;
@@ -108,26 +109,6 @@ namespace zooma_api.Controllers
 
                 double totalEnergy = _dietRepository.CountEnergyOfDiet(id);
 
-           /*     foreach (var item in dietDetailsId)
-                {
-                    if (item != null && item.Food != null)
-                    {
-                        totalEnergy += item.Food.EnergyValue * (double)item.Quantity;
-                    }
-                }
-
-                DateTime startDay = diet.ScheduleAt;
-                DateTime endDay = diet.EndAt;
-                TimeSpan allDay = endDay - startDay;
-                if (allDay < TimeSpan.Zero)
-                {
-                    allDay = TimeSpan.FromDays(1);
-                }
-
-                double totalDay = (double)allDay.TotalDays;
-
-                totalEnergy = totalEnergy / totalDay; */
-
                 diet.Name = diet.Name;
                 diet.Description = dietUpdate.Description;
                 //        dietUpdate.CreateAt = dietUpdate.CreateAt;
@@ -138,24 +119,32 @@ namespace zooma_api.Controllers
                 diet.EndAt = dietUpdate.EndAt;
                 diet.TotalEnergyValue = totalEnergy;
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DietExists(id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                TimeSpan time = diet.EndAt - diet.ScheduleAt;
 
-                return Ok("Update successfully");
+                if(time < TimeSpan.Zero)
+                {
+                    return BadRequest("The end day can't be sooner than the schedule day");
+                }
+                else
+                {
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!DietExists(id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
 
+                    return Ok("Update successfully");
+                }
             }
         }
 
@@ -206,18 +195,29 @@ namespace zooma_api.Controllers
                 TotalEnergyValue = 0
             };
 
-            var dietExists = _context.Diets.FirstOrDefault(e => e.Name == diet.Name);
+            TimeSpan time = diet.EndAt - diet.ScheduleAt;
+            TimeSpan time1 = diet.EndAt - diet.CreateAt;
 
-            if (dietExists != null)
+            if (time < TimeSpan.Zero)
             {
-                return BadRequest("This diets is existed");
+                return BadRequest("The end day can't be sooner the schedule day");
+            } else if(time1 < TimeSpan.Zero){
+                return BadRequest("The end day can't be sooner the create day");
             }
+            else
+            {
+                var dietExists = _context.Diets.FirstOrDefault(e => e.Name == diet.Name);
 
-            _context.Diets.Add(diet);
-            await _context.SaveChangesAsync();
+                if (dietExists != null)
+                {
+                    return BadRequest("This diets is existed");
+                }
 
-            return Ok(new { dietDTO = _mapper.Map<DietDTO>(diet), message = "Create successfully!" });
+                _context.Diets.Add(diet);
+                await _context.SaveChangesAsync();
 
+                return Ok(new { dietDTO = _mapper.Map<DietDTO>(diet), message = "Create successfully!" });
+            }
         }
 
         //Hàm xóa diet

@@ -220,7 +220,7 @@ namespace zooma_api.Controllers
         {
             if (_context.Animals == null)
             {
-                return Problem("Entity set 'ZoomaContext.Animals'  is null.");
+                return Problem("Entity set 'ZoomaContext.Animals' is null.");
             }
 
             Animal animal = new Animal
@@ -244,37 +244,46 @@ namespace zooma_api.Controllers
             {
                 animal.DietId = null;
             } */
+            
+            TimeSpan time = animal.ArrivalDate - animalDTO.DateOfBirth;
 
-            if (animal.CageId == null)
+            if (time < TimeSpan.Zero)
             {
-                animal.CageId = null;
-                _context.Animals.Add(animal);
-                await _context.SaveChangesAsync();
+                return BadRequest("The Date Of Birth can't be sooner than Arrival Date!");
             }
             else
             {
-                var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == animal.CageId);
-
-                if (cage != null)
+                if (animal.CageId == null)
                 {
-                    if (cage.AnimalCount == cage.AnimalLimit)
-                    {
-                        return BadRequest("This cage is full");
-                    }
-                    else
-                    {
-                        cage.AnimalCount++;
-                        _context.Animals.Add(animal);
-                        await _context.SaveChangesAsync();
-                    }
+                    animal.CageId = null;
+                    _context.Animals.Add(animal);
+                    await _context.SaveChangesAsync();
                 }
                 else
                 {
-                    return BadRequest("Can't found this cage!");
-                }
-            }
+                    var cage = await _context.Cages.FirstOrDefaultAsync(e => e.Id == animal.CageId);
 
-            return Ok(new { animalDTO = _mapper.Map<AnimalDTO>(animal), message = "Animal created successfully" });
+                    if (cage != null)
+                    {
+                        if (cage.AnimalCount == cage.AnimalLimit)
+                        {
+                            return BadRequest("This cage is full");
+                        }
+                        else
+                        {
+                            cage.AnimalCount++;
+                            _context.Animals.Add(animal);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("Can't found this cage!");
+                    }
+                }
+
+                return Ok(new { animalDTO = _mapper.Map<AnimalDTO>(animal), message = "Animal created successfully" });
+            }
         }
 
         // DELETE: api/Animals/5
