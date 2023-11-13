@@ -19,27 +19,26 @@ namespace zooma_api.Controllers
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
         private readonly IDietRepository _dietRepository;
+        private readonly IDietDetailsRepository _dietDetailsRepository;
 
-        public DietDetailsController(zoomadbContext context, IMapper mapper, IDietRepository dietRepository)
+        public DietDetailsController(zoomadbContext context, IMapper mapper, IDietRepository dietRepository, IDietDetailsRepository dietDetailsRepository)
         {
             _context = context;
             _mapper = mapper;
             _dietRepository = dietRepository;
+            _dietDetailsRepository = dietDetailsRepository;
         }
 
         // Hàm lấy tất cả dietDetails ra
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DietDetailDTO>>> GetDietDetails()
+        public ActionResult<IEnumerable<DietDetailDTO>> GetDietDetails()
         {
             if (_context.DietDetails == null)
             {
                 return NotFound();
             }
 
-            var dietDetails = _context.DietDetails.
-                                                   Include(e => e.Diet).
-                                                   Include(e => e.Food).
-                                                   ToList();
+            var dietDetails = _dietDetailsRepository.GetAllDietDetails();
 
             var dietDetailsDTO = _mapper.Map<List<DietDetailDTO>>(dietDetails);
 
@@ -56,17 +55,14 @@ namespace zooma_api.Controllers
 
         // Hàm lấy Diet Details Bằng Id
         [HttpGet("{id}")]
-        public async Task<ActionResult<DietDetailDTO>> GetDietDetailById(int id)
+        public ActionResult<DietDetailDTO> GetDietDetailById(int id)
         {
             if (_context.DietDetails == null)
             {
                 return NotFound();
             }
 
-            var dietDetail = await _context.DietDetails.
-                                                        Include(e => e.Diet).
-                                                        Include(e => e.Food).
-                                                        FirstOrDefaultAsync(e => e.Id == id);
+            var dietDetail = _dietDetailsRepository.GetDietDetailById(id);
 
 
             if (dietDetail == null)
@@ -91,18 +87,14 @@ namespace zooma_api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("diet-details/{id}")]
-        public async Task<ActionResult<IEnumerable<DietDetailDTO>>> GetDietDetailByDietId(int id)
+        public ActionResult<IEnumerable<DietDetailDTO>> GetDietDetailByDietId(int id)
         {
             if (_context.DietDetails == null)
             {
                 return NotFound();
             }
 
-            var dietDetail = await _context.DietDetails.
-                                                        Include(e => e.Diet).
-                                                        Include(e => e.Food).
-                                                        Where(e => e.DietId == id).
-                                                        ToListAsync();
+            var dietDetail = _dietDetailsRepository.GetDietDetailByDietId(id);
 
 
             if (dietDetail == null)
