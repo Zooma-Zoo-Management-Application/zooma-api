@@ -15,16 +15,16 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/animals")]
     [ApiController]
-    public class animalsController : ControllerBase
+    public class AnimalsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly IAnimalRepository _animalRepository;
 
-        public animalsController(IConfiguration config, IMapper mapper, IAnimalRepository animalRepository)
+        public AnimalsController(IConfiguration config, IMapper mapper, IAnimalRepository animalRepository)
         {
             _config = config;
             _mapper = mapper;

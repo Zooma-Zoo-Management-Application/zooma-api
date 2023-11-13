@@ -11,14 +11,14 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/dietdetails")]
     [ApiController]
-    public class dietDetailsController : ControllerBase
+    public class DietDetailsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
 
-        public dietDetailsController(zoomadbContext context, IMapper mapper)
+        public DietDetailsController(zoomadbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -137,8 +137,8 @@ namespace zooma_api.Controllers
                 return NotFound("Can't found this diet detail");
             }
 
-            dietDetail.Name = dietDetail.Name ?? dietDetailUpdate.Name;
-            dietDetail.Description = dietDetail.Description ?? dietDetailUpdate.Description;
+            dietDetail.Name = dietDetailUpdate.Name;
+            dietDetail.Description = dietDetailUpdate.Description;
             dietDetail.UpdateAt = DateTime.Now;
             dietDetail.ScheduleAt = dietDetailUpdate.ScheduleAt;
             dietDetail.EndAt = dietDetailUpdate.EndAt;

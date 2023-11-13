@@ -13,15 +13,15 @@ using zooma_api.Models;
 
 namespace zooma_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/foods")]
     [ApiController]
-    public class foodsController : ControllerBase
+    public class FoodsController : ControllerBase
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
         private readonly IFoodRepository _foodRepository;
 
-        public foodsController(zoomadbContext context, IMapper mapper, IFoodRepository foodRepository)
+        public FoodsController(zoomadbContext context, IMapper mapper, IFoodRepository foodRepository)
         {
             _context = context;
             _mapper = mapper;
