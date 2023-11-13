@@ -156,30 +156,38 @@ namespace zooma_api.Controllers
 
             _context.Entry(dietDetail).State = EntityState.Modified;
 
-            try
+            TimeSpan time = (TimeSpan)(dietDetail.EndAt - dietDetail.ScheduleAt);
+            if(time < TimeSpan.Zero)
             {
-                await _context.SaveChangesAsync();
-                var diet = _context.Diets.FirstOrDefault(e => e.Id == dietDetail.DietId);
-                if (diet != null)
+                return BadRequest("The end day can't be sooner than the schedule at");
+            }
+            else
+            {
+                try
                 {
-                    diet.TotalEnergyValue = _dietRepository.CountEnergyOfDiet(dietDetail.DietId);
-                    _context.Entry(diet).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+                    var diet = _context.Diets.FirstOrDefault(e => e.Id == dietDetail.DietId);
+                    if (diet != null)
+                    {
+                        diet.TotalEnergyValue = _dietRepository.CountEnergyOfDiet(dietDetail.DietId);
+                        _context.Entry(diet).State = EntityState.Modified;
+                        await _context.SaveChangesAsync();
+                    }
                 }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DietDetailExists(id))
+                catch (DbUpdateConcurrencyException)
                 {
-                    return NotFound();
+                    if (!DietDetailExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return Ok("Update successfully!");
+                return Ok("Update successfully!");
+            }
         }
 
         // POST: api/DietDetails
@@ -215,25 +223,39 @@ namespace zooma_api.Controllers
                 DietId = dietDetailCreate.DietId,
             };
 
-            var dietDetailExists = _context.DietDetails.FirstOrDefault(e => e.Name == dietDetailCreate.Name);
+            TimeSpan time = (TimeSpan)(dietDetail.EndAt - dietDetail.CreateAt);
 
-            if (dietDetailExists != null)
+            TimeSpan time1 = (TimeSpan)(dietDetail.EndAt - dietDetail.ScheduleAt);
+
+            if (time < TimeSpan.Zero)
             {
-                return BadRequest("This diet exists before!");
-            }
-
-            _context.DietDetails.Add(dietDetail);
-
-            await _context.SaveChangesAsync();
-            var diet = _context.Diets.FirstOrDefault(e => e.Id == dietDetail.DietId);
-            if (diet != null)
+                return BadRequest("The end day can't be sooner than the create day");
+            } else if(time1 < TimeSpan.Zero)
             {
-                diet.TotalEnergyValue = _dietRepository.CountEnergyOfDiet(dietDetail.DietId);
-                _context.Entry(diet).State = EntityState.Modified;
-                await _context.SaveChangesAsync();  
+                return BadRequest("The end day can't be sooner than the schedule day");
             }
+            else
+            {
+                var dietDetailExists = _context.DietDetails.FirstOrDefault(e => e.Name == dietDetailCreate.Name);
 
-            return Ok(new { dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail), message = "Create successfully!"});
+                if (dietDetailExists != null)
+                {
+                    return BadRequest("This diet exists before!");
+                }
+
+                _context.DietDetails.Add(dietDetail);
+
+                await _context.SaveChangesAsync();
+                var diet = _context.Diets.FirstOrDefault(e => e.Id == dietDetail.DietId);
+                if (diet != null)
+                {
+                    diet.TotalEnergyValue = _dietRepository.CountEnergyOfDiet(dietDetail.DietId);
+                    _context.Entry(diet).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
+
+                return Ok(new { dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail), message = "Create successfully!" });
+            }
         }
 
         // DELETE: api/DietDetails/5
