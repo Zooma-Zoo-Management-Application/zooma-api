@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
+using zooma_api.Interfaces;
 using zooma_api.Models;
 
 namespace zooma_api.Controllers
@@ -17,11 +18,13 @@ namespace zooma_api.Controllers
     {
         public zoomadbContext _context = new zoomadbContext();
         private readonly IMapper _mapper;
+        private readonly IDietRepository _dietRepository;
 
-        public DietDetailsController(zoomadbContext context, IMapper mapper)
+        public DietDetailsController(zoomadbContext context, IMapper mapper, IDietRepository dietRepository)
         {
             _context = context;
             _mapper = mapper;
+            _dietRepository = dietRepository;
         }
 
         // Hàm lấy tất cả dietDetails ra
@@ -156,6 +159,13 @@ namespace zooma_api.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                var diet = _context.Diets.FirstOrDefault(e => e.Id == dietDetail.DietId);
+                if (diet != null)
+                {
+                    diet.TotalEnergyValue = _dietRepository.CountEnergyOfDiet(dietDetail.DietId);
+                    _context.Entry(diet).State = EntityState.Modified;
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -212,9 +222,16 @@ namespace zooma_api.Controllers
                 return BadRequest("This diet exists before!");
             }
 
-
             _context.DietDetails.Add(dietDetail);
+
             await _context.SaveChangesAsync();
+            var diet = _context.Diets.FirstOrDefault(e => e.Id == dietDetail.DietId);
+            if (diet != null)
+            {
+                diet.TotalEnergyValue = _dietRepository.CountEnergyOfDiet(dietDetail.DietId);
+                _context.Entry(diet).State = EntityState.Modified;
+                await _context.SaveChangesAsync();  
+            }
 
             return Ok(new { dietDetailDTO = _mapper.Map<DietDetailDTO>(dietDetail), message = "Create successfully!"});
         }
