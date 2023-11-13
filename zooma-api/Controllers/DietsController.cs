@@ -76,7 +76,7 @@ namespace zooma_api.Controllers
         /// <param name="name"></param>
         /// <returns></returns>
         // GET: api/Diets/5
-        [HttpGet("{name}")]
+        [HttpGet("name/{name}")]
         public ActionResult<Diet> GetDietByName(string name)
         {
             if (_context.Diets == null)
