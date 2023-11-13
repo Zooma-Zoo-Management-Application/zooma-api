@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 using zooma_api.DTO;
 using zooma_api.Interfaces;
 using zooma_api.Models;
@@ -88,7 +89,7 @@ namespace zooma_api.Repositories
             {
                 try
                 {
-                    var diet = _context.Diets.Include(a => a.Animals).ToList();
+                    var diet = _context.Diets.Where(e => e.Status == true).Include(a => a.Animals).ToList();
 
                     return diet;
                 }
@@ -106,7 +107,10 @@ namespace zooma_api.Repositories
             {
                 try
                 {
-                    var diet = _context.Diets.Include(a => a.Animals).FirstOrDefault(e => e.Id == id);
+                    var diet = _context.Diets
+                        .Include(a => a.Animals)
+                        .Where(e => e.Status == true && e.Id == id)
+                        .FirstOrDefault();
 
                     return diet;
                 }
@@ -125,6 +129,24 @@ namespace zooma_api.Repositories
                 try
                 {
                     var diet = _context.Diets.SingleOrDefault(d => d.Name == name);
+
+                    return diet;
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+        }
+
+        public List<Diet> GetInActiveDiet()
+        {
+            using (var _context = new zoomadbContext())
+            {
+                try
+                {
+                    var diet = _context.Diets.Where(d => d.Status == false).ToList();
 
                     return diet;
                 }
