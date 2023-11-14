@@ -58,11 +58,6 @@ namespace zooma_api.Repositories
                             {
                                 int dayOfWeekAsInt = (int)date.DayOfWeek;
 
-                                if (dayOfWeekAsInt == 0) 
-                                {
-                                    dayOfWeekAsInt = 7; 
-                                }
-
                                 if (dayInWeek.Contains(dayOfWeekAsInt))
                                 {
                                     countDays++;
