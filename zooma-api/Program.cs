@@ -18,6 +18,7 @@ builder.Services.AddScoped<IAnalisticRepository, AnalisticRepository>();
 builder.Services.AddScoped<IAnimalRepository, AnimalRepository>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<ICageRepository, CageRepository>();
+builder.Services.AddScoped<IDietDetailsRepository, DietDetailsRepository>();
 builder.Services.AddScoped<IDietRepository, DietRepository>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodSpecyRepository, FoodSpecyRepository>();
