@@ -189,7 +189,7 @@ namespace zooma_api.Controllers
                 CreateAt = dietCreate.CreateAt,
                 UpdateAt = dietCreate.UpdateAt,
                 ScheduleAt = dietCreate.ScheduleAt,
-                Status = false,
+                Status = true,
                 Goal = dietCreate.Goal,
                 EndAt = dietCreate.EndAt,
                 TotalEnergyValue = 0

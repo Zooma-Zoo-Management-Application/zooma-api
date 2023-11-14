@@ -228,13 +228,6 @@ namespace zooma_api.Controllers
             }
             else
             {
-                var dietDetailExists = _context.DietDetails.FirstOrDefault(e => e.Name == dietDetailCreate.Name);
-
-                if (dietDetailExists != null)
-                {
-                    return BadRequest("This diet exists before!");
-                }
-
                 _context.DietDetails.Add(dietDetail);
 
                 await _context.SaveChangesAsync();
