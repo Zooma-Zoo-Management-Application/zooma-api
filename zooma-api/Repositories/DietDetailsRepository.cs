@@ -58,7 +58,7 @@ namespace zooma_api.Repositories
                     var dietDetail = _context.DietDetails.
                                                            Include(e => e.Diet).
                                                            Include(e => e.Food).
-                                                           FirstOrDefault(e => e.Id == id);
+                                                           FirstOrDefault(e => e.Id == dietId);
 
                     return dietDetail;
                 }
