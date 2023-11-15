@@ -249,7 +249,7 @@ namespace zooma_api.Controllers
 
             if (time < TimeSpan.Zero)
             {
-                return BadRequest("The Date Of Birth can't be sooner than Arrival Date!");
+                return BadRequest(new { message = "The Date Of Birth can't be sooner than Arrival Date!" });
             }
             else
             {
