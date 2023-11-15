@@ -109,7 +109,7 @@ namespace zooma_api.Controllers
 
                 double totalEnergy = _dietRepository.CountEnergyOfDiet(id);
 
-                diet.Name = diet.Name;
+                diet.Name = dietUpdate.Name;
                 diet.Description = dietUpdate.Description;
                 //        dietUpdate.CreateAt = dietUpdate.CreateAt;
                 diet.UpdateAt = dietUpdate.UpdateAt;
@@ -121,7 +121,11 @@ namespace zooma_api.Controllers
 
                 TimeSpan time = diet.EndAt - diet.ScheduleAt;
 
-                if(time < TimeSpan.Zero)
+                var dietExist = _context.Diets.Count(e => e.Name == dietUpdate.Name);
+                if (dietExist > 1)
+                {
+                    return BadRequest("This diet existed before");
+                } else if(time < TimeSpan.Zero)
                 {
                     return BadRequest("The end day can't be sooner than the schedule day");
                 }
