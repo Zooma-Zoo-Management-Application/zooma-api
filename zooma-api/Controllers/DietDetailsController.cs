@@ -166,15 +166,15 @@ namespace zooma_api.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
                     if (!DietDetailExists(id))
                     {
-                        return NotFound();
+                        return NotFound("Can't found this diet details");
                     }
                     else
                     {
-                        throw;
+                        throw new Exception(ex.Message);
                     }
                 }
 
