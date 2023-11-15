@@ -75,7 +75,7 @@ namespace zooma_api.Controllers
 
                 if (response.VnPayResponseCode == "00")
                 {
-
+                    order.LastUpdateDate = DateTime.UtcNow.AddHours(7);
                     if (order != null)
                     {
                         var transaction = new Transaction()
@@ -209,7 +209,7 @@ namespace zooma_api.Controllers
         //API THANH TOÁN LẠI TỪ ORDER ĐÃ CÓ
 
         /// <summary>
-        /// Take an old order and repay it
+        /// Take an old unsucessful order and repay it or checkout the pending order.
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
@@ -220,14 +220,24 @@ namespace zooma_api.Controllers
             var order = repository.GetOrdersById(orderId);
             if (order == null )
             {
-                return NotFound("order not found");
+                    return NotFound("order not found");
             }
             else if ( order.Status == 2)
             {
                 return BadRequest(new { msg = "can not repay this order" });
             }
 
-            int id = repository.RepayOrder(order.UserId, order);
+            int id = 0;
+            if(order.Status ==1 )
+            {
+                id = orderId;
+            }else if(order.Status == 0)
+            {
+                id = repository.RepayOrder(order.UserId, order);
+
+            }
+
+
 
             VnPayLibrary vnpay = new VnPayLibrary();
 

@@ -106,8 +106,8 @@ namespace zooma_api.Repositories
                     var currentDate = DateTime.UtcNow.AddHours(7); // Lấy thời điểm hiện tại
 
                     var recentOrders = _context.Orders
-                                        .Where(o => o.Status == 2 && o.OrderDate <= currentDate) // Lọc các đơn hàng có Status=1 và OrderDate không lớn hơn thời điểm hiện tại
-                                        .OrderByDescending(o => o.OrderDate) // Sắp xếp theo OrderDate giảm dần để lấy các đơn hàng gần đây nhất trước
+                                        .Where(o => o.Status == 2 && o.LastUpdateDate <= currentDate) // Lọc các đơn hàng có Status=1 và OrderDate không lớn hơn thời điểm hiện tại
+                                        .OrderByDescending(o => o.LastUpdateDate) // Sắp xếp theo OrderDate giảm dần để lấy các đơn hàng gần đây nhất trước
                                         .Take(5) // Lấy ra 5 đơn hàng
                                         .Include(o => o.OrderDetails)
                                         .Include(o => o.Transactions)
@@ -139,7 +139,7 @@ namespace zooma_api.Repositories
         {
             using (var context = new zoomadbContext())
             {
-                return context.Orders.Where(o => o.UserId == userID).Include(o=>o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o=>o.Transactions).OrderByDescending(o => o.OrderDate).ToList();
+                return context.Orders.Where(o => o.UserId == userID).Include(o=>o.OrderDetails).ThenInclude(o=>o.Ticket).Include(o=>o.Transactions).OrderByDescending(o => o.LastUpdateDate).ToList();
             }
 
         }
@@ -191,7 +191,7 @@ namespace zooma_api.Repositories
             {
                 try
                 {
-                    return await context.Orders.Where(o => o.Status == 2).Include(o => o.OrderDetails).ThenInclude(o => o.Ticket).Include(o => o.Transactions).OrderByDescending(o => o.OrderDate).ToListAsync();
+                    return await context.Orders.Where(o => o.Status == 2).Include(o => o.OrderDetails).ThenInclude(o => o.Ticket).Include(o => o.Transactions).OrderByDescending(o => o.LastUpdateDate).ToListAsync();
                 }
                 catch (Exception)
                 {
