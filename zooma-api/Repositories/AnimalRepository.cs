@@ -17,7 +17,7 @@ namespace zooma_api.Repositories
                     var animal = _context.Animals.FirstOrDefault(e => e.Id == animalId);
                     var animalInCage = _context.Animals.Count(e => e.CageId == cageId);
 
-                    if (animalInCage == cage.AnimalLimit)
+                    if (animalInCage >= cage.AnimalLimit)
                     {
                         return false;
                     }
@@ -25,8 +25,6 @@ namespace zooma_api.Repositories
                     {
                         animal.CageId = (short?)cageId;
                         cage.AnimalCount = (byte)(animalInCage + 1);
-                        _context.Entry(cage).State = EntityState.Modified;
-                        _context.Entry(animal).State = EntityState.Modified;
                         return _context.SaveChanges() > 0;
                     }
                 }
@@ -211,9 +209,6 @@ namespace zooma_api.Repositories
                             animalInCage--;
 
                             cage.AnimalCount = (byte)animalInCage;
-
-                            _context.Entry(cage).State = EntityState.Modified;
-                            _context.Entry(animal).State = EntityState.Modified;
 
                             return _context.SaveChanges()>0;
                         }
