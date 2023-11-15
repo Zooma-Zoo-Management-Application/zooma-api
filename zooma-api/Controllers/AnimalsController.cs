@@ -294,7 +294,9 @@ namespace zooma_api.Controllers
             {
                 return NotFound();
             }
+
             var animal = await _context.Animals.FindAsync(id);
+
             if (animal == null)
             {
                 return NotFound("Can't found the animal");
@@ -302,6 +304,7 @@ namespace zooma_api.Controllers
 
             _context.Animals.Remove(animal);
             await _context.SaveChangesAsync();
+            _animalRepository.UpdateAnimalInCage();
 
             return Ok("Delete successfully");
         }
@@ -325,21 +328,32 @@ namespace zooma_api.Controllers
 
             bool status = false;
 
-            foreach (var item in id)
+            var count = id.Count();
+
+            var animalInCage = _context.Animals.Count(e => e.CageId == cageID);
+
+            if (count + animalInCage > cage.AnimalLimit)
             {
-                var animal = _context.Animals.FirstOrDefault(e => e.Id == item);
-
-                if (animal == null)
+                return BadRequest("Cage is full!");
+            }
+            else
+            {
+                foreach (var item in id)
                 {
-                    return NotFound("Invalid Id (" + item + ")");
-                }
-                else
-                {
-                    status = _animalRepository.AssignAnimalToACage(cageID, item);
+                    var animal = _context.Animals.FirstOrDefault(e => e.Id == item);
 
-                    if (status == false)
+                    if (animal == null)
                     {
-                        break;
+                        return NotFound("Invalid Id (" + item + ")");
+                    }
+                    else
+                    {
+                        status = _animalRepository.AssignAnimalToACage(cageID, item);
+
+                        if (status == false)
+                        {
+                            break;
+                        }
                     }
                 }
             }
