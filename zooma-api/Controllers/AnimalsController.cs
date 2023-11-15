@@ -182,6 +182,8 @@ namespace zooma_api.Controllers
             }
 
             animal.Name = animalUpdate.Name;
+            animal.ArrivalDate = animalUpdate.ArrivalDate;
+            animal.DateOfBirth = animalUpdate.DateOfBirth;
             animal.Height = animalUpdate.Height;
             animal.Weight = animalUpdate.Weight;
             animal.Description = animalUpdate.Description;
@@ -192,24 +194,34 @@ namespace zooma_api.Controllers
             animal.TrainingPlanId = animalUpdate.TrainingPlanId;
 
             _context.Entry(animal).State = EntityState.Modified;
+            TimeSpan time = animalUpdate.ArrivalDate - animalUpdate.DateOfBirth;
 
-            try
+            if (time < TimeSpan.Zero)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest("The Date Of Birth can't be sooner than Arrival Date!");
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!AnimalExists(id))
+
+                try
                 {
-                    return NotFound();
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException ex)
                 {
-                    throw;
+                    if (!AnimalExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw new Exception(ex.Message);
+                    }
                 }
+
+                return Ok("Update succesfully");
             }
 
-            return Ok("Update succesfully");
 
         }
 
