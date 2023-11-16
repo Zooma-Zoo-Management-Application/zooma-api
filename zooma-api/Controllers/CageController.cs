@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿    using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using zooma_api.DTO;
@@ -207,6 +207,7 @@ public class CageController : ControllerBase
     public async Task<IActionResult> UpdateCage(int id, CageUpdate cage)
     {
         var cageUpdate = await _context.Cages.SingleOrDefaultAsync(c => c.Id == id);
+
         if (cageUpdate == null)
         {
             return BadRequest();
@@ -223,22 +224,29 @@ public class CageController : ControllerBase
             cageUpdate.AreaId = (short)cage.AreaId;
             _context.Entry(cageUpdate).State = EntityState.Modified;
         }
-        try
+
+        if(cageUpdate.AnimalCount > cage.AnimalLimit)
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
+            return BadRequest("There's still have more animals than the new limit of cage");
+        } else
         {
-            if (!CageExists(id))
+            try
             {
-                return NotFound();
+                await _context.SaveChangesAsync();
             }
-            else
+            catch (DbUpdateConcurrencyException)
             {
-                throw;
+                if (!CageExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
+            return Ok(new { cage = _mapper.Map<CagesDTO>(cageUpdate), message = "Cage updated successfully" });
         }
-        return Ok(new { cage = _mapper.Map<CagesDTO>(cageUpdate), message = "Cage updated successfully"});
     }
 
     /// <summary>
