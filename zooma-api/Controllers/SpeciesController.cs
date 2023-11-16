@@ -125,27 +125,36 @@ namespace zooma_api.Controllers
                 speciesUpdate.ImageUrl = species.ImageUrl;
                 speciesUpdate.TypeId = species.TypeId;
                 _context.Entry(speciesUpdate).State = EntityState.Modified;
-            }
-            else
-            {
-                BadRequest("wrong id species");
-            }
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SpeciesExists(id))
+
+                var speciesExist = _context.Species.Count(e => e.Name == species.Name);
+                if (speciesExist > 1)
                 {
-                    return NotFound();
+                    return BadRequest("This species has existed before");
                 }
                 else
                 {
-                    throw;
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!SpeciesExists(id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return Ok(speciesUpdate);
                 }
             }
-            return Ok(speciesUpdate);
+            else
+            {
+                return BadRequest("wrong id species");
+            }
         }
 
         // POST: api/Species
@@ -164,11 +173,18 @@ namespace zooma_api.Controllers
                 ImageUrl = species.ImageUrl,
                 TypeId = species.TypeId
             };
-            _context.Species.Add(speciesCreate);
-            await _context.SaveChangesAsync();
+            var speciesExist = _context.Species.FirstOrDefault(e => e.Name == species.Name);
+            if (speciesExist != null)
+            {
+                return BadRequest("This species already existed before");
+            }
+            else
+            {
+                _context.Species.Add(speciesCreate);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSpecies", new { id = speciesCreate.Id }, speciesCreate);
-
+                return CreatedAtAction("GetSpecies", new { id = speciesCreate.Id }, speciesCreate);
+            }
         }
 
         // DELETE
