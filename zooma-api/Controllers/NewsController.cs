@@ -137,7 +137,7 @@ namespace zooma_api.Controllers
             existingNews.Title = newsBody.Title;
             existingNews.Content = newsBody.Content;
             existingNews.Image = newsBody.Image;
-            existingNews.Date = DateTime.Now;
+            existingNews.Date = DateTime.UtcNow.AddHours(7);
             existingNews.Description = newsBody.Description;
 
             _context.Entry(existingNews).State = EntityState.Modified;
@@ -173,7 +173,7 @@ namespace zooma_api.Controllers
             {
                 Title = newsBody.Title,
                 Content = newsBody.Content,
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow.AddHours(7),
                 Description = newsBody.Description,
                 Image = newsBody.Image,
                 Status = false,
