@@ -48,11 +48,28 @@ namespace zooma_api.Repositories
             {
                 try
                 {
-                    var cageOfSpecies = _context.Animals.Where(e => e.SpeciesId == id).Select(e => e.CageId).ToList();
+                    var cageOfSpecies = _context.Animals.Where(e => e.SpeciesId == id)
+                                                        .Select(e => e.CageId)
+                                                        .Distinct()
+                                                        .ToList();
 
-                    var areaId = _context.Cages.Where(e => cageOfSpecies.Contains(e.AreaId)).Select(e => e.AreaId).Distinct().ToArray();
+                    List<short?> cageId = cageOfSpecies.Where(e => e!=null).ToList();
+                    List<short> areaIds = new List<short>();
 
-                    return areaId;
+                    foreach(var item in cageId)
+                    {
+                        var area = _context.Cages.Where(e => e.Id == item)
+                                                 .Select(a => a.AreaId)
+                                                 .FirstOrDefault();
+
+                        if(area != null)
+                        {
+                            areaIds.Add(area);
+                        }
+                    }
+
+                    short[] uniqueAreaIds = areaIds.Distinct().ToArray();
+                    return uniqueAreaIds;
                 }
                 catch (Exception)
                 {
