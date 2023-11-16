@@ -222,11 +222,21 @@ namespace zooma_api.Controllers
             {
                     return NotFound("order not found");
             }
-            else if ( order.Status == 2)
+            else
             {
-                return BadRequest(new { msg = "can not repay this order" });
-            }
+                var orderDetails = repository.GetOrderDetailsByOrderId(orderId);
+                var ticketDate = orderDetails[1].TicketDate;
+                if(ticketDate < DateTime.Now)
+                {
+                    return BadRequest("Invalid ticket date, please try again");
+                }
+                if (order.Status == 2 || order.Status == 3)
+                {
+                    return BadRequest(new { msg = "can not repay this order" });
+                }
 
+
+            }
             int id = 0;
             if(order.Status ==1 )
             {
@@ -234,10 +244,7 @@ namespace zooma_api.Controllers
             }else if(order.Status == 0)
             {
                 id = repository.RepayOrder(order.UserId, order);
-
             }
-
-
 
             VnPayLibrary vnpay = new VnPayLibrary();
 
@@ -262,9 +269,6 @@ namespace zooma_api.Controllers
             var paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             return Ok(new { url = paymentUrl , orderID = id });
         }
-
-
-
 
         // ===========XỬ LÝ PAYMENT URL KHI CHECK OUT=============//
         private String createPaymentUrl(OrderInfo order)
@@ -309,6 +313,20 @@ namespace zooma_api.Controllers
             {
                 return NotFound("order not found");
             }
+            else
+            {
+                var orderDetails = repository.GetOrderDetailsByOrderId(refundRequest.OrderId);
+                var ticketDate = orderDetails[1].TicketDate;
+                if (ticketDate < DateTime.Now)
+                {
+                    return BadRequest("Ihis order had been overdated, can not refund");
+                }
+                if (order.Status == 0 || order.Status == 1)
+                {
+                    return BadRequest(new { msg = "can not refund this order" });
+                }
+            }
+
 
             // Lấy thông tin transaction cần refund
             var transaction = await _context.Transactions
