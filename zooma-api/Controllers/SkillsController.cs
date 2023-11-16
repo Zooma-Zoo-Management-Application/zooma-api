@@ -71,20 +71,20 @@ namespace zooma_api.Controllers
         {
             var skill = await _context.Skills.FirstOrDefaultAsync(a => a.Id == id);
 
-            skill.Name = skillUpdate.Name;
-            skill.Description = skillUpdate.Description;
-            skill.Status = skillUpdate.Status;
+            var skillExists = _context.Skills.FirstOrDefault(e => e.Name == skillUpdate.Name && e.Name != skill.Name);
 
-            _context.Entry(skill).State = EntityState.Modified;
-
-            var skillExists = _context.Skills.Count(e => e.Name == skillUpdate.Name);
-            
-            if(skillExists > 1)
+            if (skillExists != null)
             {
-                return BadRequest("There's already has this skill before");
+                return BadRequest("This skill has already existed before");
             }
             else
             {
+                skill.Name = skillUpdate.Name;
+                skill.Description = skillUpdate.Description;
+                skill.Status = skillUpdate.Status;
+
+                _context.Entry(skill).State = EntityState.Modified;
+
                 try
                 {
                     await _context.SaveChangesAsync();
@@ -125,7 +125,7 @@ namespace zooma_api.Controllers
             var skillExist = _context.Skills.FirstOrDefault(e => e.Name == skillCreate.Name);
             if (skillExist != null)
             {
-                return BadRequest("There's already a skill before");
+                return BadRequest(new { message = "There's already a skill before" });
             }
             else
             {

@@ -118,7 +118,12 @@ namespace zooma_api.Controllers
             {
                 return BadRequest();
             }
-            if (speciesUpdate != null)
+            var speciesExist = _context.Species.FirstOrDefault(e => e.Name == species.Name && e.Name != speciesUpdate.Name);
+
+            if (speciesExist != null) {
+                return BadRequest("This species has already existed before");
+            }
+            else if(speciesUpdate != null)
             {
                 speciesUpdate.Name = species.Name;
                 speciesUpdate.Description = species.Description;
@@ -126,13 +131,6 @@ namespace zooma_api.Controllers
                 speciesUpdate.TypeId = species.TypeId;
                 _context.Entry(speciesUpdate).State = EntityState.Modified;
 
-                var speciesExist = _context.Species.Count(e => e.Name == species.Name);
-                if (speciesExist > 1)
-                {
-                    return BadRequest("This species has existed before");
-                }
-                else
-                {
                     try
                     {
                         await _context.SaveChangesAsync();
@@ -150,7 +148,6 @@ namespace zooma_api.Controllers
                     }
                     return Ok(speciesUpdate);
                 }
-            }
             else
             {
                 return BadRequest("wrong id species");
