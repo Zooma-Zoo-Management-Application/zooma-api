@@ -77,23 +77,32 @@ namespace zooma_api.Controllers
 
             _context.Entry(skill).State = EntityState.Modified;
 
-            try
+            var skillExists = _context.Skills.Count(e => e.Name == skillUpdate.Name);
+            
+            if(skillExists > 1)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest("There's already has this skill before");
             }
-            catch (DbUpdateConcurrencyException)
+            else
             {
-                if (!SkillExists(id))
+                try
                 {
-                    return NotFound();
+                    await _context.SaveChangesAsync();
                 }
-                else
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
+                    if (!SkillExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-            }
 
-            return Ok("Update successfully");
+                return Ok("Update successfully");
+            }
         }
 
         // Hàm tạo 1 skill mới
@@ -112,9 +121,18 @@ namespace zooma_api.Controllers
             };
 
             _context.Skills.Add(skill);
-            await _context.SaveChangesAsync();
 
-            return Ok( new { skillDTO = _mapper.Map<SkillDTO>(skill), message = "Create skill successfully"});
+            var skillExist = _context.Skills.FirstOrDefault(e => e.Name == skillCreate.Name);
+            if (skillExist != null)
+            {
+                return BadRequest("There's already a skill before");
+            }
+            else
+            {
+                await _context.SaveChangesAsync();
+
+                return Ok(new { skillDTO = _mapper.Map<SkillDTO>(skill), message = "Create skill successfully" });
+            }
         }
 
         // Hàm xóa skill
