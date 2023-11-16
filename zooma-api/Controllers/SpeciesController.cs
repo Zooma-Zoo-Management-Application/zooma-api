@@ -194,15 +194,23 @@ namespace zooma_api.Controllers
             }
             var species = await _context.Species.FindAsync(id);
 
-            if (species == null)
+            var animalOfSpecies = _context.Animals.FirstOrDefault(e => e.SpeciesId == id);
+
+            if (animalOfSpecies != null)
+            {
+                return BadRequest("There are still many animals of this species existed");
+            } 
+            else if (species == null)
             {
                 return NotFound("Can't found the animal");
             }
+            else
+            {
+                _context.Species.Remove(species);
+                await _context.SaveChangesAsync();
 
-            _context.Species.Remove(species);
-            await _context.SaveChangesAsync();
-
-            return Ok("Delete successfully");
+                return Ok("Delete successfully");
+            }
         }
 
         private bool AnimalExists(int id)
